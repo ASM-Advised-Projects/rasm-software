@@ -1,0 +1,51 @@
+## The Usual
+
+# makefile intermediates
+*.d
+
+# compiled object files
+*.slo
+*.lo
+*.o
+*.obj
+
+# compiled dynamic libraries
+*.so
+*.dylib
+*.dll
+
+# compiled static libraries
+*.lai
+*.la
+*.a
+*.lib
+
+# executables
+*.exe
+*.out
+*.app
+
+## Top-level Directories
+
+# for experimenting and testing ideas
+spike/
+
+# libs compiled by project; third-party or otherwise
+lib/
+
+# for object files
+build/
+
+# for target libraries/executables
+bin/
+
+## Top-level Files
+
+# specific to Mac OS X
+.DS_Store
+
+# specific to Visual Studio Code
+.vscode/
+
+# personal worklist
+TODO.txt
