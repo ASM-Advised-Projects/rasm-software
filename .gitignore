@@ -30,6 +30,9 @@
 # for experimenting and testing ideas
 spike/
 
+# holds data for image processing models
+data/
+
 # libs compiled by project; third-party or otherwise
 lib/
 
