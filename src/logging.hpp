@@ -174,7 +174,7 @@ private:
     Poco::AutoPtr<MapConfiguration> log_conf =
         configs.get_config_group(ConfigurationManager::Group::LOGGING);
 
-    // store max log file size
+    // get max log file size
     max_filesize = 1000 * log_conf->getInt64("max_filesize_KB");
 
     // get directory names
