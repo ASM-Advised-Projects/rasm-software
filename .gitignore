@@ -30,8 +30,11 @@
 # for experimenting and testing ideas
 spike/
 
-# holds data for image processing models
-data/
+# holds image processing related data
+test/pseudo_rasm_filespace/root/rasm_2_1/data/
+
+# holds log files
+test/pseudo_rasm_filespace/root/rasm_2_1/log/
 
 # libs compiled by project; third-party or otherwise
 lib/
