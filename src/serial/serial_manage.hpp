@@ -37,16 +37,12 @@ struct UARTDevMeta
 
 /**
  * This class is a singleton that manages access to a set of I2C buses, SPI
- * devices, and UART devices. Access to the actual buses/devices is achieved
- * with instances of the I2CBus, SPIDevice, and UARTDevice classes.
+ * devices, and UART devices. Access is provided with contiguous bus/device
+ * indices which correspond to I2CBus, SPIDevice, and UARTDevice instances.
  *
- * If this singleton is all that is used to get these bus/device instances then
- * it is guaranteed that only one instance will exist per bus/device. Moreover,
- * it is also guaranteed that each instance is only retrieved once. This prevents
- * two separate parts of a software system from inadvertently using the same
- * bus/device.
- *
- * Note that a bus/device instance is only created when it is first requested.
+ * Note that a bus/device instance is only created when it is first requested
+ * and can only be retrieved once. It is then up to the retrieving code to
+ * share the instance with other scopes if necessary.
  */
 class SerialManager
 {
