@@ -1,8 +1,5 @@
 /**
  * Defines the UARTDevice class.
-Fixed UARTDevice class device settings problems.
-Created BaudRate enumeration.
-Added lots of comments that clarify the specific uart protocol used.
  */
 
 #ifndef UART_INCLUDED
@@ -18,14 +15,14 @@ Added lots of comments that clarify the specific uart protocol used.
  * given baud rate. Binary data can also be written but the interface provided
  * by this class uses char sequences.
  *
- * This class uses the following uart protocol characteristics:
+ * This class has the following uart characteristics:
  *  - one start bit
  *  - 8-bit character
  *  - even parity
  *  - one stop bit
- *  - canonical mode (line-based input reading)
- *  - null byte (\0) on parity or frame error
  *  - no hardware or software flow control
+ *  - null byte (\0) on parity or frame error
+ *  - canonical receive mode (line-based input reading)
  */
 class UARTDevice
 {
@@ -60,6 +57,9 @@ public:
    * Constructs a uart device by opening and configuring the device file given
    * by filepath. This 'configuring' just happens at the file descriptor level.
    * The input and output baud rates are both set to baudrate.
+   *
+   * Throws an exception if the device file could not be opened or fully
+   * configured.
    */
   UARTDevice(const std::string &filepath, Baudrate baudrate)
   {
@@ -134,47 +134,62 @@ public:
   }
 
   /**
-   *
+   * Writes the given tx string to the output of this uart device.
+   * Returns true if the entire string was successfully written.
+   * Returns false if an error occurred or if only part of the string could
+   * be written.
    */
-  virtual int write(const std::string &tx) {
-    return ::write(fd, (char*)tx.c_str(), tx.length());
+  virtual bool write(const std::string &tx)
+  {
+    if (tx.length() == 0)
+      return true;
+    int result = ::write(fd, (char*)tx.c_str(), tx.length());
+    return result == tx.length();
   }
 
   /**
-   *
+   * Sets rx to a newline-delimited string read from this uart device. The
+   * newline character will not be copied to rx. If the line length exceeds
+   * 4096 characters then only the first 4096 characters will be read; the
+   * rest are discarded.
+   * Returns true if a line was read into rx.
+   * Returns false if an error occurred or if a line was not available to read
+   * (in which case rx will remain unmodified).
    */
-  virtual int write(char *tx, int length) {
-    return ::write(fd, tx, length);
-  }
-
-  /**
-   *
-   */
-  virtual int read(char *rx, int length) {
-      return ::read(fd, (void*)rx, length);
-  }
-
-  /**
-   *
-   */
-  virtual int read(std::string &rx, int length) {
+  virtual bool readline(std::string &rx)
+  {
       char *rxptr;
-      int result = ::read(fd, (void*)rxptr, length);
+      int result = ::read(fd, (void*)rxptr, 4096);
+
+      // if error or nothing read
+      if (result == -1 || result == 0)
+        return false;
+
+      // set rx and remove newlines
       rx = std::string(rxptr);
-      return result;
+      if (*(rx.begin()) == '\n')
+        rx.erase(rx.begin());
+      if (*(rx.end()-1) == '\n')
+        rx.erase(rx.end());
+
+      return true;
   }
 
   /**
-   *
+   * Closes the underlying character file for this uart device. All read/write
+   * operations will fail after this method is called.
    */
-  virtual void close() {
+  virtual void close()
+  {
       ::close(fd);
   }
 
   /**
-   *
+   * Destructs this uart device.
+   * Closes this device's underlying character file.
    */
-  virtual ~UARTDevice() {
+  virtual ~UARTDevice()
+  {
       this->close();
   }
 
