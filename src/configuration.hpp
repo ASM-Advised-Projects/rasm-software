@@ -111,15 +111,17 @@ public:
  * correspondences:
  *  Enum              File
  *  - - - - - - - -   - - - - - - - - - - - - - - - - -
- *  GENERAL           rwd/config/general.properties
- *  LOGGING           rwd/config/logging.properties
- *  POSE_ESTIMATION   rwd/config/pose_estimation.properties
- *  CONTROL           rwd/config/control.properties
- *  HTTP_SERVER       rwd/config/http_server.properties
- *  SHELL_SERVER      rwd/config/shell_server.properties
+ *  GENERAL           <rwd>/config/general.properties
+ *  LOGGING           <rwd>/config/logging.properties
+ *  POSE_ESTIMATION   <rwd>/config/pose_estimation.properties
+ *  CONTROL           <rwd>/config/control.properties
+ *  SERIAL            <rwd>/config/serial.properties
+ *  HTTP_SERVER       <rwd>/config/http_server.properties
+ *  SHELL_SERVER      <rwd>/config/shell_server.properties
  *
- * rwd stands for root working directory and must be set with
- * set_root_dir prior to first obtaining the singleton instance.
+ * rwd stands for root working directory and exists as a public static field
+ * which must be set prior to this singleton's construction (happens when
+ * obtaining the singleton instance for the first time).
  */
 class ConfigurationManager : public Poco::Util::TimerTask
 {
@@ -127,7 +129,7 @@ public:
   ConfigurationManager(const ConfigurationManager &) = delete;
   void operator=(const ConfigurationManager &) = delete;
 
-  static char *rwd;
+  static char *rwd;  // the root working directory - set prior to construction
 
   /**
    * An enumerator representation of each configuration group/file managed
@@ -139,6 +141,7 @@ public:
     LOGGING,
     POSE_ESTIMATION,
     CONTROL,
+    SERIAL,
     HTTP_SERVER,
     SHELL_SERVER
   };
@@ -147,8 +150,8 @@ private:
   string root_working_dir;
   std::map<Group, ConfigGroup> config_groups;
   std::unordered_set<string> modifiables;  // keys of modifiable values
-  Poco::Util::Timer sync_timer;
-  Poco::Clock::ClockDiff sync_interval;
+  Poco::Util::Timer sync_timer;  // filesystem synchronization timer
+  Poco::Clock::ClockDiff sync_interval;  // filesystem syncronization interval
 
   ConfigurationManager()
   {
@@ -162,6 +165,7 @@ private:
     config_groups[Group::LOGGING] = ConfigGroup(configroot + "/logging.properties");
     config_groups[Group::POSE_ESTIMATION] = ConfigGroup(configroot + "/pose_estimation.properties");
     config_groups[Group::CONTROL] = ConfigGroup(configroot + "/control.properties");
+    config_groups[Group::SERIAL] = ConfigGroup(configroot + "/serial.properties");
     config_groups[Group::HTTP_SERVER] = ConfigGroup(configroot + "/http_server.properties");
     config_groups[Group::SHELL_SERVER] = ConfigGroup(configroot + "/shell_server.properties");
 
@@ -175,6 +179,9 @@ private:
     reschedule_sync_timer();
   }
 
+  /**
+   * Synchronization timer callback method (required via extension of TimerTask).
+   */
   void run()
   {
     save_config_changes();

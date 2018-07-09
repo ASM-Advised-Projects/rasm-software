@@ -244,6 +244,21 @@ public:
   {
     threshold = blur_threshold;
   }
+
+  /**
+   *
+   */
+  virtual void update_image()
+  {
+    camera >> bgr_img;
+
+    // TODO: use laplacian transform to recognize blur
+
+    index++;
+    have_gray = false;
+    have_small_bgr = false;
+    have_small_gray = false;
+  }
 };
 
 #endif

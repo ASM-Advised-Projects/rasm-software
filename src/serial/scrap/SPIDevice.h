@@ -26,13 +26,12 @@
 
 #include <string>
 #include <stdint.h>
-#include "BusDevice.h"
 
 namespace serial {
 
 /**
  * @class SPIDevice
- * @brief Generic SPI Device class that can be used to connect to any type of 
+ * @brief Generic SPI Device class that can be used to connect to any type of
  * SPI device and read or write to its registers
  */
 class SPIDevice {

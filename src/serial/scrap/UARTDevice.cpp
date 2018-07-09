@@ -34,7 +34,7 @@ int UARTDevice::open() {
 	tcflush(fd, TCIFLUSH);
 	tcsetattr(fd, TCSANOW, &uart_port);
 
-    return 0;
+  return 0;
 }
 
 int UARTDevice::write(char *tx, int length) {
