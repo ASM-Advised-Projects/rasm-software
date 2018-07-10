@@ -16,7 +16,35 @@ private:
 
 
 public:
-  SPIDevice(const std::string &filepath)
+  /**
+   *
+   */
+  enum ParityMode { NONE, ODD, EVEN };
+
+  /**
+   *
+   */
+  enum IdleLevel { LOW, HIGH };
+
+  /**
+   *
+   */
+  enum CaptureEdge { RISING, FALLING };
+
+  /**
+  *
+  */
+  struct Settings
+  {
+    std::string filepath;  // absolute path to device file
+    IdleLevel idle_mode;
+    CaptureEdge capture_mode;
+    unsigned int word_size;    // bits (not including a potential parity bit)
+    unsigned int clock_speed;  // in Hertz
+    unsigned int transfer_delay;   // in microseconds
+  };
+
+  SPIDevice(const Settings &settings)
   {
 
   }

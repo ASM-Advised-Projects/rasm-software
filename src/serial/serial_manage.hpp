@@ -171,13 +171,13 @@ public:
    * Assigns the given UARTDevice pointer to a valid instance for the given
    * device index if:
    *  - that uart device exists; and
-   *  - this method hasn't been called yet with the same device
+   *  - this method hasn't been called yet with the same device index
    * Device indices are incremental and start at 0.
    *
    * Returns true if the UARTDevice pointer was set to a valid instance; false
    * otherwise (in which case the pointer will remain unmodified).
    */
-  bool get_uart_device(int device_index, UARTDevice *uartDevPtr)
+  bool get_uart_device(int device_index, UARTDevice::Baudrate baudrate, UARTDevice *uartDevPtr)
   {
     if (uart_metas.count(device_index) == 0)
       return false;
@@ -185,7 +185,7 @@ public:
     if (uart_metas[device_index].retrieved)
       return false;
 
-    uartDevPtr = new UARTDevice(uart_metas[device_index].filepath);
+    uartDevPtr = new UARTDevice(uart_metas[device_index].filepath, baudrate);
     uart_metas[device_index].retrieved = true;
     return true;
   }

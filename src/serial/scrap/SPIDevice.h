@@ -44,6 +44,9 @@ public:
 		MODE3 = 3    //!< High at idle, capture on rising clock edge
 	};
 
+  // IdleLevel {LOW, HIGH}
+  // CaptureEdge {RISING, FALLING}
+
 private:
 	unsigned int bus;    /**< the bus number */
 	unsigned int device; /**< the device number on the bus  */

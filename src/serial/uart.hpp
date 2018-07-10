@@ -1,5 +1,6 @@
 /**
- * Defines the UARTDevice class.
+ * Defines the UARTDevice base class along with the UARTDeviceC (canonical read)
+ * and UARTDeviceNC (non-canonical read) subclasses.
  */
 
 #ifndef UART_INCLUDED
@@ -11,48 +12,103 @@
 #include <termios.h>
 
 /**
- * Opens a uart device file for reading and writing character-based data at a
- * given baud rate. Binary data can also be written but the interface provided
- * by this class uses char sequences.
- *
- * This class has the following uart characteristics:
- *  - one start bit
- *  - 8-bit character
- *  - even parity
- *  - one stop bit
- *  - no hardware or software flow control
- *  - null byte (\0) on parity or frame error
- *  - canonical receive mode (line-based input reading)
+ * The termios-allowed baud rates for async comms ports.
+ */
+enum BaudRate
+{
+  BR50 = B50,
+  BR75 = B75,
+  BR110 = B110,
+  BR134 = B134,
+  BR150 = B150,
+  BR200 = B200,
+  BR300 = B300,
+  BR600 = B600,
+  BR1200 = B1200,
+  BR1800 = B1800,
+  BR2400 = B2400,
+  BR4800 = B4800,
+  BR9600 = B9600,
+  BR19200 = B19200,
+  BR38400 = B38400,
+  BR57600 = B57600,
+  BR115200 = B115200,
+  BR230400 = B230400
+};
+
+/**
+ * Base class for opening a uart device file for reading and writing character-
+ * based data.
  */
 class UARTDevice
 {
-private:
+protected:
   int fd;  // uart device file descriptor
 
-public:
-  // the termios-allowed baud rates for an async comms port
-  enum Baudrate
+  /**
+   *
+   */
+  struct termios get_base_settings(BaudRate baudrate)
   {
-    BR50 = B50,
-    BR75 = B75,
-    BR110 = B110,
-    BR134 = B134,
-    BR150 = B150,
-    BR200 = B200,
-    BR300 = B300,
-    BR600 = B600,
-    BR1200 = B1200,
-    BR1800 = B1800,
-    BR2400 = B2400,
-    BR4800 = B4800,
-    BR9600 = B9600,
-    BR19200 = B19200,
-    BR38400 = B38400,
-    BR57600 = B57600,
-    BR115200 = B115200,
-    BR230400 = B230400
-  };
+    // new termios struct (used to configure an async comms port settings)
+    struct termios settings;
 
+    // initialize all settings to 0
+    bzero(&settings, sizeof(settings));
+
+    // set input & output speed to the given baudrate
+    cfsetspeed(&settings, (speed_t)baudrate);
+
+    // input mode flags
+    settings.c_iflag |= INPCK;  // enable input parity checking
+
+    // output mode flags
+    // none
+
+    // control mode flags
+    settings.c_cflag |= CS8;  // 8-bit character size
+    settings.c_cflag |= CREAD;  // enable receiver
+    settings.c_cflag |= PARENB;  // enable output parity generation and input parity checking.
+    settings.c_cflag |= CLOCAL;  // ignore modem control lines
+
+    // local mode flags
+    // none
+    // canonical mode: "c_lflag |= ICANON"
+
+    // c_cc (special characters) settings
+    // none
+    // non-canonical mode: "c_cc[VMIN] = 0" and "c_cc[VTIME] = 0" (polling read)
+
+    return settings;
+  }
+
+  /**
+   *
+   */
+  bool apply_settings(struct termios &settings)
+  {
+    // apply the settings to the uart device file
+    tcflush(fd, TCIOFLUSH);
+    tcsetattr(fd, TCSANOW, &settings);
+
+    // check that all requested settings have been successfully set
+    struct termios actual_settings;
+    bzero(&actual_settings, sizeof(actual_settings));
+    tcgetattr(fd, &actual_settings);
+    bool success =
+        actual_settings.c_iflag == settings.c_iflag &&
+        actual_settings.c_oflag == settings.c_oflag &&
+        actual_settings.c_cflag == settings.c_cflag &&
+        actual_settings.c_lflag == settings.c_lflag &&
+        actual_settings.c_cc[VMIN] == settings.c_cc[VMIN] &&
+        actual_settings.c_cc[VTIME] == settings.c_cc[VTIME] &&
+        cfgetispeed(&actual_settings) == cfgetispeed(&settings) &&
+        cfgetospeed(&actual_settings) == cfgetospeed(&settings);
+
+    return success;
+  }
+
+public:
   /**
    * Constructs a uart device by opening and configuring the device file given
    * by filepath. This 'configuring' just happens at the file descriptor level.
@@ -61,7 +117,7 @@ public:
    * Throws an exception if the device file could not be opened or fully
    * configured.
    */
-  UARTDevice(const std::string &filepath, Baudrate baudrate)
+  UARTDevice(const std::string &filepath)
   {
     /* Open the uart device file for reading and writing (O_RDWR).
      * O_NOCTTY keeps the device file from becoming this process's controlling
@@ -74,67 +130,11 @@ public:
     {
       // throw exception
     }
-
-    // new termios struct (used to configure an async comms port settings)
-    struct termios uartsettings;
-
-    // initialize all settings to 0
-    bzero(&uartsettings, sizeof(uartsettings));
-
-    // set input & output speed to the given baudrate
-    cfsetspeed(&uartsettings, (speed_t)baudrate);
-
-    // input mode flags
-    tcflag_t iflags = 0;
-    iflags |= INPCK;  // enable input parity checking
-
-    // output mode flags
-    tcflag_t oflags = 0;
-
-    // control mode flags
-    tcflag_t cflags = 0;
-    cflags |= CS8;  // 8-bit character size
-    cflags |= CREAD;  // enable receiver
-    cflags |= PARENB;  // enable output parity generation and input parity checking.
-    cflags |= CLOCAL;  // ignore modem control lines
-
-    // local mode flags
-    tcflag_t lflags = 0;
-    lflags |= ICANON;  // canonical mode
-
-    // c_cc (special characters) settings
-    // none
-    //  - no additional EOF or EOL characters need to be defined
-    //  - VTIME and VMIN only apply for noncanonical mode
-
-    // apply the settings to the uart device file
-    uartsettings.c_iflag = iflags;
-    uartsettings.c_oflag = oflags;
-    uartsettings.c_cflag = cflags;
-    uartsettings.c_lflag = lflags;
-    tcflush(fd, TCIOFLUSH);
-    tcsetattr(fd, TCSANOW, &uartsettings);
-
-    // check that all requested settings have been successfully set
-    bzero(&uartsettings, sizeof(uartsettings));
-    tcgetattr(fd, &uartsettings);
-    bool success =
-        uartsettings.c_iflag == iflags &&
-        uartsettings.c_oflag == oflags &&
-        uartsettings.c_cflag == cflags &&
-        uartsettings.c_lflag == lflags &&
-        cfgetispeed(&uartsettings) == (speed_t)baudrate &&
-        cfgetospeed(&uartsettings) == (speed_t)baudrate;
-
-    // throw exception if any settings could not be set
-    if (!success)
-    {
-      // throw exception
-    }
   }
 
   /**
    * Writes the given tx string to the output of this uart device.
+   *
    * Returns true if the entire string was successfully written.
    * Returns false if an error occurred or if only part of the string could
    * be written.
@@ -148,10 +148,66 @@ public:
   }
 
   /**
+   * Closes the underlying character file for this uart device. All read/write
+   * operations will fail after this method is called.
+   */
+  virtual void close()
+  {
+      ::close(fd);
+  }
+
+  /**
+   * Destructs this uart device.
+   * Closes this device's underlying character file.
+   */
+  virtual ~UARTDevice()
+  {
+      this->close();
+  }
+};
+
+
+/**
+ * Opens a uart device file for reading and writing character-based data at a
+ * given baud rate. Binary data can also be written but the interface provided
+ * by this class uses char sequences.
+ *
+ * This class has the following uart characteristics:
+ *  - one start bit
+ *  - 8-bit character
+ *  - even parity
+ *  - one stop bit
+ *  - no hardware or software flow control
+ *  - null byte (\0) on parity or frame error
+ *  - canonical receive mode (line-based read)
+ */
+class UARTDeviceC : public UARTDevice
+{
+public:
+  /**
+   * Constructs and configures this device for a canonical read interface.
+   */
+  UARTDeviceC(const std::string &filepath, BaudRate baudrate)
+  : UARTDevice(filepath)
+  {
+    struct termios settings = get_base_settings(baudrate);
+    settings.c_lflag |= ICANON;
+
+    bool success = apply_settings(settings);
+
+    // throw exception if any settings could not be set
+    if (!success)
+    {
+      // throw exception
+    }
+  }
+
+  /**
    * Sets rx to a newline-delimited string read from this uart device. The
    * newline character will not be copied to rx. If the line length exceeds
    * 4096 characters then only the first 4096 characters will be read; the
    * rest are discarded.
+   *
    * Returns true if a line was read into rx.
    * Returns false if an error occurred or if a line was not available to read
    * (in which case rx will remain unmodified).
@@ -174,25 +230,64 @@ public:
 
       return true;
   }
+};
 
+
+/**
+ * Opens a uart device file for reading and writing character-based data at a
+ * given baud rate. Binary data can also be written but the interface provided
+ * by this class uses char sequences.
+ *
+ * This class has the following uart characteristics:
+ *  - one start bit
+ *  - 8-bit character
+ *  - even parity
+ *  - one stop bit
+ *  - no hardware or software flow control
+ *  - null byte (\0) on parity or frame error
+ *  - non-canonical receive mode (non-delimited continuous read)
+ */
+class UARTDeviceNC : public UARTDevice
+{
+public:
   /**
-   * Closes the underlying character file for this uart device. All read/write
-   * operations will fail after this method is called.
+   * Constructs and configures this device for a non-canonical read interface.
    */
-  virtual void close()
+  UARTDeviceNC(const std::string &filepath, BaudRate baudrate)
+  : UARTDevice(filepath)
   {
-      ::close(fd);
+    struct termios settings = get_base_settings(baudrate);
+    settings.c_cc[VMIN] = 0;
+    settings.c_cc[VTIME] = 0;
+
+    bool success = apply_settings(settings);
+
+    // throw exception if any settings could not be set
+    if (!success)
+    {
+      // throw exception
+    }
   }
 
   /**
-   * Destructs this uart device.
-   * Closes this device's underlying character file.
+   * This read method is non-blocking and is basically a polling read.
+   *
+   * Sets rx to a string read from this uart device. The max characters that
+   * will be read is lesser of the given length and the number of characters
+   * available. The max characters available is 4095. Any data that has arrived
+   * at this device's input when 4095 chars are in the read buffer has been
+   * discarded.
+   *
+   * Returns -1 if a read error occured; otherwise returns the number of
+   * characters read from the read buffer into rx.
    */
-  virtual ~UARTDevice()
+  virtual int read(std::string &rx, int length)
   {
-      this->close();
+      char *rxptr;
+      int result = ::read(fd, (void*)rxptr, 4096);
+      rx = std::string(rxptr);
+      return result;
   }
-
 };
 
 #endif
