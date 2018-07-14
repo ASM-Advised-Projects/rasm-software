@@ -38,8 +38,8 @@ public:
     // initialize all RASM subsystems (includes initializing all
     // lazily-initialized singletons)
     ConfigurationManager &config_manager = config::ConfigurationManager::get_instance();
-    LoggingManager &log_manager = log::LoggingManager::getInstance();
-    BatterySentinel &batt_sentinel = energy::BatterySentinel::getInstance();
+    LogManager &log_manager = log::LoggingManager::getInstance();
+    BatterySentinel batt_sentinel;
     RasmShellServer shell_server;
     RasmHttpServer http_server;
     Controller controller;

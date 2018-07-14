@@ -5,9 +5,9 @@
 #ifndef PERIPHERY_ACCESS_INCLUDED
 #define PERIPHERY_ACCESS_INCLUDED
 
-//#include "periphery/i2c.h"
-//#include "periphery/spi.h"
-//#include "periphery/serial.h"
+#include "periphery/i2c.h"
+#include "periphery/spi.h"
+#include "periphery/serial.h"
 #include "periphery_config.hpp"
 #include "configuration.hpp"
 #include "logging.hpp"
@@ -50,7 +50,7 @@ private:
   {
     // get configuration group
     Poco::AutoPtr<MapConfiguration> configs = ConfigurationManager::get_instance().
-      get_config_group(ConfigurationManager::Group::PERIPHERAL);
+      get_config_group(ConfigurationManager::Group::PERIPHERY);
 
     string configkey;
 
@@ -119,6 +119,8 @@ public:
         "Periphery library error message: \"%s\".";
     msg = format(msg, bus_index, i2c_errmsg(&i2c_bus));
     LogManager::get_instance().log_message(msg, LogManager::LogLevel::ERROR);
+
+    return false;
   }
 
   /**
@@ -150,6 +152,8 @@ public:
         "#%d on bus #%d. Periphery library error message: \"%s\".";
     msg = format(msg, device_index, bus_index, spi_errmsg(&spi_device));
     LogManager::get_instance().log_message(msg, LogManager::LogLevel::ERROR);
+
+    returns false;
   }
 
   /**
@@ -177,6 +181,8 @@ public:
         "Periphery library error message: \"%s\".";
     msg = format(msg, device_index, serial_errmsg(&uart_device));
     LogManager::get_instance().log_message(msg, LogManager::LogLevel::ERROR);
+
+    return false;
   }
 
   /**

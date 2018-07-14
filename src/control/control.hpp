@@ -1,17 +1,11 @@
 /**
- * 
+ * Defines the Controller class.
  */
-
-#include "pose_estimation.h"
 
 #ifndef CONTROL_INCLUDED
 #define CONTROL_INCLUDED
 
-namespace control
-{
+#include "pose_estimation.hpp"
 
-
-    
-}
 
 #endif

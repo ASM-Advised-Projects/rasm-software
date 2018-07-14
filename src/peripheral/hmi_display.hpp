@@ -5,8 +5,8 @@
 #ifndef HMI_DISPLAY_INCLUDED
 #define HMI_DISPLAY_INCLUDED
 
-#include "uart.hpp"
-#include "serial_manage.hpp"
+#include "periphery/serial.h"
+#include "periphery_access.hpp"
 #include "configuration.hpp"
 
 /**
@@ -15,27 +15,27 @@
 class HMIDisplay
 {
 private:
-  UARTDeviceNC *uart_device;
+  serial_t uart_device;
 
   HMIDisplay()
   {
     Poco::AutoPtr<MapConfiguration> configs = ConfigurationManager::get_instance().
-        get_config_group(ConfigurationManager::Group::SERIAL);
+        get_config_group(ConfigurationManager::Group::PERIPHERY);
 
     int dev = configs->getInt("hmi_display.uartdev");
-    bool obtained = SerialManager::get_instance().get_uart_device(dev, uart_device);
+    UartConf settings;  // leave defaults
+
+    bool initsuccess = SerialManager::get_instance().
+        init_uart_device(dev, &uart_device, settings);
     if (!obtained)
     {
       // log & throw exception
     }
-
-
   }
 
 public:
   HMIDisplay(const HMIDisplay &) = delete;
   void operator=(const HMIDisplay &) = delete;
-
 
 
 };

@@ -1,8 +1,7 @@
 /**
- * http_server.h
- *
- * Defines the RASM's HTTP server subsystem.
- * This file implements the HTTP server backend.
+ * Implements the RASM's HTTP server subsystem.
+ * Defines the GETRequestHandler, POSTRequestHandler, OtherRequestHandler,
+ * HandlerFactory, and RasmHttpServer classes.
  */
 
 #ifndef HTTP_SERVER_INCLUDED
@@ -21,9 +20,6 @@
 #include <Poco/Net/HTTPServerParams.h>
 #include <Poco/Net/HTTPServerRequest.h>
 #include <Poco/Net/HTTPServerResponse.h>
-
-namespace web
-{
 
 namespace pnet = Poco::Net;
 using std::string;
@@ -199,7 +195,5 @@ public:
     socket.~ServerSocket();
   }
 };
-
-}  // namespace web
 
 #endif

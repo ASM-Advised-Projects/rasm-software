@@ -1,0 +1,3 @@
+/**
+ * Defines the BatterySentinel class
+ */

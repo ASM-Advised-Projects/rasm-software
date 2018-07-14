@@ -6,6 +6,10 @@
 #ifndef PERIPHERY_CONFIG_INCLUDED
 #define PERIPHERY_CONFIG_INCLUDED
 
+#include "periphery/i2c.h"
+#include "periphery/spi.h"
+#include "periphery/serial.h"
+
 enum Endianness { LSB_FIRST, MSB_FIRST };
 
 enum Parity { NONE, ODD, EVEN };

@@ -1,10 +1,6 @@
 /**
- * configuration.h
- *
- * Defines the RASM's configuration subsystem.
- * Provides the ConfigurationManager singleton that manages several
- * configuration groups.  Each configuration group corresponds to a single
- * .properties configuration file.
+ * Implements the RASM's configuration subsystem.
+ * Defines the ConfigGroup and ConfigurationManager classes.
  */
 
 #ifndef CONFIGURATION_INCLUDED
@@ -115,7 +111,7 @@ public:
  *  LOGGING           <rwd>/config/logging.properties
  *  POSE_ESTIMATION   <rwd>/config/pose_estimation.properties
  *  CONTROL           <rwd>/config/control.properties
- *  PERIPHERAL        <rwd>/config/peripheral.properties
+ *  PERIPHERY         <rwd>/config/periphery.properties
  *  HTTP_SERVER       <rwd>/config/http_server.properties
  *  SHELL_SERVER      <rwd>/config/shell_server.properties
  *
@@ -141,7 +137,7 @@ public:
     LOGGING,
     POSE_ESTIMATION,
     CONTROL,
-    PERIPHERAL,
+    PERIPHERY,
     HTTP_SERVER,
     SHELL_SERVER
   };
@@ -165,7 +161,7 @@ private:
     config_groups[Group::LOGGING] = ConfigGroup(configroot + "/logging.properties");
     config_groups[Group::POSE_ESTIMATION] = ConfigGroup(configroot + "/pose_estimation.properties");
     config_groups[Group::CONTROL] = ConfigGroup(configroot + "/control.properties");
-    config_groups[Group::PERIPHERAL] = ConfigGroup(configroot + "/serial.properties");
+    config_groups[Group::PERIPHERY] = ConfigGroup(configroot + "/periphery.properties");
     config_groups[Group::HTTP_SERVER] = ConfigGroup(configroot + "/http_server.properties");
     config_groups[Group::SHELL_SERVER] = ConfigGroup(configroot + "/shell_server.properties");
 
