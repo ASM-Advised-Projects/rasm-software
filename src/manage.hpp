@@ -37,12 +37,12 @@ public:
 
     // initialize all RASM subsystems (includes initializing all
     // lazily-initialized singletons)
-    config::ConfigurationManager &config_manager = config::ConfigurationManager::get_instance();
-    log::LoggingManager &log_manager = log::LoggingManager::getInstance();
-    energy::BatterySentinel &batt_sentinel = energy::BatterySentinel::getInstance();
-    shell::RasmShellServer shell_server;
-    web::RasmHttpServer http_server;
-    control::Controller controller;
+    ConfigurationManager &config_manager = config::ConfigurationManager::get_instance();
+    LoggingManager &log_manager = log::LoggingManager::getInstance();
+    BatterySentinel &batt_sentinel = energy::BatterySentinel::getInstance();
+    RasmShellServer shell_server;
+    RasmHttpServer http_server;
+    Controller controller;
     controller.start();
 
     // register this classes shutdown callback with the battery sentinel
@@ -51,8 +51,8 @@ public:
     // wait for call to shutdown_callback
     shutdown_sema.wait();
 
-    // close/destroy all subsystems in logical order (may not be the same
-    // as the reverse of the order they were created in)
+    // close all subsystems in logical order (may not be the same as the
+    // reverse of the order they were created in)
     shell_server.~RasmShellServer();
     http_server.~RasmHttpServer();
     controller.~Controller();

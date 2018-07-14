@@ -15,7 +15,7 @@
 class HMIDisplay
 {
 private:
-  UARTDevice *uart_device;
+  UARTDeviceNC *uart_device;
 
   HMIDisplay()
   {
