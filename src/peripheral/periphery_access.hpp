@@ -1,5 +1,5 @@
 /**
- * Defines the PeripheryAccess class.
+ * Defines the PeripheryAccess (singleton) class.
  */
 
 #ifndef PERIPHERY_ACCESS_INCLUDED

@@ -1,0 +1,10 @@
+/**
+ *
+ */
+
+#ifndef TRAJECTORY_GENERATION_INCLUDED
+#define TRAJECTORY_GENERATION_INCLUDED
+
+
+
+#endif

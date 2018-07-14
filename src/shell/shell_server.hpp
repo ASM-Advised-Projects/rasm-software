@@ -1,9 +1,5 @@
 /**
- * shell_servers.h
- *
- * Defines the RASM's shell server subsystem.
- * This file implements classes for running multiple TCP-socket-based shells.
- * Everything defined here is in the 'shell' namespace.
+ * Defines the ShellSession and RasmShellServer classes.
  */
 
 #ifndef RASM_SHELL_INCLUDED
@@ -13,9 +9,6 @@
 #include <Poco/Net/ServerSocket.h>
 #include <Poco/Thread.h>
 #include <Poco/Runnable.h>
-
-namespace shell
-{
 
 #define SHELL_SERVER_PORT 5000
 #define MAX_SHELLS 5
@@ -209,7 +202,5 @@ public:
     server_socket.~ServerSocket();
   }
 };
-
-}  // namespace shell
 
 #endif

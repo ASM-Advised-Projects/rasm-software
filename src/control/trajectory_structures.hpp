@@ -1,0 +1,10 @@
+/**
+ *
+ */
+
+#ifndef TRAJECTORY_STRUCTURES_INCLUDED
+#define TRAJECTORY_STRUCTURES_INCLUDED
+
+
+
+#endif

@@ -1,6 +1,7 @@
 /**
- * Defines the RASM's logging subsystem.
- * Provides a logging singleton that maintains the log filesystem.
+ * Implements the RASM's logging subsystem.
+ * Defines the LogManager (singleton) class along with the LogFile and TimeStamp
+ * structures.
  */
 
 #ifndef LOGGING_INCLUDED

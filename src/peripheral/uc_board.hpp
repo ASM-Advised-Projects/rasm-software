@@ -1,5 +1,5 @@
 /**
- * Defines the UCBoard class.
+ * Defines the UCBoard (singleton) class.
  */
 
 #ifndef UC_BOARD_INCLUDED

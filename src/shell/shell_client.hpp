@@ -1,19 +1,18 @@
 /**
- * shell_clients.h
- *
- * Imlements the client end for communicating via TCP with a rasm shell defined
- * in shell_server.h.
+ * Defines the RasmShellClient class.
  */
 
+#ifndef SHELL_CLIENT_INCLUDED
+#define SHELL_CLIENT_INCLUDED
+
 #include "shell_server.hpp"
+
 #include <string>
 #include <cctype>
+
 #include <Poco/Thread.h>
 #include <Poco/Net/StreamSocket.h>
 #include <Poco/String.h>
-
-namespace shell
-{
 
 typedef void (*data_callback_ptr)(char *, int);
 typedef void (*notify_callback_ptr)();
@@ -126,4 +125,4 @@ public:
   }
 };
 
-} // namespace shell
+#endif

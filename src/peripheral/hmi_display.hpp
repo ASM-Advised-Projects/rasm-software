@@ -1,5 +1,5 @@
 /**
- * Defines the HMIDisplay class.
+ * Defines the HMIDisplay (singleton) class.
  */
 
 #ifndef HMI_DISPLAY_INCLUDED

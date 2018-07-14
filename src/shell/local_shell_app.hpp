@@ -6,6 +6,9 @@
  * To quit the session just type "quit" and press enter.
  */
 
+#ifndef LOCAL_SHELL_APP
+#define LOCAL_SHELL_APP
+
 #include "shell_client.hpp"
 #include <iostream>
 #include <Poco/Semaphore.h>
@@ -13,7 +16,7 @@
 using std::cout; using std::cin; using std::endl;
 using std::string;
 
-void run_session(shell::RasmShellClient);
+void run_session(RasmShellClient);
 void message_data_callback(char *, int);
 void response_end_callback();
 void session_end_callback();
@@ -28,7 +31,7 @@ int main(int argc, char **argv)
   //int port;
   //sscanf("%d", argv[1], &port);
 
-  shell::RasmShellClient client(
+  RasmShellClient client(
     &message_data_callback,
     &response_end_callback,
     &session_end_callback
@@ -42,7 +45,7 @@ int main(int argc, char **argv)
 }
 
 
-void run_session(shell::RasmShellClient client)
+void run_session(RasmShellClient client)
 {
   string command;
   while (true)
@@ -65,7 +68,7 @@ void run_session(shell::RasmShellClient client)
  */
 void message_data_callback(char *response, int length)
 {
-  while (strcmp(response, shell::RESPONSE_END_MSG.c_str()) != 0)
+  while (strcmp(response, RESPONSE_END_MSG.c_str()) != 0)
     cout << response;
 }
 
@@ -86,3 +89,5 @@ void session_end_callback()
 {
   quit = true;
 }
+
+#endif

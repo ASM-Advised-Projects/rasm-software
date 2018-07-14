@@ -1,6 +1,6 @@
 /**
  * Implements the RASM's configuration subsystem.
- * Defines the ConfigGroup and ConfigurationManager classes.
+ * Defines the ConfigGroup and ConfigurationManager (singleton) classes.
  */
 
 #ifndef CONFIGURATION_INCLUDED

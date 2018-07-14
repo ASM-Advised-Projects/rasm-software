@@ -3,8 +3,8 @@
  * UnblurCameraImageBuffer classes.
  */
 
-#ifndef CAMERA_UTILS_INCLUDED
-#define CAMERA_UTILS_INCLUDED
+#ifndef IMAGE_BUFFERS_INCLUDED
+#define IMAGE_BUFFERS_INCLUDED
 
 #include "camera_calibration.hpp"
 

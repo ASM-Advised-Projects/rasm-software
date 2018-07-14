@@ -7,10 +7,10 @@
 
 #include "configuration.hpp"
 #include "logging.hpp"
-#include "shell_server.hpp"
-#include "http_server.hpp"
+#include "shell/shell_server.hpp"
+#include "http/http_server.hpp"
 #include "battery.hpp"
-#include "control.hpp"
+#include "control/control.hpp"
 
 #include <Poco/Semaphore.h>
 
@@ -37,8 +37,8 @@ public:
 
     // initialize all RASM subsystems (includes initializing all
     // lazily-initialized singletons)
-    ConfigurationManager &config_manager = config::ConfigurationManager::get_instance();
-    LogManager &log_manager = log::LoggingManager::getInstance();
+    ConfigurationManager &config_manager = ConfigurationManager::get_instance();
+    LogManager &log_manager = LoggingManager::getInstance();
     BatterySentinel batt_sentinel;
     RasmShellServer shell_server;
     RasmHttpServer http_server;

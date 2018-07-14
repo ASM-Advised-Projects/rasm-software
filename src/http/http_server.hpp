@@ -1,25 +1,12 @@
 /**
- * Implements the RASM's HTTP server subsystem.
- * Defines the GETRequestHandler, POSTRequestHandler, OtherRequestHandler,
- * HandlerFactory, and RasmHttpServer classes.
+ * Defines the HandlerFactory and RasmHttpServer classes.
  */
 
 #ifndef HTTP_SERVER_INCLUDED
 #define HTTP_SERVER_INCLUDED
 
+#include "request_handling.hpp"
 #include "configuration.hpp"
-
-#include <string>
-#include <map>
-#include <Poco/Path.h>
-#include <Poco/File.h>
-#include <Poco/Thread.h>
-#include <Poco/Net/HTTPServer.h>
-#include <Poco/Net/ServerSocket.h>
-#include <Poco/Net/HTTPRequestHandler.h>
-#include <Poco/Net/HTTPServerParams.h>
-#include <Poco/Net/HTTPServerRequest.h>
-#include <Poco/Net/HTTPServerResponse.h>
 
 namespace pnet = Poco::Net;
 using std::string;
@@ -33,91 +20,12 @@ using std::string;
 
 #define THREAD_PRIORITY Poco::Thread::Priority::PRIO_LOW
 
-/**
- * Handles HTTP GET requests by sending the file that corresponds to the
- * request URI. If the file doesn't exist then a 404 Not Found response is
- * sent.
- */
-class GETRequestHandler : public pnet::HTTPRequestHandler
-{
-private:
-  std::map<string, string> ext_to_types;
-
-public:
-  GETRequestHandler()
-  {
-    ext_to_types[".html"] = "text/html";
-    ext_to_types[".css"] = "text/css";
-    ext_to_types[".js"] = "text/javascript";
-    ext_to_types[".png"] = "text/png";
-    ext_to_types[".jpg"] = "text/jpeg";
-    ext_to_types[".jpeg"] = "text/jpeg";
-  }
-
-  void handleRequest(pnet::HTTPServerRequest &request, pnet::HTTPServerResponse &response)
-  {
-    Poco::Path filepath = Poco::Path(DOC_ROOT + request.getURI());
-    filepath.makeAbsolute();
-    Poco::File requested_file = Poco::File(filepath);
-    if (requested_file.isFile() && !requested_file.isHidden() && requested_file.exists())
-    {
-      response.setStatus(pnet::HTTPResponse::HTTPStatus::HTTP_OK);
-
-      string fileext = filepath.getExtension();
-      if (ext_to_types.count(fileext) > 0)
-        response.setContentType(ext_to_types[fileext]);
-      else
-        response.setContentType("text/plain");
-
-      response.setContentLength(requested_file.getSize());
-      response.sendFile(requested_file.path(), response.getContentType());
-    }
-    else
-    {
-      response.setStatus(pnet::HTTPResponse::HTTPStatus::HTTP_NOT_FOUND);
-      response.setContentType("text/plain");
-      response.setContentLength(0);
-      response.send();
-    }
-  }
-};
 
 /**
- * Handles HTTP POST requests by parsing their headers to get the type of form
- * and subsequently parsing their data to update the backend with. Things like
- * the RASM's configuration or user-review databases are updated.
+ * Overrides the HTTPRequestHandlerFactory::createRequestHandler method in
+ * order to return the appropriate request handler. Each handler is only created
+ * once.
  */
-class POSTRequestHandler : public pnet::HTTPRequestHandler
-{
-private:
-
-public:
-  POSTRequestHandler()
-  {
-
-  }
-
-  void handleRequest(pnet::HTTPServerRequest &request, pnet::HTTPServerResponse &response)
-  {
-    //request.
-  }
-};
-
-/**
- * Handles all HTTP requests by sending a 403 Forbidden response.
- */
-class OtherRequestHandler : public pnet::HTTPRequestHandler
-{
-public:
-  void handleRequest(pnet::HTTPServerRequest &request, pnet::HTTPServerResponse &response)
-  {
-    response.setStatus(pnet::HTTPResponse::HTTPStatus::HTTP_FORBIDDEN);
-    response.setContentType("text/plain");
-    response.setContentLength(0);
-    response.send();
-  }
-};
-
 class HandlerFactory : public pnet::HTTPRequestHandlerFactory
 {
 private:
@@ -150,6 +58,7 @@ public:
     other_handler->~OtherRequestHandler();
   }
 };
+
 
 /**
  * This server hosts local documents and dynamically created data using either
