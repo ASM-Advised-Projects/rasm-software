@@ -115,7 +115,7 @@ public:
  *  LOGGING           <rwd>/config/logging.properties
  *  POSE_ESTIMATION   <rwd>/config/pose_estimation.properties
  *  CONTROL           <rwd>/config/control.properties
- *  SERIAL            <rwd>/config/serial.properties
+ *  PERIPHERAL        <rwd>/config/peripheral.properties
  *  HTTP_SERVER       <rwd>/config/http_server.properties
  *  SHELL_SERVER      <rwd>/config/shell_server.properties
  *
@@ -141,7 +141,7 @@ public:
     LOGGING,
     POSE_ESTIMATION,
     CONTROL,
-    SERIAL,
+    PERIPHERAL,
     HTTP_SERVER,
     SHELL_SERVER
   };
@@ -165,7 +165,7 @@ private:
     config_groups[Group::LOGGING] = ConfigGroup(configroot + "/logging.properties");
     config_groups[Group::POSE_ESTIMATION] = ConfigGroup(configroot + "/pose_estimation.properties");
     config_groups[Group::CONTROL] = ConfigGroup(configroot + "/control.properties");
-    config_groups[Group::SERIAL] = ConfigGroup(configroot + "/serial.properties");
+    config_groups[Group::PERIPHERAL] = ConfigGroup(configroot + "/serial.properties");
     config_groups[Group::HTTP_SERVER] = ConfigGroup(configroot + "/http_server.properties");
     config_groups[Group::SHELL_SERVER] = ConfigGroup(configroot + "/shell_server.properties");
 

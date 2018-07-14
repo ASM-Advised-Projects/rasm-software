@@ -77,6 +77,15 @@ public:
   void operator=(const LogManager &) = delete;
 
   /**
+   * Returns this singleton's instance.
+   */
+  static LogManager& get_instance()
+  {
+    static LogManager instance;
+    return instance;
+  }
+
+  /**
    * An enumerator representation of each log level recognized by this log
    * manager.
    */
