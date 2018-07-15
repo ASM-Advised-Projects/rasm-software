@@ -2,10 +2,9 @@
  * Defines the RealTimeLTIFilter and CircularBuffer classes.
  */
 
-#ifndef _SIGNAL_FILTERING_H_
-#define _SIGNAL_FILTERING_H_
+#ifndef _SIGNAL_PROCESSING_H_
+#define _SIGNAL_PROCESSING_H_
 
-#include <mutex>
 #include <vector>
 
 using std::vector;
@@ -47,24 +46,43 @@ public:
   /**
    *
    */
-  NumericType operator[](unsigned int entries_back)
+  NumericType get(unsigned int entries_back)
   {
     if (entries_back >= max_size_)
       return 0;
     return array[(next_index-1-entries_back) % max_size_];
   }
 
-  unsigned int max_size()
+  /**
+   *
+   */
+  NumericType operator[](unsigned int entries_back)
+  {
+    return get(entries_back);
+  }
+
+  /**
+   *
+   */
+  void modify(unsigned int entries_back, NumericType val)
+  {
+    if (entries_back < max_size_)
+      array[(next_index-1-entries_back) % max_size_] = val;
+  }
+
+  unsigned int max_size() const
   {
     return max_size();
   }
 };
 
+
 /**
- * Real-time means two things: this filter is causal and this class's interface
- * only supports input/output of one signal value at a time.
+ * Real-time means two things:
+ *   - this filter is causal
+ *   - this interface only supports input/output of one signal value at a time
  *
- * General filter algorithm
+ * Filtering algorithm
  *     y[n] = sum{i=0:M}(ff_coeffs[i] * x[n-i]) + sum{j=1:N}(fb_coeffs[i] * y[n-j])
  */
 class RealTimeLTIFilter
@@ -133,6 +151,22 @@ public:
     input(value);
     return output(0);
   }
+};
+
+
+/**
+ * infinite or range integration
+ * first order differentiation
+ * constant or non-constant time intervals for integration and differentiation
+ *
+ */
+class RealTimeDifferentiator
+{
+private:
+
+
+public:
+
 };
 
 #endif
