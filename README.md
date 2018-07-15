@@ -21,12 +21,15 @@ Peripheral Interfacing | src/peripheral/* | Poco and c-periphery
 Battery Monitoring | src/battery.hpp | none
 
 **Configuration**
+
 Provides a simple read/write interface to all configuration files. This interface is provided by a singleton that can be used by all subsystems.
 
 **Logging**
+
 Provides a single logging facility (a singleton) that can be accessed by all subsystems. Manages the log file system and provides four log message levels: notice, warning, error, and critical.
 
 **Battery Monitoring**
+
 Predicts the battery system's SOC (state of charge) and SOH (state of health) using a filtering state estimation algorithm.
 
 **HTTP Server**
