@@ -46,7 +46,7 @@ public:
     controller.start();
 
     // register this classes shutdown callback with the battery sentinel
-    batt_sentinel.add_shutdown_callback(shutdown_callback);
+    batt_sentinel.register_shutdown_callback(shutdown_callback);
 
     // wait for call to shutdown_callback
     shutdown_sema.wait();
