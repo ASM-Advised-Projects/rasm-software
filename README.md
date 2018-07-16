@@ -22,11 +22,11 @@ Battery Monitoring | src/battery.hpp | none
 
 **Configuration**
 
-Provides a simple read/write interface to all configuration files. This interface is provided by a singleton that can be used by all subsystems.
+Provides a simple access/modify interface to all configurations which are loaded from, and synchronized with, a set of configuration files. This interface is provided by a singleton that can be used by all subsystems.
 
 **Logging**
 
-Provides a single logging facility (a singleton) that can be accessed by all subsystems. Manages the log file system and provides four log message levels: notice, warning, error, and critical.
+Defines a single logging interface (as a singleton) that can be used by all subsystems. Manages the log file system and provides four log message levels: notice, warning, error, and critical.
 
 **Battery Monitoring**
 
