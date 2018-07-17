@@ -78,12 +78,15 @@ public:
 
 
 /**
- * Real-time means two things:
- *   - this filter is causal
- *   - this interface only supports input/output of one signal value at a time
+ * This class represents a causal SISO LTI digital filter.  SISO means
+ * single-input single-output while LTI means linear time-invariant.
+ * The 'RealTime' in the class name means that this filter is causal and only
+ * supports input/output of one signal value at a time.
  *
- * Filtering algorithm
- *     y[n] = sum{i=0:M}(ff_coeffs[i] * x[n-i]) + sum{j=1:N}(fb_coeffs[i] * y[n-j])
+ * The filtering algorithm uses the provided feedforward and feedback
+ * coefficients (ff_coeffs and fb_coeffs) to compute the output signal y using
+ * signal input x:
+ *   y[n] = sum{i=0:M}(ff_coeffs[i] * x[n-i]) + sum{j=1:N}(fb_coeffs[i] * y[n-j])
  */
 class RealTimeLTIFilter
 {

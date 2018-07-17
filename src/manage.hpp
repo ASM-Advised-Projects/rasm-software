@@ -9,8 +9,9 @@
 #include "logging.hpp"
 #include "shell/shell_server.hpp"
 #include "http/http_server.hpp"
-#include "battery.hpp"
 #include "control/control.hpp"
+#include "peripheral/uc_board.hpp"
+#include "battery.hpp"
 
 #include <Poco/Semaphore.h>
 
@@ -39,14 +40,15 @@ public:
     // lazily-initialized singletons)
     ConfigurationManager &config_manager = ConfigurationManager::get_instance();
     LogManager &log_manager = LoggingManager::getInstance();
-    BatterySentinel batt_sentinel;
+    BatterySentinel battery_sentinel;
     RasmShellServer shell_server;
     RasmHttpServer http_server;
     Controller controller;
     controller.start();
 
-    // register this classes shutdown callback with the battery sentinel
-    batt_sentinel.register_shutdown_callback(shutdown_callback);
+    // register this class's shutdown callback with the UCBoard and battery sentinel
+    UCBoard.get_instance().register_shutdown_callback(shutdown_callback);
+    battery_sentinel.register_shutdown_callback(shutdown_callback);
 
     // wait for call to shutdown_callback
     shutdown_sema.wait();
@@ -56,7 +58,7 @@ public:
     shell_server.~RasmShellServer();
     http_server.~RasmHttpServer();
     controller.~Controller();
-    batt_sentinel.~BatterySentinel();
+    battery_sentinel.~BatterySentinel();
     config_manager.~ConfigurationManager();
     log_manager.~LoggingManager();
   }
