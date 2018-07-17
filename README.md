@@ -65,7 +65,7 @@ Uses a camera mounted next to the Tobii screen to detect and estimate the pose o
 
 Generates joint-space trajectories, tracks trajectories with feedforward and feedback control, and processes sensor signals. The overall RASM behavior is defined via the control routines implemented in the Controller class. These control routines utilize the pose estimation, peripheral interfacing, and battery monitoring subsystems. 
 
-![alt text](blaaa "control system block diagram")
+![alt text](https://github.com/ASM-Advised-Projects/rasm-v2/blob/master/analyze/images/control_system_block_diagram.png "control system block diagram")
 
 **Peripheral Interfacing**
 
