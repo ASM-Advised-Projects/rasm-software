@@ -14,7 +14,7 @@
 
 /**
  * This class is a singleton that monitors the battery's charge level and
- * provides basic queriable stats. The reason for this class being a singleton
+ * provides basic queryable stats. The reason for this class being a singleton
  * is because it is inefficient for the UCBoard class to have multiple sentinels
  * retrieving the battery voltage. This in turn would needlessly use up
  * communication time with the signal processing board.
@@ -24,32 +24,30 @@ class BatterySentinel : Poco::Runnable
 private:
   Poco::Thread sentinelThread;
   Poco::Semaphore pauseSemaphore;
+  Controller &controller;
 
   double present_volts;
   double charge_percent;
   int remaining_time;
   bool charging;
 
-  // TODO
-
   /**
    * Instantiates a new sentinel and starts it's processing loop in a newly
    * created thread.
    */
-  BatterySentinel()
-  : pauseSemaphore(0, 1)
+  BatterySentinel(Controller &ctl)
+  : controller(ctl)
+  , pauseSemaphore(0, 1)
   , present_volts(0)
   , charge_percent(0)
   , remaining_time(0)
   , charging(false)
   {
-    // TODO
-
-    // set the attributes of this runnable
+    // set the attributes of the sentinel thread
     sentinelThread.setName("battery_sentinel");
     sentinelThread.setPriority(Poco::Thread::PRIO_LOW);
 
-    // run this runnable in a separate thread
+    // start the sentinel thread
     sentinelThread.start(*this);
   }
 
@@ -73,18 +71,26 @@ private:
     configs.get_config_value(ConfigurationManager::Group::BATTERY, "periodmillis", strvalue);
     int period = Poco::NumberParser::parseInt(strvalue);
 
-    // get the UCBoard instance
+    // get the UCBoard instance (for reading the battery voltage)
     UCBoard &uc_board = UCBoard::get_instance();
-    // for use via the uc_board.get_battery_voltage() method
 
+    double voltage;
     while (true)
     {
-      // TODO
-
       // tryWait will return true if the destructor is ever called, otherwise
       // it will wait till the end of the period and return false
       if (pauseSemaphore.tryWait(period))
         break;
+
+      // skip this iteration if the motors are currently running
+      if (controller.motors_running())
+        continue;
+
+      // get the present battery voltage
+      voltage = uc_board.get_battery_voltage();
+
+      // compute new battery state estimates
+      // TODO
     }
   }
 
