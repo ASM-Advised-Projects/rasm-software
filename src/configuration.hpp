@@ -109,6 +109,7 @@ public:
  *  - - - - - - - -   - - - - - - - - - - - - - - - - -
  *  GENERAL           <rwd>/config/general.properties
  *  LOGGING           <rwd>/config/logging.properties
+ *  BATTERY           <rwd>/config/battery.properties
  *  POSE_ESTIMATION   <rwd>/config/pose_estimation.properties
  *  CONTROL           <rwd>/config/control.properties
  *  PERIPHERY         <rwd>/config/periphery.properties
@@ -135,6 +136,7 @@ public:
   {
     GENERAL,
     LOGGING,
+    BATTERY,
     POSE_ESTIMATION,
     CONTROL,
     PERIPHERY,
@@ -159,6 +161,7 @@ private:
     // load all properties from each configuration file (one .properties file per group)
     config_groups[Group::GENERAL] = ConfigGroup(configroot + "/general.properties");
     config_groups[Group::LOGGING] = ConfigGroup(configroot + "/logging.properties");
+    config_groups[Group::BATTERY] = ConfigGroup(configroot + "/battery.properties");
     config_groups[Group::POSE_ESTIMATION] = ConfigGroup(configroot + "/pose_estimation.properties");
     config_groups[Group::CONTROL] = ConfigGroup(configroot + "/control.properties");
     config_groups[Group::PERIPHERY] = ConfigGroup(configroot + "/periphery.properties");

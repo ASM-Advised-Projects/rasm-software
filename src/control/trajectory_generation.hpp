@@ -45,7 +45,7 @@ Trajectory1D quintic_poly_trajectory(const TrajectoryParams &params)
 class TrajectoryGenerator
 {
 public:
-  TrajectoryGenerator(RobotStructure params)
+  TrajectoryGenerator(JointLinkKinematics params)
   {
 
   }

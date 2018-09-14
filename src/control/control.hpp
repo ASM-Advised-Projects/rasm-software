@@ -50,6 +50,12 @@ public:
   {
 
   }
+
+  static bool motors_running()
+  {
+
+    return false;
+  }
 };
 
 #endif

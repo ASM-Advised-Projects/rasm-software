@@ -28,7 +28,6 @@ class TrackingPoseEstimator
 private:
   const double BOX_EXPAND_RATIO = 1.2;
 
-protected:
   CameraImageBuffer &camera;
   dlib::object_detector<ImageScannerType> *detector;
   dlib::shape_predictor *pose_model;
@@ -52,6 +51,7 @@ protected:
   Rect zero_box;
   Pose zero_pose;
 
+protected:
   virtual dlib::object_detector<ImageScannerType> * get_object_detector() = 0;
   virtual dlib::shape_predictor * get_shape_predictor() = 0;
   virtual const std::vector<cv::Point3d> & get_object_points() = 0;

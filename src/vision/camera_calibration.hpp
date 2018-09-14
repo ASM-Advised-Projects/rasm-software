@@ -19,10 +19,11 @@ private:
 
 public:
   /**
+   * Runs a calibration routine that computes the camera matrix and distance
+   * coefficients for the currently connected camera.
    *
-   *
-   * Instead of returning a success/failure indication, an exception will be
-   * thrown if any errors occur or if calibration was unsuccessfull.
+   * An exception will be thrown if any errors occur or if the calibration is
+   * unsuccessfull.
    */
   static void run_chessboard_calibration(const std::string &settings_filepath, cv::Mat &cam_matrix, cv::Mat &dist_coeffs)
   {
@@ -30,9 +31,9 @@ public:
   }
 
   /**
-   *
+   * Save the given camera matrix and distance coefficients
    */
-  static void save_camera_properties(const cv::Mat &cam_matrix, const cv::Mat &dist_coeffs)
+  static void save_camera_properties(const std::string &calib_filepath, const cv::Mat &cam_matrix, const cv::Mat &dist_coeffs)
   {
 
   }

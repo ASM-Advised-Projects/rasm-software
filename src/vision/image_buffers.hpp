@@ -11,12 +11,73 @@
 #include "opencv2/opencv.hpp"
 
 /**
- *
+ * An abstract base class for all image filters that qualify if an image is
+ * 'good enough' to be processed by the pose estimation software, and
+ * potentially transform the image in a certain way.
+ */
+class ImageFilter
+{
+public:
+  virtual void operator()(cv::Mat_<cv::Vec3b> &image, bool & retake) = 0;
+};
+
+
+/**
+ * A filter that applies a transform to correct any image distortion.
+ */
+class UndistortFilter : ImageFilter
+{
+private:
+  cv::Mat cam_matrix;
+  cv::Mat dist_coeffs;
+  cv::Mat distorted;
+
+public:
+  UndistortFilter(cv::Mat cam_matrix, cv::Mat dist_coeffs)
+  {
+    this->cam_matrix = cam_matrix;
+    this->dist_coeffs = dist_coeffs;
+  }
+
+  void operator()(cv::Mat_<cv::Vec3b> &image, bool &retake)
+  {
+    // TODO: use initUndistortRectifyMap and remap
+    retake = false;
+  }
+};
+
+
+/**
+ * A filter that discardes images that are 'too' blurry.
+ */
+class UnblurFilter : ImageFilter
+{
+private:
+  double threshold;
+
+public:
+  UnblurFilter(double blur_threshold)
+  {
+    threshold = blur_threshold;
+  }
+
+  void operator()(cv::Mat_<cv::Vec3b> &image, bool &retake)
+  {
+    // TODO: use laplacian transform to recognize blur
+    retake = false;
+  }
+};
+
+
+/**
+ * Instances of this class are single-image buffers that provide different
+ * versions of the image like gray scale and reduced size.
  */
 class CameraImageBuffer
 {
-protected:
+private:
   cv::VideoCapture camera;
+  ImageFilter *filter;
 
   cv::Mat_<cv::Vec3b> bgr_img;
   cv::Mat_<unsigned short> gray_img;
@@ -30,7 +91,6 @@ protected:
   int index;
   double downsample_ratio;
 
-private:
   /**
    *
    */
@@ -55,7 +115,8 @@ public:
   /**
    *
    */
-  CameraImageBuffer(int camera_id)
+  CameraImageBuffer(int camera_id, ImageFilter *filter=nullptr)
+  : filter(filter)
   {
     camera.open(camera_id);
     initialize();
@@ -64,19 +125,36 @@ public:
   /**
    *
    */
-  CameraImageBuffer(const std::string &camera_filepath)
+  CameraImageBuffer(const std::string &camera_filepath, ImageFilter *filter=nullptr)
+  : filter(filter)
   {
     camera.open(camera_filepath);
     initialize();
   }
 
   /**
-   * Grabs the next image in the camera file, overwriting the previously set
+   * Grabs the next image in the camera file and applies a filter if one was
+   * given during construction. This method will overwrite the previously set
    * image. Note that this method is internally called upon construction.
    */
-  virtual void update_image()
+  void update_image()
   {
-    camera >> bgr_img;
+    while (true)
+    {
+      camera >> bgr_img;
+
+      // apply image filter
+      if (filter != nullptr)
+      {
+        bool retake = false;
+        (*filter)(bgr_img, retake);
+        if (retake)
+          continue;
+      }
+
+      break;  // exit loop if retake isn't needed
+    }
+
     index++;
     have_gray = false;
     have_small_bgr = false;
@@ -109,6 +187,7 @@ public:
   }
 
   /**
+   * Sets the preferred frame size for the images captured by the camera.
    *
    */
   void set_preferred_framesize(unsigned int width, unsigned int height)
@@ -128,9 +207,9 @@ public:
   }
 
   /**
-   *
+   * Returns th
    */
-  virtual const cv::Mat_<cv::Vec3b> & get_bgr_image()
+  const cv::Mat_<cv::Vec3b> & get_bgr_image()
   {
     return bgr_img;
   }
@@ -138,7 +217,7 @@ public:
   /**
    *
    */
-  virtual const cv::Mat_<unsigned short> & get_gray_image()
+  const cv::Mat_<unsigned short> & get_gray_image()
   {
     if (!have_gray)
     {
@@ -149,9 +228,10 @@ public:
   }
 
   /**
-   *
+   * Returns a scaled down bgr version of the current image. The amount of
+   * scaling is set by the set_downsample_ratio method.
    */
-  virtual const cv::Mat_<cv::Vec3b> & get_small_bgr_image()
+  const cv::Mat_<cv::Vec3b> & get_small_bgr_image()
   {
     if (!have_small_bgr)
     {
@@ -162,9 +242,10 @@ public:
   }
 
   /**
-   *
+   * Returns a scaled down grayscale version of the original image. The amount
+   * of scaling is set by the set_downsample_ratio method.
    */
-  virtual const cv::Mat_<unsigned short> & get_small_gray_image()
+  const cv::Mat_<unsigned short> & get_small_gray_image()
   {
     if (!have_small_gray)
     {
@@ -180,85 +261,5 @@ public:
   }
 };
 
-
-/**
- *
- */
-class UndistCameraImageBuffer : public CameraImageBuffer
-{
-protected:
-  cv::Mat cam_matrix;
-  cv::Mat dist_coeffs;
-  cv::Mat distorted;
-
-public:
-  UndistCameraImageBuffer(int camera_id, cv::Mat cam_matrix, cv::Mat dist_coeffs)
-  : CameraImageBuffer(camera_id)
-  {
-    this->cam_matrix = cam_matrix;
-    this->dist_coeffs = dist_coeffs;
-  }
-
-  UndistCameraImageBuffer(const std::string &camera_filepath, cv::Mat cam_matrix, cv::Mat dist_coeffs)
-  : CameraImageBuffer(camera_filepath)
-  {
-    this->cam_matrix = cam_matrix;
-    this->dist_coeffs = dist_coeffs;
-  }
-
-  /**
-   *
-   */
-  virtual void update_image()
-  {
-    camera >> distorted;
-
-    // TODO: use initUndistortRectifyMap and remap
-
-    index++;
-    have_gray = false;
-    have_small_bgr = false;
-    have_small_gray = false;
-  }
-
-};
-
-
-/**
- *
- */
-class UnblurCameraImageBuffer : public CameraImageBuffer
-{
-protected:
-  double threshold;
-
-public:
-  UnblurCameraImageBuffer(int camera_id, double blur_threshold)
-  : CameraImageBuffer(camera_id)
-  {
-    threshold = blur_threshold;
-  }
-
-  UnblurCameraImageBuffer(const std::string &camera_filepath, double blur_threshold)
-  : CameraImageBuffer(camera_filepath)
-  {
-    threshold = blur_threshold;
-  }
-
-  /**
-   *
-   */
-  virtual void update_image()
-  {
-    camera >> bgr_img;
-
-    // TODO: use laplacian transform to recognize blur
-
-    index++;
-    have_gray = false;
-    have_small_bgr = false;
-    have_small_gray = false;
-  }
-};
 
 #endif

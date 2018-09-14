@@ -88,7 +88,13 @@ private:
 
   void process_command(int cmdlength)
   {
-    // TODO
+    // use a constructor-initialized parse tree
+    // hash map of string cmds to method handles
+    // organize by subsystem
+    // control, http, peripheral, shell?, vision, battery, log, manage (for mode)
+    // handling of -h and --help commands
+    //   lists subsystem-specific command structure w/valid tokens
+    // invalid commands
   }
 
   void close()
@@ -107,18 +113,18 @@ public:
     ongoing = false;
   }
 
+  ~ShellSession()
+  {
+    close();
+    socket.~StreamSocket();
+  }
+
   void start(Poco::Net::StreamSocket ss)
   {
     socket = ss;
     Poco::Thread shellThread;
     shellThread.setPriority(THREAD_PRIORITY);
     shellThread.start(*this);
-  }
-
-  ~ShellSession()
-  {
-    close();
-    socket.~StreamSocket();
   }
 
   bool is_ongoing()

@@ -172,4 +172,12 @@ public:
 
 };
 
+class RealTimeIntegrator
+{
+private:
+
+public:
+
+};
+
 #endif
