@@ -1,5 +1,9 @@
 /**
- * Defines the RealTimeLTIFilter and CircularBuffer classes.
+ * Defines the following classes related to signal processing:
+ *   CircularArray<NumericType>
+ *   RealTimeLTIFilter
+ *   RealTimeDifferentiator
+ *   RealTimeIntegrator
  */
 
 #ifndef _SIGNAL_PROCESSING_H_
@@ -11,40 +15,51 @@ using std::vector;
 
 
 /**
- *
+ * This class represents a ring buffer of numeric values. It's basically a
+ * fixed-size array that will remove the oldest values in order to add new
+ * values. Its values are indexed according to how recently they were added.
  */
 template <typename NumericType>
 class CircularArray {
 private:
   static_assert(std::is_arithmetic<NumericType>::value, "NumericType must be numeric");
-	std::unique_ptr<double[]> array;
+  NumericType *array;
 	unsigned int next_index;
 	unsigned int max_size_;
+  unsigned int size_;
 
 public:
   /**
-    *
+   * Constructs an empty circular array with the given fixed size as its
+   * capacity.
    */
 	CircularArray(unsigned int max_size)
-	: array(std::unique_ptr<NumericType[]>(new NumericType[max_size]))
+	: array(new NumericType[max_size])
   , next_index(0)
 	, max_size_(max_size)
 	{
-    for (int i = 0; i < max_size; i++)
-      array[i] = 0;
+    size_ = 0;
+  }
+
+  ~CircularArray()
+  {
+    delete[] array;
   }
 
   /**
-   *
+   * Pushes a new value onto the front of this array. This will delete the
+   * oldest value if this array is full.
    */
 	void push(NumericType val)
 	{
 	  array[next_index] = val;
     next_index = (next_index + 1) % max_size_;
+    ++size_;
 	}
 
   /**
-   *
+   * Returns the value at the given index, which is a number of entries back.
+   * If the entries back is greater than size()-1 then 0 is returned.
    */
   NumericType get(unsigned int entries_back)
   {
@@ -54,15 +69,8 @@ public:
   }
 
   /**
-   *
-   */
-  NumericType operator[](unsigned int entries_back)
-  {
-    return get(entries_back);
-  }
-
-  /**
-   *
+   * Changes the value held at the given index (entries_back) to val. If the
+   * given index is greater than size()-1 then this method does nothing.
    */
   void modify(unsigned int entries_back, NumericType val)
   {
@@ -70,23 +78,37 @@ public:
       array[(next_index-1-entries_back) % max_size_] = val;
   }
 
-  unsigned int max_size() const
+  /**
+   * Returns the current amount of values in this array.
+   */
+  unsigned int size() const
   {
-    return max_size();
+    return size_;
+  }
+
+  /**
+   * Returns that max amount of values this array can hold.
+   */
+  unsigned int capacity() const
+  {
+    return max_size_;
   }
 };
 
 
 /**
- * This class represents a causal SISO LTI digital filter.  SISO means
+ * This class represents a causal SISO LTI digital filter. SISO means
  * single-input single-output while LTI means linear time-invariant.
- * The 'RealTime' in the class name means that this filter is causal and only
- * supports input/output of one signal value at a time.
+ * The 'RealTime' in the class name is just another word for causal.
  *
- * The filtering algorithm uses the provided feedforward and feedback
+ * The filtering algorithm uses the given feedforward and feedback
  * coefficients (ff_coeffs and fb_coeffs) to compute the output signal y using
- * signal input x:
- *   y[n] = sum{i=0:M}(ff_coeffs[i] * x[n-i]) + sum{j=1:N}(fb_coeffs[i] * y[n-j])
+ * signal input x according to this equation:
+ * y[n] = sum{i=0:M}(ff_coeffs[i] * x[n-i]) + sum{j=1:N}(fb_coeffs[i] * y[n-j])
+ *
+ * As the names suggest, feedforward coefficients relate input values directly
+ * to the current output value while feedback coefficients relate previous
+ * output values to the current output value.
  */
 class RealTimeLTIFilter
 {
@@ -97,62 +119,51 @@ private:
   CircularArray<double> inputs;
   CircularArray<double> outputs;
 
-  int max_inputs;
-  int max_outputs;
-
-  int max(int a, int b)
-  {
-    return a > b ? a : b;
-  }
-
 public:
   /**
-   *
+   * Creates a new filter using the given feedforward (ff_coeffs) and feedback
+   * (fb_coeffs) coefficients.
    */
-  RealTimeLTIFilter(const vector<double> &ff_coeffs, const vector<double> &fb_coeffs, int store_length)
+  RealTimeLTIFilter(const vector<double> &ff_coeffs, const vector<double> &fb_coeffs)
   : ff_coeffs(ff_coeffs)
   , fb_coeffs(fb_coeffs)
   , inputs(ff_coeffs.size())
-  , outputs(max(fb_coeffs.size(), store_length))
+  , outputs(fb_coeffs.size())
   {
-    max_inputs = inputs.max_size();
-    max_outputs = outputs.max_size();
   }
 
   /**
-   *
+   * Adds the given value as the newest input value of this filter. To get the
+   * new output of this filter, call output().
    */
   void input(double value)
   {
     inputs.push(value);
 
     double new_output = 0;
-
-    for (int i = 0; i < max_inputs; i++)
-      new_output += ff_coeffs[i] * inputs[i];
-
-    // j still starts at 0 because new_output hasn't been pushed to outputs yet
-    for (int j = 0; j < max_outputs; j++)
-      new_output += fb_coeffs[j] * outputs[j];
+    for (int i = 0; i < inputs.capacity(); i++)
+      new_output += ff_coeffs[i] * inputs.get(i);
+    for (int j = 0; j < outputs.capacity(); j++)
+      new_output += fb_coeffs[j] * outputs.get(j);
 
     outputs.push(new_output);
   }
 
   /**
-   *
+   * Returns the current output value of this filter.
    */
-  double output(unsigned int values_back)
+  double output()
   {
-    return outputs[values_back];
+    return outputs.get(0);
   }
 
   /**
-   *
+   * This operator is calls input(value), then returns output().
    */
   double operator()(double value)
   {
     input(value);
-    return output(0);
+    return output();
   }
 };
 
@@ -172,6 +183,10 @@ public:
 
 };
 
+
+/**
+ *
+ */
 class RealTimeIntegrator
 {
 private:

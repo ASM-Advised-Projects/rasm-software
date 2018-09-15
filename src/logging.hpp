@@ -1,10 +1,10 @@
 /**
  * Implements the RASM's logging subsystem.
- * Defines the LogFile and LogManager (singleton) classes.
+ * Defines the LogManager (singleton) and LogFile classes.
  */
 
-#ifndef LOGGING_INCLUDED
-#define LOGGING_INCLUDED
+#ifndef _LOGGING_H_
+#define _LOGGING_H_
 
 #include "configuration.hpp"
 
