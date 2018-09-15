@@ -1,13 +1,13 @@
-Nearly all of the code is in the headers file. The four cpp files defined here are each for their own programs.
+Nearly all of the code is in the 'headers' folder. The four cpp files defined here each run their own program.
 
-* rasm_main_app.cpp
+* rasm_main.cpp
 This is the program that operates the RASM, with all of its usual functions, in a hospital environment.
 
-* local_shell_app.cpp
+* local_shell.cpp
 
 
-* system_modeling_app.cpp
+* system_modeling.cpp
 
 
-* camera_calibration_app.cpp
+* camera_calibration.cpp
 
