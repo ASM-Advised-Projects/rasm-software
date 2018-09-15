@@ -242,13 +242,13 @@ public:
   {
     return derivative_;
   }
-
 };
 
 
 /**
- * Uses simpsons rule to compute the integral over a series of values for a
- * given range.
+ * Computes the integral of a series of dependent input values with respect
+ * to a series of independent values (e.g., time). The trapezoidal rule is used
+ * to calculate the integral over a series of values for a given range.
  */
 class RealTimeIntegrator
 {
@@ -258,22 +258,51 @@ private:
   double integral_;
 
 public:
+  /**
+   * Constructs a new integrator that integrates over the <range> latest data
+   * points.
+   */
   RealTimeIntegrator(unsigned int range)
   : f(range)
   , x(range)
   {
+    integral_ = 0;
   }
 
-  void input()
+  /**
+   * Inputs the given dependent-independent pair of values as the newest data
+   * point.
+   */
+  void input(double dep_value, double ind_value)
   {
+    // using this variable so that the actual integral value can be changed
+    // all at once at the end of the method (makes this class thread safe)
+    double integral_change = 0;
 
+    if (f.size() == f.capacity())
+    {
+      // subtract earliest trapezoid before removing last data point
+      unsigned int a = f.size()-2;
+      unsigned int b = f.size()-1;
+      integral_change -= (b-a) * (f[a]+f[b]) / 2;
+    }
+    f.push(dep_value);
+    x.push(ind_value);
+
+    // add latest trapezoid to integral
+    integral_change += (x[0]-x[1]) * (f[1]+f[0]) / 2;
+
+    integral_ += integral_change;
   }
 
+  /**
+   * Returns the current integral of the input data if more than one value
+   * has been input; returns 0 otherwise.
+   */
   double integral()
   {
-
+    return integral_;
   }
-
 };
 
 #endif
