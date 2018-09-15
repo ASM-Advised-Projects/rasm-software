@@ -39,6 +39,7 @@ public:
 	, max_size_(max_size)
 	{
     size_ = 0;
+
   }
 
   ~CircularArray()
@@ -54,7 +55,8 @@ public:
 	{
 	  array[next_index] = val;
     next_index = (next_index + 1) % max_size_;
-    ++size_;
+    if (size_ < max_size_)
+      ++size_;
 	}
 
   /**
@@ -66,6 +68,14 @@ public:
     if (entries_back >= max_size_)
       return 0;
     return array[(next_index-1-entries_back) % max_size_];
+  }
+
+  /**
+   * The equivalent of calling the get(unsigned int) method.
+   */
+  double operator[](unsigned int entries_back)
+  {
+    return get(entries_back);
   }
 
   /**
@@ -141,10 +151,10 @@ public:
     inputs.push(value);
 
     double new_output = 0;
-    for (int i = 0; i < inputs.capacity(); i++)
-      new_output += ff_coeffs[i] * inputs.get(i);
-    for (int j = 0; j < outputs.capacity(); j++)
-      new_output += fb_coeffs[j] * outputs.get(j);
+    for (int i = 0; i < inputs.capacity(); ++i)
+      new_output += ff_coeffs[i] * inputs[i];
+    for (int j = 0; j < outputs.capacity(); ++j)
+      new_output += fb_coeffs[j] * outputs[j];
 
     outputs.push(new_output);
   }
@@ -154,7 +164,7 @@ public:
    */
   double output()
   {
-    return outputs.get(0);
+    return outputs[0];
   }
 
   /**
@@ -169,29 +179,100 @@ public:
 
 
 /**
- * infinite or range integration
- * first order differentiation
- * constant or non-constant time intervals for integration and differentiation
- *
+ * Computes the derivative of a series of dependent input values with respect
+ * to a series of independent values (e.g., time). A second order lagrange
+ * interpolating polynomial is used to find the current derivative. This
+ * requires three data points. If there are only two points then a finite-
+ * difference formula is used. If less than two points have been input, then the
+ * derivative is zero.
  */
 class RealTimeDifferentiator
 {
 private:
-
+  CircularArray<double> f;
+  CircularArray<double> x;
+  double derivative_;
 
 public:
+  /**
+   * Creates a new differentiator with no initial input data.
+   */
+  RealTimeDifferentiator()
+  : f(3)
+  , x(3)
+  , derivative_(0)
+  {
+  }
+
+  /**
+   * Inputs the given dependent-independent pair of values as the newest data
+   * point.
+   */
+  void input(double dep_value, double ind_value)
+  {
+    f.push(dep_value);
+    x.push(ind_value);
+
+    if (f.size() > 2)
+    {
+      double x0 = x[0];  // latest value
+      double x1 = x[1];
+      double x2 = x[2];
+      derivative_ =
+          f[2]*(2*x0-x1-x0) / ((x2-x1)*(x2-x0)) +
+          f[1]*(2*x0-x2-x0) / ((x1-x2)*(x1-x0)) +
+          f[0]*(2*x0-x2-x1) / ((x0-x2)*(x0-x1));
+      return;
+    }
+
+    if (f.size() > 1)
+    {
+      derivative_ = (f[0]-f[1]) / (x[0]-x[1]);
+      return;
+    }
+
+    derivative_ = 0;
+  }
+
+  /**
+   * Returns the current derivative of the input data if more than one value
+   * has been input; returns 0 otherwise.
+   */
+  double derivative()
+  {
+    return derivative_;
+  }
 
 };
 
 
 /**
- *
+ * Uses simpsons rule to compute the integral over a series of values for a
+ * given range.
  */
 class RealTimeIntegrator
 {
 private:
+  CircularArray<double> f;
+  CircularArray<double> x;
+  double integral_;
 
 public:
+  RealTimeIntegrator(unsigned int range)
+  : f(range)
+  , x(range)
+  {
+  }
+
+  void input()
+  {
+
+  }
+
+  double integral()
+  {
+
+  }
 
 };
 
