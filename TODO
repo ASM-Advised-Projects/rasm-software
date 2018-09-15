@@ -4,8 +4,8 @@ Josh:
     - write camera calibration routines
 
 Joe:
-    - write RealTimeDifferentiator and Integrator classes
     - fully comment logging, configuration, and all vision files
+    - write a notifyer for configuration changes
     - add confidence weights to the TrackingPoseEstimator
     - write high-level control algorithm
     - setup testing framework
