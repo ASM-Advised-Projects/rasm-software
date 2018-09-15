@@ -111,7 +111,7 @@ void start_shutdown()
 
 int main(int argc, char **argv)
 {
-  // pass the root working directory to a config namespace global
+  // pass the root working directory to the configuration manager
   if (argc < 2)
     throw std::runtime_error("root working directory must be specified");
   ConfigurationManager::rwd = argv[1];

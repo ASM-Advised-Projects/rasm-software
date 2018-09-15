@@ -1,6 +1,6 @@
 /**
  * Implements the RASM's battery monitoring subsystem.
- * Defines the BatterySentinel class.
+ * Defines the BatteryEstimator class.
  */
 
 #ifndef BATTERY_INCLUDED
@@ -15,14 +15,14 @@
 /**
  * This class is a singleton that monitors the battery's charge level and
  * provides basic queryable stats. The reason for this class being a singleton
- * is because it is inefficient for the UCBoard class to have multiple sentinels
+ * is because it is inefficient for the UCBoard class to have multiple estimators
  * retrieving the battery voltage. This in turn would needlessly use up
  * communication time with the signal processing board.
  */
-class BatterySentinel : Poco::Runnable
+class BatteryEstimator : Poco::Runnable
 {
 private:
-  Poco::Thread sentinelThread;
+  Poco::Thread estimatorThread;
   Poco::Semaphore pauseSemaphore;
   Controller &controller;
 
@@ -32,10 +32,10 @@ private:
   bool charging;
 
   /**
-   * Instantiates a new sentinel and starts it's processing loop in a newly
+   * Instantiates a new estimator and starts it's processing loop in a newly
    * created thread.
    */
-  BatterySentinel(Controller &ctl)
+  BatteryEstimator(Controller &ctl)
   : controller(ctl)
   , pauseSemaphore(0, 1)
   , present_volts(0)
@@ -43,16 +43,16 @@ private:
   , remaining_time(0)
   , charging(false)
   {
-    // set the attributes of the sentinel thread
-    sentinelThread.setName("battery_sentinel");
-    sentinelThread.setPriority(Poco::Thread::PRIO_LOW);
+    // set the attributes of the estimator thread
+    estimatorThread.setName("battery_estimator");
+    estimatorThread.setPriority(Poco::Thread::PRIO_LOW);
 
-    // start the sentinel thread
-    sentinelThread.start(*this);
+    // start the estimator thread
+    estimatorThread.start(*this);
   }
 
   /**
-   * Runs the processing loop of this sentinel.
+   * Runs the processing loop of this estimator.
    * Before the loop begins, relevant configurations are retrieved from the
    * configuration manager. The processing loop then begins and will only exit
    * if the destructor is called.
@@ -95,21 +95,29 @@ private:
   }
 
 public:
-  BatterySentinel(const BatterySentinel &) = delete;
-  void operator=(const BatterySentinel &) = delete;
+  BatteryEstimator(const BatteryEstimator &) = delete;
+  void operator=(const BatteryEstimator &) = delete;
 
   /**
    * Returns a reference to this singleton's instance.
    */
-  static BatterySentinel& get_instance()
+  static BatteryEstimator& get_instance()
   {
-    static BatterySentinel manager;
+    static BatteryEstimator manager;
     return manager;
   }
 
-  ~BatterySentinel()
+  /**
+   * Destructs this singleton by closing the processing thread.
+   */
+  ~BatteryEstimator()
   {
     pauseSemaphore.set();  // exit the processing loop
+    estimatorThread.join();  // wait for processing thread to close
+
+    // other destruction
+    pauseSemaphore.~Semaphore();
+    estimatorThread.~Thread();
   }
 
   /**
