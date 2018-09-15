@@ -53,7 +53,7 @@ Status: needs testing
 
 Predicts the battery system's SOC (state of charge) and SOH (state of health) using a filtering state estimation algorithm.
 
-Status: not started
+Status: estimation algorithm still needs writing; needs testing
 
 **HTTP Server**
 
