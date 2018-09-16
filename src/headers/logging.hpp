@@ -24,7 +24,7 @@ using std::string;
 
 
 /**
- *
+ * Represents a text file used for logging.
  */
 class LogFile
 {
@@ -35,12 +35,15 @@ public:
   LogFile(const LogFile &lf) = delete;
   void operator=(const LogFile &lf) = delete;
 
-  LogFile()
+  LogFile() : path("")
   {
   }
 
   /**
-   *
+   * Sets the path field to the given filepath and opens the corresponding file
+   * in the filesystem for appending. If the file doesn't exist then it will be
+   * created. If this LogFile instance already has an open file then it will
+   * first be closed.
    */
   void init(string &filepath)
   {
@@ -50,7 +53,8 @@ public:
   }
 
   /**
-   *
+   * Closes the currently opened file, if there is one. The path field will be
+   * set to an empty string.
    */
   void close()
   {
@@ -59,21 +63,28 @@ public:
       stream.flush();
       stream.close();
     }
+    path = "";
   }
 
   /**
-   *
+   * Returns the size, in bytes, of the currently opened file. If a file isn't
+   * open, then 0 is returned.
    */
   unsigned long get_size() const
   {
-    std::ifstream in(path, std::ofstream::ate | std::ofstream::binary);
-    return in.tellg();
+    if (stream.is_open())
+    {
+      std::ifstream in(path, std::ofstream::ate | std::ofstream::binary);
+      return in.tellg();
+    }
+    return 0;
   }
 };
 
 
 /**
- *
+ * Represents a relative time with string hour, minute, second, and millisecond
+ * fields.
  */
 struct TimeStamp
 {
@@ -85,7 +96,45 @@ struct TimeStamp
 
 
 /**
+ * This class represents a singleton that initializes and manages a logging
+ * system which can be used anywhere else in the program to submit log messages
+ * to the log filesystem. It handles file & directory creation/naming, provides
+ * log priority levels, automatically rotates log files, and buffers log
+ * messages. This singleton is thread-safe.
  *
+ * Every program will have it's own log directory. The name of the that
+ * directory will be an integer that is one larger than the current largest
+ * integer directory name in the logging root folder. If no numbered directories
+ * exist yet then the integer will be 1.
+ *
+ * Within the program's newly created directory, .log files are created for each
+ * log level. Any one log file is rotated if it exceeds its size limit. The log
+ * files will have the following naming convention:
+ *   level_HH-MM-SS.log
+ * Where level is that log file's priority level.
+ *
+ * There are four priority levels. From lowest to highest priority they are:
+ * notice, warning, error, and critical. These are defined in the
+ * LogManager::LogLevel enum.
+ *
+ * Each log message will be placed in the file corresponding to its priority
+ * level along with the files for all lower priority levels. For example, an
+ * error log message will be appended to the current log files for error,
+ * warning, and notice logs.
+ *
+ * Each log message will have the following structure:
+ *   <log priority>
+ *   HH-MM-SS-LLL  <thread name>:<thread id>:<thread priority>
+ *   <message>\n\n
+ * The log priority level will only be placed at the start if the log message
+ * has a priority that is higher than the log file's priority; otherwise that
+ * first line won't exist for that log message.
+ *
+ * All messages going into the warning and notice log files will be buffered
+ * before they are actually appended to the files. This periodic flushing of
+ * log messages happens at the end of every buffer time interval. The length of
+ * this interval is set by the configuration system. All critical and error
+ * logs will be immediately written to their log files.
  */
 class LogManager
 {
@@ -115,8 +164,14 @@ public:
   };
 
   /**
-   * HH-MM-SS-LLL  <thread name>:<thread id>:<thread priority>
-   * <message>\n\n
+   * Logs a message at the given priority level. The message will be placed in
+   * the log files with priority levels equal to and lower than the given level.
+   * The message will have this structure:
+   *   <priority level>
+   *   HH-MM-SS-LLL  <thread name>:<thread id>:<thread priority>
+   *   <message>\n\n
+   * That first line will only exist for the files whose priority levels are
+   * lower than the given level.
    */
   void log_message(const string &msg, LogLevel level)
   {
@@ -148,21 +203,19 @@ public:
         << "  " << thread_name << ":" << thread_id << ":" << thread_prio << "\n";
     msg_builder << msg << "\n\n";
 
-    // log the header-ed message via switch case fall through
-    log_mutex.lock();
+    // log the headered message via switch case fall through
+    stream_mutex.lock();
     switch (level)
     {
       case CRITICAL:
         file_map[CRITICAL]->stream << msg_builder.str();
         file_map[CRITICAL]->stream.flush();
-        rotate_log_check(CRITICAL);
 
       case ERROR:
         if (level != ERROR)
             file_map[ERROR]->stream << level_as_string(level, true) << "\n";
         file_map[ERROR]->stream << msg_builder.str();
         file_map[ERROR]->stream.flush();
-        rotate_log_check(ERROR);
 
       case WARNING:
         if (level != WARNING)
@@ -173,27 +226,27 @@ public:
         if (level != NOTICE)
             file_map[NOTICE]->stream << level_as_string(level, true) << "\n";
         file_map[NOTICE]->stream << msg_builder.str();
-      }
-      log_mutex.unlock();
-  }
+    }
+    stream_mutex.unlock();
 
-  /**
-   * Logs the given exception's stack trace and message at the ERROR level.
-   */
-  void log_exception(const std::exception &exc)
-  {
-
+    rotate_log_check(level);
   }
 
 private:
   std::map<LogLevel, LogFile*> file_map;
-  Poco::Util::TimerTaskAdapter<LogManager> *flush_timer;
+  Poco::Util::Timer flush_timer;
   string log_dir;
   Poco::Clock startup_time;
   long max_filesize;
-  Poco::Mutex log_mutex;
+  Poco::Mutex stream_mutex;
 
-  LogManager()
+  /**
+   * Creates a new log manager instance. Retrieves some configurations, sets up
+   * a log directory, ensures there is enough requisite filespace for logging,
+   * creates and opens a log file for each priority level, and starts the log
+   * buffer flush timers.
+   */
+  LogManager() : flush_timer(Poco::Thread::PRIO_LOWEST)
   {
     // get logging configuration group
     ConfigurationManager &configs = ConfigurationManager::get_instance();
@@ -214,7 +267,7 @@ private:
     if (dir_int > max_dir_int)
       dir_int = 1;
 
-    // create new log directory file object (don't create directory yet)
+    // create new log directory file object (don't create actual directory yet)
     log_dir = root_dir + toplevel_dir + "/" + std::to_string(dir_int);
     Poco::File new_log_dir(log_dir);
 
@@ -229,8 +282,8 @@ private:
     configs.change_config_value(ConfigurationManager::Group::LOGGING,
         "next_log_dir", std::to_string(dir_int + 1));
 
-    // ensure requisite filespace exists for log system by potentially
-    // deleting old log directories
+    // delete some of the oldest directories if not enough filespace exists
+    // for the log system
     struct statvfs partition_info;
     if (statvfs("/", &partition_info) == 0)
     {
@@ -264,14 +317,25 @@ private:
     for (const auto &pair : file_map)
       rotate_log_check(pair.first);
 
-    // start NOTICE and WARNING log buffer flush timers
-    // error and critical are immediately written to file
-    flush_timer = new Poco::Util::TimerTaskAdapter<LogManager>(
+    // start the timer tasks for flushing the NOTICE and WARNING log buffers
+    Poco::AutoPtr<Poco::Util::TimerTask> flush_task_1 =
+        new Poco::Util::TimerTaskAdapter<LogManager>(
         *this, &LogManager::flush_notice_log);
-    flush_timer = new Poco::Util::TimerTaskAdapter<LogManager>(
+    Poco::AutoPtr<Poco::Util::TimerTask> flush_task_2 =
+        new Poco::Util::TimerTaskAdapter<LogManager>(
         *this, &LogManager::flush_warning_log);
+
+    Poco::AutoPtr<Poco::Util::TimerTask> task_ptr_1(flush_task_1);
+    Poco::AutoPtr<Poco::Util::TimerTask> task_ptr_2(flush_task_2);
+
+    int interval = 1000 * log_conf->getInt("flush_interval_sec");
+    flush_timer.scheduleAtFixedRate(task_ptr_1, interval, interval);
+    flush_timer.scheduleAtFixedRate(task_ptr_2, interval, interval);
   }
 
+  /**
+   * Destructs this singleton.
+   */
   ~LogManager()
   {
     for (auto &pair : file_map)
@@ -281,20 +345,24 @@ private:
     startup_time.~Clock();
   }
 
+  /**
+   * Flushes the notice log message stream to the current notice log file.
+   */
   void flush_notice_log(Poco::Util::TimerTask &)
   {
-    log_mutex.lock();
+    stream_mutex.lock();
     file_map[NOTICE]->stream.flush();
-    rotate_log_check(NOTICE);
-    log_mutex.unlock();
+    stream_mutex.unlock();
   }
 
+  /**
+   * Flushes the warning log message stream to the current warning log file.
+   */
   void flush_warning_log(Poco::Util::TimerTask &)
   {
-    log_mutex.lock();
+    stream_mutex.lock();
     file_map[WARNING]->stream.flush();
-    rotate_log_check(WARNING);
-    log_mutex.unlock();
+    stream_mutex.unlock();
   }
 
   /**
@@ -302,25 +370,29 @@ private:
    * exceeding the max log file size. If a log file for the level doesn't
    * exist yet then a file will be created.
    */
-  void rotate_log_check(const LogLevel &level)
+  void rotate_log_check(LogLevel level)
   {
     // if the file for the given log level is non-existent or has a size that
     // is not within 100 chars of limit or over the limit...
     if (!file_map[level]->stream.is_open() ||
         file_map[level]->get_size() > max_filesize - 100)
     {
+      stream_mutex.lock();
+      file_map[level]->stream.flush();  // in case of buffered notice or warning logs
       string newlogpath = new_log_filepath(level);
       file_map[level]->init(newlogpath);
       file_map[level]->stream << "Header Format: HH-MM-SS-LLL "
           "<thread name>:<thread_id>:<thread_priority>\n";
       file_map[level]->stream.flush();
+      stream_mutex.unlock();
     }
   }
 
   /**
-   *
+   * Returns the name of a new log file for the given priority level. The name
+   * is of the format level_HH-MM-SS.log.
    */
-  string new_log_filepath(const LogLevel level) const
+  string new_log_filepath(LogLevel level) const
   {
     TimeStamp ts = elapsed_time();
     std::ostringstream name_builder;
@@ -330,7 +402,8 @@ private:
   }
 
   /**
-   *
+   * Returns the elapsed time from when this logging singleton was initialized
+   * as a TimeStamp struct.
    */
   TimeStamp elapsed_time() const
   {
@@ -359,9 +432,12 @@ private:
   }
 
   /**
-   *
+   * Returns the string representation of the given log priority level. The
+   * string returned is just the actual name of the level. If uppercase is set
+   * to true, then the entire name will be uppercase; otherwise the entire name
+   * will be lowercase.
    */
-  string level_as_string(const LogLevel level, bool uppercase) const
+  string level_as_string(LogLevel level, bool uppercase) const
   {
     switch (level)
     {
