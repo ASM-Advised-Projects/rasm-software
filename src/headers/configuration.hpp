@@ -21,7 +21,6 @@ using Poco::Util::PropertyFileConfiguration;
 
 /**
  * For internal use by the ConfigurationManager class.
- *
  * Holds all java-style configurations from a single .properties file given
  * by the filepath argument. Any configuration can have it's values retreived,
  * changed, or saved back to the file.
@@ -51,7 +50,6 @@ public:
    * Sets value to the configuration value that corresponds to the given
    * key if that key exists. If the key doesn't exist then value is set to
    * an empty string. Returns true if the key exists; false otherwise.
-   *
    * Note that keys are case sensitive.
    */
   bool get_value(const string &key, string &value)
@@ -72,7 +70,6 @@ public:
    * Changes the old value corresponding to the given key to the given value
    * if the key exists. Returns true if the key exists (and subsequently the
    * value change was made); false otherwise.
-   *
    * Note that keys are case sensitive.
    */
   bool change_value(const string &key, const string &value)

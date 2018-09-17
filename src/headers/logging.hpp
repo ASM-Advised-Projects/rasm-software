@@ -24,6 +24,7 @@ using std::string;
 
 
 /**
+ * For internal use by the LogManager class.
  * Represents a text file used for logging.
  */
 class LogFile

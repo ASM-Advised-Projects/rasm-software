@@ -100,6 +100,52 @@ public:
   }
 
   /**
+   * Returns the proper spi mode integer based on the idle level and capture edge.
+   */
+  static int get_spi_mode(IdleLevel &idle, CaptureEdge &edge)
+  {
+    if (idle == IdleLevel::LOW && edge == CaptureEdge::RISING)
+      return 0;
+
+    if (idle == IdleLevel::LOW && edge == CaptureEdge::FALLING)
+      return 1;
+
+    if (idle == IdleLevel::HIGH && edge == CaptureEdge::FALLING)
+      return 2;
+
+    return 3;
+  }
+
+  /**
+   * Returns the spi bit order as an spi_bit_order_t structure that represents
+   * the given endianness.
+   */
+  static spi_bit_order_t get_spi_bit_order(Endianness order)
+  {
+    if (order == Endianness::LSB_FIRST)
+      return LSB_FIRST;
+
+    return MSB_FIRST;
+  }
+
+  /**
+   * Returns the uart parity mode as a serial_parity_t structure that represents
+   * the given parity.
+   */
+  static serial_parity_t get_serial_parity(Parity parity)
+  {
+    switch (parity)
+    {
+      case NONE:
+        return PARITY_NONE;
+      case ODD:
+        return PARITY_ODD;
+      case EVEN:
+        return PARITY_EVEN;
+    }
+  }
+
+  /**
    * Initializes the I2C handle structure pointed to by i2c_bus for the given bus
    * index if the corresponding i2c bus exists. Bus indices are incremental and
    * start at 0.

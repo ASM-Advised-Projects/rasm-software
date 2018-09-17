@@ -49,52 +49,6 @@ enum BaudRate
 };
 
 /**
- * Returns the proper spi mode integer based on the idle level and capture edge.
- */
-int get_spi_mode(IdleLevel &idle, CaptureEdge &edge)
-{
-  if (idle == IdleLevel::LOW && edge == CaptureEdge::RISING)
-    return 0;
-
-  if (idle == IdleLevel::LOW && edge == CaptureEdge::FALLING)
-    return 1;
-
-  if (idle == IdleLevel::HIGH && edge == CaptureEdge::FALLING)
-    return 2;
-
-  return 3;
-}
-
-/**
- * Returns the spi bit order as an spi_bit_order_t structure that represents
- * the given endianness.
- */
-spi_bit_order_t get_spi_bit_order(Endianness order)
-{
-  if (order == Endianness::LSB_FIRST)
-    return LSB_FIRST;
-
-  return MSB_FIRST;
-}
-
-/**
- * Returns the uart parity mode as a serial_parity_t structure that represents
- * the given parity.
- */
-serial_parity_t get_serial_parity(Parity parity)
-{
-  switch (parity)
-  {
-    case NONE:
-      return PARITY_NONE;
-    case ODD:
-      return PARITY_ODD;
-    case EVEN:
-      return PARITY_EVEN;
-  }
-}
-
-/**
  * SPI device settings.
  */
 struct SpiConf
