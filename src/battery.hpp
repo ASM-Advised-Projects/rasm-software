@@ -3,7 +3,9 @@
  * Defines the BatterySentinel class.
  */
 
-#include <unistd.h>
+#include  <cstdlib>
+#include <fstream>
+#include <string>
 #ifndef BATTERY_INCLUDED
 #define BATTERY_INCLUDED
 
@@ -11,13 +13,22 @@
 class BatterySentinel
 {
   public:
-    void sentinel()
+    int sentinel()
     {
-      while(ANY_MOTOR_RUNNING)
+      std::string line;
+      int voltage;
+      std::system("echo cape-bone-iio > sys/devices/bone_capemgr.*/slots");
+      std::ifstream battery_file("/sys/devices/ocp.2/helper.14/AIN1");
+      if(battery_file.is_open())
       {
-        sleep(1); //The documentation says to sleep for a few seconds, but 
-                  //wouldn't that be an awfully long time?
+        getline(battery_file, line);
+        voltage << std::stoi(line);
+        battery_file.close();
+        return voltage;
       }
+      throw std::exception();
+
+
     }
 };
 
