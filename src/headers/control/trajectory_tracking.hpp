@@ -36,7 +36,7 @@ class PIDFeedbackGenerator
 /**
  *
  */
-class FullStateFeedbackGenerator
+class StateFeedbackGenerator
 {
 
 };

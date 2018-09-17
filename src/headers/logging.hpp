@@ -1,11 +1,10 @@
 /**
  * Implements the RASM's logging subsystem.
- * Defines the LogManager (singleton) class along with the LogFile and TimeStamp
- * structures.
+ * Defines the LogManager (singleton) and LogFile classes.
  */
 
-#ifndef LOGGING_INCLUDED
-#define LOGGING_INCLUDED
+#ifndef _LOGGING_H_
+#define _LOGGING_H_
 
 #include "configuration.hpp"
 
@@ -27,11 +26,22 @@ using std::string;
 /**
  *
  */
-struct LogFile
+class LogFile
 {
+public:
   string path;
   std::ofstream stream;
 
+  LogFile(const LogFile &lf) = delete;
+  void operator=(const LogFile &lf) = delete;
+
+  LogFile()
+  {
+  }
+
+  /**
+   *
+   */
   void init(string &filepath)
   {
     close();
@@ -39,6 +49,9 @@ struct LogFile
     stream.open(path, std::ofstream::out | std::ofstream::app);
   }
 
+  /**
+   *
+   */
   void close()
   {
     if (stream.is_open())
@@ -48,6 +61,9 @@ struct LogFile
     }
   }
 
+  /**
+   *
+   */
   unsigned long get_size() const
   {
     std::ifstream in(path, std::ofstream::ate | std::ofstream::binary);
@@ -137,26 +153,26 @@ public:
     switch (level)
     {
       case CRITICAL:
-        file_map[CRITICAL].stream << msg_builder.str();
-        file_map[CRITICAL].stream.flush();
+        file_map[CRITICAL]->stream << msg_builder.str();
+        file_map[CRITICAL]->stream.flush();
         rotate_log_check(CRITICAL);
 
       case ERROR:
         if (level != ERROR)
-            file_map[ERROR].stream << level_as_string(level, true) << "\n";
-        file_map[ERROR].stream << msg_builder.str();
-        file_map[ERROR].stream.flush();
+            file_map[ERROR]->stream << level_as_string(level, true) << "\n";
+        file_map[ERROR]->stream << msg_builder.str();
+        file_map[ERROR]->stream.flush();
         rotate_log_check(ERROR);
 
       case WARNING:
         if (level != WARNING)
-            file_map[WARNING].stream << level_as_string(level, true) << "\n";
-        file_map[WARNING].stream << msg_builder.str();
+            file_map[WARNING]->stream << level_as_string(level, true) << "\n";
+        file_map[WARNING]->stream << msg_builder.str();
 
       case NOTICE:
         if (level != NOTICE)
-            file_map[NOTICE].stream << level_as_string(level, true) << "\n";
-        file_map[NOTICE].stream << msg_builder.str();
+            file_map[NOTICE]->stream << level_as_string(level, true) << "\n";
+        file_map[NOTICE]->stream << msg_builder.str();
       }
       log_mutex.unlock();
   }
@@ -170,7 +186,7 @@ public:
   }
 
 private:
-  std::map<LogLevel, LogFile> file_map;
+  std::map<LogLevel, LogFile*> file_map;
   Poco::Util::TimerTaskAdapter<LogManager> *flush_timer;
   string log_dir;
   Poco::Clock startup_time;
@@ -238,13 +254,13 @@ private:
       }
     }
 
-    // map each log level to a LogFile struct instance
-    file_map[NOTICE] = LogFile();
-    file_map[WARNING] = LogFile();
-    file_map[ERROR] = LogFile();
-    file_map[CRITICAL] = LogFile();
+    // map each log level to a LogFile instance
+    file_map[NOTICE] = new LogFile();
+    file_map[WARNING] = new LogFile();
+    file_map[ERROR] = new LogFile();
+    file_map[CRITICAL] = new LogFile();
 
-    // initialize LogFile structs
+    // initialize LogFile classes
     for (const auto &pair : file_map)
       rotate_log_check(pair.first);
 
@@ -259,7 +275,7 @@ private:
   ~LogManager()
   {
     for (auto &pair : file_map)
-        pair.second.close();
+        delete pair.second;
     file_map.~map();
     log_dir.~basic_string();
     startup_time.~Clock();
@@ -268,7 +284,7 @@ private:
   void flush_notice_log(Poco::Util::TimerTask &)
   {
     log_mutex.lock();
-    file_map[NOTICE].stream.flush();
+    file_map[NOTICE]->stream.flush();
     rotate_log_check(NOTICE);
     log_mutex.unlock();
   }
@@ -276,7 +292,7 @@ private:
   void flush_warning_log(Poco::Util::TimerTask &)
   {
     log_mutex.lock();
-    file_map[WARNING].stream.flush();
+    file_map[WARNING]->stream.flush();
     rotate_log_check(WARNING);
     log_mutex.unlock();
   }
@@ -288,15 +304,16 @@ private:
    */
   void rotate_log_check(const LogLevel &level)
   {
-    // if no file or file size is within 100 chars of limit or over limit
-    if (!file_map[level].stream.is_open() ||
-        file_map[level].get_size() > max_filesize - 100)
+    // if the file for the given log level is non-existent or has a size that
+    // is not within 100 chars of limit or over the limit...
+    if (!file_map[level]->stream.is_open() ||
+        file_map[level]->get_size() > max_filesize - 100)
     {
       string newlogpath = new_log_filepath(level);
-      file_map[level].init(newlogpath);
-      file_map[level].stream << "Header Format: HH-MM-SS-LLL "
+      file_map[level]->init(newlogpath);
+      file_map[level]->stream << "Header Format: HH-MM-SS-LLL "
           "<thread name>:<thread_id>:<thread_priority>\n";
-      file_map[level].stream.flush();
+      file_map[level]->stream.flush();
     }
   }
 

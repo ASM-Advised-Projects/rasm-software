@@ -11,7 +11,7 @@
 /**
  * Tracks and estimates the pose of human faces.
  */
-class FacePoseEstimator : public TrackingPoseEstimator<dlib::frontal_face_detector>
+class FacePoseEstimator : public TrackingPoseEstimator<dlib::scan_fhog_pyramid<dlib::pyramid_down<6>>>
 {
 private:
   dlib::frontal_face_detector face_detector;
@@ -20,7 +20,7 @@ private:
   std::vector<int> image_pt_indices;
 
 protected:
-  dlib::object_detector<ImageScannerType> * get_object_detector()
+  dlib::object_detector<dlib::scan_fhog_pyramid<dlib::pyramid_down<6>>> * get_object_detector()
   {
     return &face_detector;
   }
@@ -35,13 +35,13 @@ protected:
     return object_pts;
   }
 
-  std::vector<int> get_image_point_indices()
+  std::vector<int> & get_image_point_indices()
   {
     return image_pt_indices;
   }
 
 public:
-  FacePoseEstimator(CameraImageBuffer &camera, const string &pose_model_filepath)
+  FacePoseEstimator(CameraImageBuffer &camera, const std::string &pose_model_filepath)
   : TrackingPoseEstimator(camera)
   {
     face_detector = dlib::get_frontal_face_detector();
@@ -63,9 +63,9 @@ public:
       cv::Point3d(0.000000, -3.116408, 6.097667),    //#45 mouth central bottom corner
       cv::Point3d(0.000000, -7.415691, 4.070434)     //#6 chin corner
     };
-    objet_pts = std::vector<cv::Point3d>(temp_pts.begin(), temp_pts.end());
+    object_pts = std::vector<cv::Point3d>(temp_pts.begin(), temp_pts.end());
 
-    temp_inds = {
+    std::array<int, 14> temp_inds = {
       17,   //#17 left brow left corner
       21,   //#21 left brow right corner
       22,   //#22 right brow left corner
@@ -81,7 +81,7 @@ public:
       57,   //#57 mouth central bottom corner
       8     //#8 chin corner
     };
-    image_pt_indices = std::vector<cv::Point2d>(temp_inds.begin(), temp_inds.end());
+    image_pt_indices = std::vector<int>(temp_inds.begin(), temp_inds.end());
   }
 };
 
@@ -98,3 +98,5 @@ protected:
 public:
 
 };
+
+#endif

@@ -21,7 +21,7 @@ using std::string;
 
 /**
  * A client endpoint that connects and communicates with a running RASM shell
- * server (implimented in shell_server.h as RasmMultiShell).
+ * server.
  */
 class RasmShellClient : Poco::Runnable
 {

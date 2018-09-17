@@ -41,6 +41,13 @@ public:
     other_handler = new OtherRequestHandler();
   }
 
+  ~HandlerFactory()
+  {
+    get_handler->~GETRequestHandler();
+    post_handler->~POSTRequestHandler();
+    other_handler->~OtherRequestHandler();
+  }
+
   virtual pnet::HTTPRequestHandler* createRequestHandler(const pnet::HTTPServerRequest &request)
   {
     if (request.getMethod() == "GET")
@@ -49,13 +56,6 @@ public:
       return post_handler;
     else
       return other_handler;
-  }
-
-  ~HandlerFactory()
-  {
-    get_handler->~GETRequestHandler();
-    post_handler->~POSTRequestHandler();
-    other_handler->~OtherRequestHandler();
   }
 };
 

@@ -40,7 +40,23 @@ public:
   UCBoard(const UCBoard &) = delete;
   void operator=(const UCBoard &) = delete;
 
+  /**
+   * Returns a reference to this singleton's instance.
+   */
+  static UCBoard& get_instance()
+  {
+    static UCBoard board;
+    return board;
+  }
 
+  /**
+   * UCBoard::get_instance().get_battery_voltage();
+   */
+  double get_battery_voltage()
+  {
+
+    return 0;
+  }
 };
 
 #endif

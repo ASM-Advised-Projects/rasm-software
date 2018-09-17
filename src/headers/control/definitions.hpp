@@ -50,7 +50,7 @@ struct TrajectoryParams
 /**
  *
  */
-struct RobotStructure
+struct LinkDimensions
 {
 
 };

@@ -1,0 +1,11 @@
+Josh:
+    - finish BatteryEstimator class
+    - write MarkerPoseEstimator class
+    - write camera calibration routines
+
+Joe:
+    - fully comment logging, configuration, and all vision files
+    - write a notifyer for modifyable configuration changes
+    - add confidence weights to the TrackingPoseEstimator
+    - write high-level control algorithm
+    - setup testing framework

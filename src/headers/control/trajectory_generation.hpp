@@ -10,42 +10,13 @@
 
 
 /**
- *
- */
-Trajectory1D trapezoidal_trajectory(const TrajectoryParams &params)
-{
-
-}
-
-
-/**
- *
- */
-Trajectory1D cubic_poly_trajectory(const TrajectoryParams &params)
-{
-
-}
-
-
-/**
- *
- */
-Trajectory1D quintic_poly_trajectory(const TrajectoryParams &params)
-{
-
-}
-
-//Trajectory1D optimal_trajectory(const TrajectoryParams &params, Trajectory2Cost cost_function)
-
-
-/**
  * realizable trajectory – all trajectory points are reachable with no singularites (inf joint velocities)
  * decides where to place potential via; guarantees realizable trajectory
  */
 class TrajectoryGenerator
 {
 public:
-  TrajectoryGenerator(RobotStructure params)
+  TrajectoryGenerator(LinkDimensions params)
   {
 
   }
@@ -64,6 +35,37 @@ public:
 
   // inverse kinematics – returns true if reachable
   bool compute_joint_positions(const sixvector &pose, sixvector &joint_positions)
+  {
+
+  }
+
+  /**
+  *
+  */
+  static Trajectory1D trapezoidal_trajectory(const TrajectoryParams &params)
+  {
+
+  }
+
+
+  /**
+  *
+  */
+  static Trajectory1D cubic_poly_trajectory(const TrajectoryParams &params)
+  {
+
+  }
+
+
+  /**
+  *
+  */
+  static Trajectory1D quintic_poly_trajectory(const TrajectoryParams &params)
+  {
+
+  }
+
+  static Trajectory1D optimal_trajectory(const TrajectoryParams &params, Trajectory2Cost cost_function)
   {
 
   }
