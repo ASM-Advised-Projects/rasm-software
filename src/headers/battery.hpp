@@ -11,6 +11,11 @@
 
 #include <Poco/Thread.h>
 #include <Poco/Semaphore.h>
+#include <time.h>
+#define CHARGING_INTERVAL_WAIT_TIME 5
+#define MOTOR_INTERVAL_WAIT_TIME 5
+#define CHARGING_RATE 0.05 // volts/second
+#define DISCHARGE_RATE 0.05 // volts/second
 
 /**
  * This class is a singleton that monitors the battery's charge level and
@@ -75,6 +80,8 @@ private:
     UCBoard &uc_board = UCBoard::get_instance();
 
     double voltage;
+    time_t previous_time_charging = time(0);
+    time_t previous_time_motors = time(0);
     while (true)
     {
       // tryWait will return true if the destructor is ever called, otherwise
@@ -84,13 +91,80 @@ private:
 
       // skip this iteration if the motors are currently running
       if (controller.motors_running())
+      {
         continue;
+      }
+      else
+      {
+        previous_time_motors = time(0);
+      }
 
       // get the present battery voltage
       voltage = uc_board.get_battery_voltage();
 
       // compute new battery state estimates
-      // TODO
+      double old_voltage = present_volts;
+      present_volts = voltage;
+      if(difftime(time(0), previous_time_charging) > CHARGING_INTERVAL_WAIT_TIME && difftime(time(0), previous_time_motors) > MOTOR_INTERVAL_WAIT_TIME) 
+      { 
+        charging = present_volts >= old_voltage; 
+        previous_time_charging = time(0); 
+      }
+      if (charging)
+      {
+        double offset = 1;
+      }
+      else
+      {
+        double offset = 0;
+      }
+      if (present_volts - offset > 25.66)
+      {
+        charge_percent = 100;
+      }
+      else if (present_volts - offset > 25.44)
+      {
+        charge_percent = 90;
+      }
+      else if (present_volts - offset > 25.20)
+      {
+        charge_percent = 80;
+      }
+      else if (present_volts - offset > 24.94)
+      {
+        charge_percent = 70;
+      }
+      else if (present_volts - offset > 24.68)
+      {
+        charge_percent = 50;
+      }
+      else if (present_volts - offset > 24.12)
+      {
+        charge_percent = 40;
+      }
+      else if (present_volts - offset > 23.82)
+      {
+        charge_percent = 30;
+      }
+      else if (present_volts - offset > 23.52)
+      {
+        charge_percent = 20;
+      }
+      else if (present_volts - offset > 23.22)
+      {
+        charge_percent = 10;
+      }
+      else
+      {
+        charge_percent = 0;
+      }
+      if (charging)
+      {
+        remaining_time = (25.66-present_volts)/CHARGING_RATE;
+      }
+      else
+      {
+        remaining_time = (present_volts - 23.22)/DISCHARGE_RATE;
     }
   }
 
