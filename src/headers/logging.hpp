@@ -7,6 +7,7 @@
 #define _LOGGING_H_
 
 #include "configuration.hpp"
+#include "time.hpp"
 
 #include <fstream>
 #include <sstream>
@@ -16,7 +17,6 @@
 #include <Poco/Mutex.h>
 #include <Poco/File.h>
 #include <Poco/NumberParser.h>
-#include <Poco/Clock.h>
 #include <Poco/Util/TimerTask.h>
 #include <Poco/Util/TimerTaskAdapter.h>
 
@@ -237,7 +237,6 @@ private:
   std::map<LogLevel, LogFile*> file_map;
   Poco::Util::Timer flush_timer;
   string log_dir;
-  Poco::Clock startup_time;
   long max_filesize;
   Poco::Mutex stream_mutex;
 
@@ -339,11 +338,12 @@ private:
    */
   ~LogManager()
   {
+    flush_timer.cancel();
+    flush_timer.~Timer();
     for (auto &pair : file_map)
         delete pair.second;
     file_map.~map();
     log_dir.~basic_string();
-    startup_time.~Clock();
   }
 
   /**
@@ -408,7 +408,7 @@ private:
    */
   TimeStamp elapsed_time() const
   {
-    long millis = startup_time.elapsed() / 1000;
+    long millis = RasmTime::current_time_millis() / 1000;
     long hours = millis / (1000*60*60);
     long minutes = millis / (1000*60);
     long seconds = millis / 1000;

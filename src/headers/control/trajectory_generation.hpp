@@ -16,7 +16,7 @@
 class TrajectoryGenerator
 {
 public:
-  TrajectoryGenerator(LinkDimensions params)
+  TrajectoryGenerator(JointLinkKinematics params)
   {
 
   }
