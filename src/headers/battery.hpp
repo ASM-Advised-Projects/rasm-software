@@ -16,26 +16,28 @@
 #include <Poco/Util/TimerTaskAdapter.h>
 
 #include <vector>
+#include <fstream>
 
 using std::string;
+using std::vector;
 
 
 /**
  * An instance of this class periodically reads a battery's voltage, estimates
  * it's level of charge, and provides basic queryable stats.
  */
-class BatteryEstimator : Poco::Runnable
+class BatteryEstimator
 {
 private:
   /**
-   * This struct holds a battery-level data point containing a time, voltage,
+   * This struct holds a battery voltage data point containing a time, voltage,
    * and voltage slope.
    */
   struct BatteryDataRecord
   {
     unsigned int seconds;
-    double voltage;
-    double voltage_slope;
+    double volts;
+    double voltsperhr;
   };
 
   double (*get_voltage)();
@@ -45,9 +47,8 @@ private:
   RealTimeLTIFilter *voltage_filter;
   RealTimeDifferentiator voltage_diff;
 
-  std::vector<BatteryDataRecord> charge_particles;
-  std::vector<BatteryDataRecord> discharge_particles;
-  int particle_trials;
+  vector<BatteryDataRecord> charge_particles;
+  vector<BatteryDataRecord> discharge_particles;
   double voltage_error_weight;
   double slope_error_weight;
   int dead_volts;
@@ -58,38 +59,139 @@ private:
   bool charging_;
 
   /**
-   * Parses the given string into a vector of numbers. The numbers in the string
-   * are expected to be comma-delimited.
+   * Parses the comma-delimited numbers in the given string and places them
+   * into the given vector in the same order as they appear in the string. The
+   * given vector will be cleared beforehand.
+   *
+   * Throws a Poco::SyntaxException if a comma-delimited token other than a
+   * parseable number is encountered in the string.
    */
-  std::vector<double> parse_number_list(const string &num_list)
+  void parse_number_list(const string &num_list, vector<double> &vals)
   {
     Poco::StringTokenizer splitter(num_list, ",");
-    std::vector<double> coeffs;
+    vals.clear();
+    vals.reserve(splitter.count());
     for (int i = 0; i < splitter.count(); ++i)
-      coeffs.push_back(Poco::NumberParser::parseFloat(splitter[i]));
-    return coeffs;
+      vals.push_back(Poco::NumberParser::parseFloat(splitter[i]));
   }
 
   /**
+   * Reads battery data from the given text file into the given rows vector. The
+   * vector will be cleared beforehand.
    *
+   * The text file should be in csv format with three data columns and no
+   * headers. The first column should be an integer time in seconds, the second
+   * column should be the floating-point voltage in volts, and the third should
+   * be the floating-point voltage derivative with respect to time. The
+   * derivative should have units of volts/hour.
+   *
+   * Throws a Poco::DataException if the file data is not formatted properly.
+   * Throws a Poco::FileException if the given file path doesn't represent a
+   * readable text file.
    */
-  void load_discharge_model(const string &filepath)
+  void load_battery_data(const string &filepath, vector<BatteryDataRecord> &rows)
   {
+    rows.clear();
 
+    // open the data file
+    std::ifstream file(filepath);
+    if (!file.is_open())
+    {
+      throw Poco::FileException("In BatteryEstimator::load_file_data\n"
+      "File at path '" + filepath + "' can't be opened for reading.");
+    }
+
+    // parse each line of file and add to the rows vector
+    string line;
+    vector<double> line_vals;
+    while (std::getline(file, line))
+    {
+      parse_number_list(line, line_vals);
+      if (line_vals.size() != 3)
+      {
+        throw Poco::DataException("In BatteryEstimator::load_file_data\n"
+        "The file '" + filepath + "' has at least one data row that doesn't"
+        "hold exactly three values.");
+      }
+
+      BatteryDataRecord data_point = {
+        (unsigned int)line_vals[0],
+        (double)line_vals[1],
+        (double)line_vals[2]
+      };
+      rows.push_back(data_point);
+    }
+
+    file.close();
   }
 
   /**
+   * Reads in battery discharge data from a text file at the given filepath. The
+   * data is interpolated to get a series of <num_particles> particles that will
+   * be stored in the given particles vector. The minimum amount of data rows
+   * that the file must have is two.
    *
+   * Throws a Poco::FileException if the given file path doesn't represent a
+   * readable text file.
+   * Throws a Poco::SyntaxException if a comma-delimited token other than a
+   * parseable number is encountered in the string.
+   * Throws a Poco::DataException if the file data has less than two rows or if
+   * the data is not formatted properly.
    */
-  void load_charge_model(const string &filepath)
+  void load_battery_model(const string &filepath,
+      vector<BatteryDataRecord> &particles, int num_particles)
   {
+    // load the battery data
+    vector<BatteryDataRecord> data;
+    load_battery_data(filepath, data);
+    if (data.size() < 2)
+    {
+      throw Poco::DataException("In BatteryMonitor::load_battery_model\n"
+      "The file '" + filepath + "' holds less than two data points.");
+    }
 
+    particles.reserve(num_particles);
+
+    // get the start and end times
+    unsigned int start_time = data[0].seconds;
+    unsigned int end_time = data[data.size()-1].seconds;
+
+    // find the time difference between adjacent particles
+    double time_diff = (end_time - start_time) / (double)(num_particles-1);
+
+    // set the time values of all particles
+    particles[0].seconds = start_time;
+    for (int i = 1; i < particles.size(); i++)
+      particles[i].seconds = (unsigned int)(start_time + i*time_diff);
+
+    // for each data point besides the first, interpolate with the previous
+    // data point in order to find the voltage and voltage slope for all of the
+    // particles that lie between them
+    int part_ind = 0;
+    for (int data_ind = 1; data_ind < data.size(); data_ind++)
+    {
+      for (; particles[part_ind].seconds <= data[data_ind].seconds; part_ind++)
+      {
+        // where between the two data points the particle lies
+        double time_fraction = (particles[part_ind].seconds - data[data_ind-1].seconds) / time_diff;
+
+        // compute particle voltage via interpolation
+        // V = V_{i-1} + (V_i - V_{i-1}) * time_fraction
+        particles[part_ind].volts = data[data_ind-1].volts +
+            (data[data_ind].volts - data[data_ind-1].volts) * time_fraction;
+
+        // compute particle voltage slope via interpolation
+        // VS = VS_{i-1} + (VS_i - VS_{i-1}) * time_fraction
+        particles[part_ind].voltsperhr = data[data_ind-1].voltsperhr +
+            (data[data_ind].voltsperhr - data[data_ind-1].voltsperhr) * time_fraction;
+      }
+    }
   }
 
   /**
    * If voltage reading is allowed, then this method takes a reading and inputs
    * it into the voltage filter. It subsequently takes the new output of the
-   * voltage filter, attached the current time in seconds to it, and feeds it
+   * voltage filter, attaches the current time in hours to it, and feeds it
    * into the voltage differentiator.
    */
   void read_voltage(Poco::Util::TimerTask &)
@@ -100,12 +202,13 @@ private:
     voltage_filter->input(get_voltage());
     voltage_diff.input(
         voltage_filter->output(),
-        RasmTime::current_time_millis() / 1000.0
+        RasmTime::current_time_millis() / 1000.0 / 3600.0
     );
   }
 
   /**
-   * Updates the battery state field variables.
+   * Updates the battery state field variables using a rudimentary particle
+   * filter.
    */
   void estimate_state(Poco::Util::TimerTask &)
   {
@@ -121,15 +224,15 @@ private:
 
     // if charging, then apply a non-recursive particle filter to the charge model
     // otherwise, apply a non-recursive particle filter to the discharge model
-    std::vector<BatteryDataRecord> &particles = charging_ ? charge_particles : discharge_particles;
-    std::vector<double> errors(particles.size(), 0);
+    vector<BatteryDataRecord> &particles = charging_ ? charge_particles : discharge_particles;
+    vector<double> errors(particles.size(), 0);
 
     // calculate the weighted error for each particle
     for (int i = 0; i < errors.size(); ++i)
     {
       BatteryDataRecord particle = particles[i];
-      double voltage_diff = (voltage - particle.voltage) / particle.voltage;
-      double slope_diff = (slope - particle.voltage_slope) / particle.voltage_slope;
+      double voltage_diff = (voltage - particle.volts) / particle.volts;
+      double slope_diff = (slope - particle.voltsperhr) / particle.voltsperhr;
       errors[i] = voltage_error_weight*voltage_diff + slope_error_weight*slope_diff;
     }
 
@@ -153,7 +256,7 @@ private:
    * Returns the smallest index of the smallest number contained in the given
    * vector of numbers. If the vector is empty, then -1 is returned.
    */
-  int index_of_min(const std::vector<double> &list)
+  int index_of_min(const vector<double> &list)
   {
     if (list.size() == 0)
       return -1;
@@ -191,21 +294,23 @@ public:
 
     // initialize the voltage filter with its feedforward/back coefficients
     string ff_coeffs_str = batteryconfigs->getRawString("voltage_feedforward_coeffs");
-    std::vector<double> ff_coeffs = parse_number_list(ff_coeffs_str);
     string fb_coeffs_str = batteryconfigs->getRawString("voltage_feedback_coeffs");
-    std::vector<double> fb_coeffs = parse_number_list(fb_coeffs_str);
+    vector<double> ff_coeffs;
+    vector<double> fb_coeffs;
+    parse_number_list(ff_coeffs_str, ff_coeffs);
+    parse_number_list(fb_coeffs_str, fb_coeffs);
     voltage_filter = new RealTimeLTIFilter(ff_coeffs, fb_coeffs);
 
+    // load the battery models
+    int num_particles = batteryconfigs->getDouble("num_particles");
+    string folder = batteryconfigs->getRawString("root_working_dir") + "/config";
+    load_battery_model("/discharge_model.csv", discharge_particles, num_particles);
+    load_battery_model("/charge_model.csv", charge_particles, num_particles);
+
     // read in some more configurations
-    particle_trials = batteryconfigs->getDouble("particle_trials");
     voltage_error_weight = batteryconfigs->getDouble("voltage_error_weight");
     slope_error_weight = batteryconfigs->getDouble("slope_error_weight");
     dead_volts = batteryconfigs->getDouble("dead_volts");
-
-    // load the battery models -- must be done after particle_trials is initialized
-    string folder = batteryconfigs->getRawString("root_working_dir") + "/config";
-    load_discharge_model("/discharge_model.csv");
-    load_charge_model("/charge_model.csv");
 
     // schedule the voltage read task for periodic execution
     Poco::AutoPtr<Poco::Util::TimerTask> read_task =
