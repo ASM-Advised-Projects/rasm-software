@@ -1,5 +1,5 @@
 /**
- * Defines the RasmTime class.
+ * Defines the RasmTime and Stopwatch classes.
  */
 
 #include <Poco/Clock.h>
@@ -43,9 +43,10 @@ public:
  * A simple class for clocking how long a section of code takes to execute.
  * This stopwatch is layered in the sense that multiple timers can be ran at
  * the same time. A timer is started by calling the start method. It is stopped
- * by called the stop method. If the start method is called twice, then the
- * first call to the stop method will stop the 2nd start. The 2nd call to the
- * stop method will stop the 1st start.
+ * by calling the stop method. If the start method is called twice in a row,
+ * then two timers are started. The first call to the stop method will stop the
+ * 2nd timer started. The 2nd call to the stop method will stop the 1st timer
+ * started.
  *
  * Here's a more comprehensive example:
  * ...        // represents lines of other code
@@ -57,8 +58,10 @@ public:
  * stop()     // stops timer #2
  * elapsed()  // returns the time that timer #2 was running for
  * ...
- * start()    // starts timer #2
+ * start()    // starts timer #2 (starts back at 0 time elapsed; it doesn't
+ *            // pick up where it was last stopped)
  * ...
+ * elapsed()  // will return the same value it did before
  * stop()     // stops timer #2
  * elapsed()  // returns the time that timer #2 was just running for
  * stop()     // stops timer #1
