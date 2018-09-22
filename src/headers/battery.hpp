@@ -33,7 +33,7 @@ private:
    * This struct holds a battery voltage data point containing a time, voltage,
    * and voltage slope.
    */
-  struct BatteryDataRecord
+  struct BatteryDatum
   {
     unsigned int seconds;
     double volts;
@@ -47,8 +47,8 @@ private:
   RealTimeLTIFilter *voltage_filter;
   RealTimeDifferentiator voltage_diff;
 
-  vector<BatteryDataRecord> charge_particles;
-  vector<BatteryDataRecord> discharge_particles;
+  vector<BatteryDatum> charge_particles;
+  vector<BatteryDatum> discharge_particles;
   double voltage_error_weight;
   double slope_error_weight;
   int dead_volts;
@@ -89,7 +89,7 @@ private:
    * Throws a Poco::FileException if the given file path doesn't represent a
    * readable text file.
    */
-  void load_battery_data(const string &filepath, vector<BatteryDataRecord> &rows)
+  void load_battery_data(const string &filepath, vector<BatteryDatum> &rows)
   {
     rows.clear();
 
@@ -114,7 +114,7 @@ private:
         "hold exactly three values.");
       }
 
-      BatteryDataRecord data_point = {
+      BatteryDatum data_point = {
         (unsigned int)line_vals[0],
         (double)line_vals[1],
         (double)line_vals[2]
@@ -139,10 +139,10 @@ private:
    * the data is not formatted properly.
    */
   void load_battery_model(const string &filepath,
-      vector<BatteryDataRecord> &particles, int num_particles)
+      vector<BatteryDatum> &particles, int num_particles)
   {
     // load the battery data
-    vector<BatteryDataRecord> data;
+    vector<BatteryDatum> data;
     load_battery_data(filepath, data);
     if (data.size() < 2)
     {
@@ -224,13 +224,13 @@ private:
 
     // if charging, then apply a non-recursive particle filter to the charge model
     // otherwise, apply a non-recursive particle filter to the discharge model
-    vector<BatteryDataRecord> &particles = charging_ ? charge_particles : discharge_particles;
+    vector<BatteryDatum> &particles = charging_ ? charge_particles : discharge_particles;
     vector<double> errors(particles.size(), 0);
 
     // calculate the weighted error for each particle
     for (int i = 0; i < errors.size(); ++i)
     {
-      BatteryDataRecord particle = particles[i];
+      BatteryDatum particle = particles[i];
       double voltage_diff = (voltage - particle.volts) / particle.volts;
       double slope_diff = (slope - particle.voltsperhr) / particle.voltsperhr;
       errors[i] = voltage_error_weight*voltage_diff + slope_error_weight*slope_diff;
