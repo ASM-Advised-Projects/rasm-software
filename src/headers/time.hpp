@@ -5,6 +5,8 @@
 #include <Poco/Clock.h>
 #include <Poco/Exception.h>
 
+#include <array>
+
 /**
  * Keeps track of the amount of time that has elapsed since startup. This
  * elapsed time can be statically queried.
@@ -77,7 +79,7 @@ class Stopwatch
 {
 private:
   Poco::Clock clock;
-  unsigned int start_times[5];
+  std::array<unsigned int,5> start_times;
   int current_timer;
   unsigned int elapsed_time;
 
@@ -86,10 +88,10 @@ public:
    * Constructs a new stopwatch with no timers running.
    */
   Stopwatch()
-  : start_times {0,0,0,0,0}
-  , current_timer(-1)
+  : current_timer(-1)
   , elapsed_time(0)
   {
+    start_times.fill(0);
   }
 
   /**
@@ -98,7 +100,7 @@ public:
    */
   void start()
   {
-    if (current_timer == 4)
+    if (current_timer == start_times.size())
     {
       throw Poco::IllegalStateException("In Stopwatch::start()\n"
       "Start cannot be called if there are already 5 timers running.");
