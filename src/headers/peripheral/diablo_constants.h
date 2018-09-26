@@ -1,5 +1,8 @@
 /**
- *
+ * Defines a set of constants for use in both diablo_commands.c and in files
+ * that use diablo_commands. The original constant file had a lot of constants
+ * trimmed down to the point of having mostly just what is needed for the
+ * functions that still remain in diablo_commands.
  */
 
 #ifndef DIABLO_CONSTANTS_H

@@ -9,8 +9,9 @@
 #include "diablo_constants.h"
 #include "diablo_commands.h"
 
-#include "periphery_access.hpp"
-#include "periphery_config.hpp"
+//#include "periphery_access.hpp"
+//#include "periphery_config.hpp"
+#include "../configuration.hpp"
 
 #include "periphery/serial.h"
 
@@ -56,6 +57,17 @@ using std::string;
 class Display4D : Poco::Runnable
 {
 private:
+  /**
+   * This enumeration lists all of the available baud rates. Their names
+   * are just the rates (in Hz) that they represent with prefixed underscores.
+   * This list is relatively small because these were the only values that both
+   * the display and the usual UART drivers of the linux kernel support.
+   *
+   * Note that this enum isn't actually used because it's just meant to formally
+   * indicate what baud rates are allowed.
+   */
+  enum _BaudRate { _9600, _19200, _38400, _57600, _115200, _500000 };
+
   /**
    * A list of messages that can be randomly displayed on the splash screen.
    * Many of these were copied and adapted from this repository:
@@ -158,29 +170,27 @@ private:
     cmd_event.set();
   }
 
-public:
-  /**
-   * This enumeration lists all of the available baud rates. Their names
-   * are just the rates (in Hz) that they represent with prefixed underscores.
-   * This list is relatively small because these were the only values that both
-   * the display and the usual UART drivers of the linux kernel support.
-   */
-  enum BaudRate { _9600, _19200, _38400, _57600, _115200, _500000 };
-
-  /**
-   * Constructs a new Display4D instance to control a display at the given
-   * baud rate on the uart device corresponding to the given uart device index.
-   * This constructor will cause the display screen to be blank with a black
-   * background. Note that a background thread is started which is used to send
-   * queued commands to the display whenever it isn't busy.
+/**
+   * Constructs a new Display4D instance to control a display at the configured
+   * baud rate and uart device. This constructor will cause the display screen
+   * to be blank with a black background. Note that a background thread is
+   * started which is used to send queued commands to the display whenever it
+   * isn't busy.
    *
    * Throws Poco::RuntimeException if the uart device can't be opened.
    */
-  Display4D(int uart_index, BaudRate brate)
+  Display4D()
   : cmd_event(true)
   , exit_thread(false)
   , recv_timeout(100)
   {
+    Poco::AutoPtr<MapConfiguration> configs = ConfigurationManager::get_instance().
+        get_config_group(ConfigurationManager::Group::PERIPHERY);
+
+    // load the uart device index and baud rate from configurations
+    int uartbus = configs->getInt("display.uartbus");
+    int baudrate = configs->getInt("display.baudrate");
+
     // find length of the longest splash message and initialize index array
     longest_splash_msg = 0;
     for (int i = 0; i < splash_messages.size(); i++)
@@ -200,12 +210,13 @@ public:
     cmd_process_thread.start(*this);
 
     // initialize the uart port connected to the display (defaut baud = 9600)
+    UartConf uartconf;
     bool success = PeripheryAccess::get_instance().init_uart_device(
-        uart_index, &uart_port, UartConf());
+        uartbus, &uart_port, uartconf);
     if (!success)
     {
       throw Poco::RuntimeException("In Display4D::Display4D()\n"
-      "Initialization failed for UART device number " + std::to_string(uart_index) + ".");
+      "Initialization failed for UART device number " + std::to_string(uartbus) + ".");
     }
     /*struct termios new_port_settings;
     int k, ch, tSave, baudr;
@@ -223,28 +234,28 @@ public:
     tcsetattr(cPort, TCSANOW, &new_port_settings);
     fcntl(cPort, F_SETFL, FNDELAY);*/  // Set non-blocking
 
-    // change the default baud rate of the display and of the computer's uart
+    // change the default baud rate of both the display and the computer's uart
     // device to the given rate
-    unsigned short index;
-    unsigned int rate;
-    switch (brate)
+    int rateindex;
+    switch (baudrate)
     {
-      case _9600: index = 6; rate = 9600; break;
-      case _19200: index = 8; rate = 19200; break;
-      case _38400: index = 10; rate = 38400; break;
-      case _57600: index = 12; rate = 57600; break;
-      case _115200: index = 13; rate = 115200; break;
-      case _500000: index = 18; rate = 500000; break;
+      case 9600: rateindex = 6; break;
+      case 19200: rateindex = 8; break;
+      case 38400: rateindex = 10; break;
+      case 57600: rateindex = 12; break;
+      case 115200: rateindex = 13; break;
+      case 500000: rateindex = 18; break;
+      default: rateindex = 13; baudrate = 115200; break;
     }
 
     /* Can't use the queue system because the uart device's baud rate must be
        changed between the time of the command being sent and the response
        being received.*/
     command_t cmd;
-    setbaudWait(&cmd, index);  // set baud rate of display
+    setbaudWait(&cmd, rateindex);  // set baud rate of display
     serial_write(&uart_port, &(cmd.buffer[0]), cmd.txlength);
     serial_flush(&uart_port);
-    serial_set_baudrate(&uart_port, rate);  // set baud rate of computer
+    serial_set_baudrate(&uart_port, baudrate);  // set baud rate of computer
     unsigned char recvbuff[3];
     serial_read(&uart_port, recvbuff, cmd.rxlength, recv_timeout);
 
@@ -265,6 +276,19 @@ public:
     queue_cmd(cmd);
 
     showBlankScreen();  // clear the screen
+  }
+
+public:
+  Display4D(const Display4D &) = delete;
+  void operator=(const Display4D &) = delete;
+
+  /**
+   * Returns a reference to this singleton's instance.
+   */
+  static Display4D & get_instance()
+  {
+    static Display4D display;
+    return display;
   }
 
   /**
