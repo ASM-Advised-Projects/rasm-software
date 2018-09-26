@@ -1,5 +1,4 @@
 Josh:
-    - finish BatteryEstimator class
     - write MarkerPoseEstimator class
     - write camera calibration routines
 

@@ -6,6 +6,11 @@
 #ifndef PERIPHERY_CONFIG_INCLUDED
 #define PERIPHERY_CONFIG_INCLUDED
 
+#ifdef __cplusplus
+extern "C"
+{
+#endif
+
 #include "periphery/i2c.h"
 #include "periphery/spi.h"
 #include "periphery/serial.h"
@@ -65,9 +70,13 @@ struct SpiConf
  */
 struct UartConf
 {
-  BaudRate baudrate = BaudRate::_115200;
+  BaudRate baudrate = BaudRate::_9600;
   Parity parity = Parity::NONE;
   bool xonxoff = false;
 };
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif

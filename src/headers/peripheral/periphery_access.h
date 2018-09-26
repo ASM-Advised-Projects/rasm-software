@@ -2,8 +2,8 @@
  * Defines the PeripheryAccess (singleton) class.
  */
 
-#ifndef PERIPHERY_ACCESS_INCLUDED
-#define PERIPHERY_ACCESS_INCLUDED
+#ifndef PERIPHERY_ACCESS_H
+#define PERIPHERY_ACCESS_H
 
 #include "periphery/i2c.h"
 #include "periphery/spi.h"
