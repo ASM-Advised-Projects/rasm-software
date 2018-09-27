@@ -18,7 +18,7 @@ The RASM is an autonomous 6-degree-of-freedom robot arm that keeps a [Tobii Dyna
 
 ---
 
-The software system is written in C++ and is organized into eight subsystems:
+The software system is written in C++ and is organized into eight subsystems. The dependencies of each these subsystems are listed. Meta-operating systems such as ROS are not being used in this project. This software system is, for the most part, specific to Linux but can be ported to work on any other operating system so long as the Peripheral Interfacing subsystem is adapted for that OS.
 
 Subsystem | Source Files | Dependencies
 :-------- |:------------ |:------------
