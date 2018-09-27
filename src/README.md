@@ -1,4 +1,4 @@
-Nearly all of the code is in the 'headers' folder. The four cpp files defined here each run their own program.
+The four cpp files defined here each run their own program.
 
 * rasm_main.cpp -- Operates the RASM in a hospital environment.
 

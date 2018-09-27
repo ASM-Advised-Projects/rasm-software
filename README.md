@@ -22,14 +22,14 @@ The software system is written in C++ and is organized into eight subsystems:
 
 Subsystem | Source Files | Dependencies
 :-------- |:------------ |:------------
-Configuration | src/configuration.hpp | Poco
-Logging | src/logging.hpp | Poco
-HTTP Server | src/http/* | Poco
-Shell Server | src/shell/* | Poco
-Pose Estimation | src/vision/* | openCV and dlib
-Control | src/control/* | none
-Peripheral Interfacing | src/peripheral/* | Poco and [c-periphery](https://github.com/vsergeev/c-periphery)
-Battery Monitoring | src/battery.hpp | none
+Configuration | include/configuration.hpp | Poco
+Logging | include/logging.hpp | Poco
+HTTP Server | include/http/* | Poco
+Shell Server | include/shell/* | Poco
+Pose Estimation | include/vision/* | openCV and dlib
+Control | include/control/* | none
+Peripheral Interfacing | include/peripheral/* | Poco and [c-periphery](https://github.com/vsergeev/c-periphery)
+Battery Monitoring | include/battery.hpp | none
 
 Poco version: 1.9.x
 
@@ -53,13 +53,13 @@ Status: needs testing
 
 Predicts the battery system's SOC (state of charge) and SOH (state of health) using a filtering state estimation algorithm.
 
-Status: estimation algorithm still needs writing; needs testing
+Status: needs testing
 
 **HTTP Server**
 
 The HTTP server hosts a website which allows the user to configure the RASM while it's operating. The Tobii screen or any other wifi-capable device can connect to the RASM's wifi access point and use the configuration website. Note that the access point doesn't provide any bridge to the internet. The website files are located in the test/filesysroot/rasm_2_x/web directory.
 
-Status: needs parsing routines, legit web files to serve, and subsequent testing
+Status: needs POST request parsing routines and subsequent testing
 
 **Shell Server**
 
@@ -71,13 +71,13 @@ Status: needs parsing routines and subsequent testing
 
 Uses a camera mounted next to the Tobii screen to detect and estimate the pose of human faces and certain markers.
 
-Status: needs calibration routines and subsequent testing
+Status: needs marker pose estimator, calibration routines, and subsequent testing
 
 **Control**
 
 Generates joint-space trajectories, tracks trajectories with feedforward and feedback control, and processes sensor signals. The overall RASM behavior is defined via the control routines implemented in the Controller class. These control routines utilize the pose estimation, peripheral interfacing, and battery monitoring subsystems.
 
-Status: not started, but the object model exists
+Status: hardly started, but the object model exists
 
 ![alt text](https://github.com/ASM-Advised-Projects/rasm-v2/blob/master/analyze/images/control_system_block_diagram.png "control system block diagram")
 
@@ -85,7 +85,7 @@ Status: not started, but the object model exists
 
 Provides an abstractive interface for interacting with the peripherals connected to the single-board computer. The two peripherals in use are an 8-bit AVR microcontroller (connected via SPI) and a gen4 HMI display module (connected via UART).
 
-Status: not started, but the object model exists
+Status: UCBoard and Display4D need finishing and testing
 
 ---
 

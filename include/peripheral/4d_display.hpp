@@ -6,11 +6,10 @@
 #ifndef DISPLAY_4D_H
 #define DISPLAY_4D_H
 
-#include "diablo_constants.h"
 #include "diablo_commands.h"
 
-//#include "periphery_access.hpp"
-//#include "periphery_config.hpp"
+#include "periphery_access.hpp"
+#include "periphery_config.h"
 #include "../configuration.hpp"
 
 #include "periphery/serial.h"
