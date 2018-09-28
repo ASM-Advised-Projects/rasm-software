@@ -6,8 +6,6 @@
 #define POSE_ESTIMATION_INCLUDED
 
 #include "pose_estimation_base.hpp"
-#warning "What do warnings look like?"
-#error "What do errors look like?"
 
 
 /**
