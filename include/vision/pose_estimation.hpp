@@ -30,14 +30,14 @@ protected:
     return &face_pose_model;
   }
 
-  std::vector<cv::Point3d> & get_object_points()
+  std::vector<cv::Point3d> * get_object_points()
   {
-    return object_pts;
+    return &object_pts;
   }
 
-  std::vector<int> & get_image_point_indices()
+  std::vector<int> * get_image_point_indices()
   {
-    return image_pt_indices;
+    return &image_pt_indices;
   }
 
 public:

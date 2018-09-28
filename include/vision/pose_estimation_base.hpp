@@ -32,8 +32,8 @@ private:
   dlib::object_detector<ImageScannerType> *detector;
   dlib::shape_predictor *pose_model;
 
-  const std::vector<cv::Point3d> & object_pts;
-  const std::vector<int> & image_pt_inds;
+  std::vector<cv::Point3d> *object_pts;
+  std::vector<int> *image_pt_inds;
 
   cv::Mat cam_matrix;
   cv::Mat dist_coeffs;
@@ -54,8 +54,8 @@ private:
 protected:
   virtual dlib::object_detector<ImageScannerType> * get_object_detector() = 0;
   virtual dlib::shape_predictor * get_shape_predictor() = 0;
-  virtual const std::vector<cv::Point3d> & get_object_points() = 0;
-  virtual const std::vector<int> & get_image_point_indices() = 0;
+  virtual std::vector<cv::Point3d> * get_object_points() = 0;
+  virtual std::vector<int> * get_image_point_indices() = 0;
 
   /**
    *
@@ -258,7 +258,7 @@ public:
 
     // load 2d image points to use
     image_pts.clear();
-    for (auto iter = image_pt_inds.begin(); iter != image_pt_inds.end(); iter++)
+    for (auto iter = image_pt_inds->begin(); iter != image_pt_inds->end(); iter++)
     {
       image_pts.push_back(cv::Point2d(shape.part(*iter).x(), shape.part(*iter).y()));
     }
@@ -266,7 +266,7 @@ public:
     // find the pose of the object
     cv::Mat rotation_vec;      // 3x1 (row x col)
     cv::Mat translation_vec;   // 3x1 (row x col)
-    cv::solvePnP(object_pts, image_pts, cam_matrix, dist_coeffs, rotation_vec, translation_vec);
+    cv::solvePnP((*object_pts), (*image_pts), cam_matrix, dist_coeffs, rotation_vec, translation_vec);
     Pose pose = {
       translation_vec.at<double>(1, 1),
       translation_vec.at<double>(2, 1),

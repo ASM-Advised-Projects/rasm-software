@@ -43,7 +43,7 @@ public:
    */
   static bool load_camera_properties(const std::string &calib_filepath, cv::Mat &cam_matrix, cv::Mat &dist_coeffs)
   {
-
+    return false;
   }
 };
 
