@@ -1,6 +1,13 @@
 /**
- *
+ * This file defines the main method for the program that runs all software
+ * tests for the RASM's software system.
  */
+
+#include "battery_tests.hpp"
+#include "configuration_tests.hpp"
+#include "logging_tests.hpp"
+#include "http_tests.hpp"
+#include "other_tests.hpp"
 
 #include <string>
 #include <vector>

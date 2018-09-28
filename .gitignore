@@ -40,7 +40,7 @@ test/pseudo_rasm_filespace/root/rasm_2_1/log/
 lib/
 
 # for object files
-build/
+# build/
 
 # for target libraries/executables
 bin/
