@@ -254,7 +254,7 @@ public:
 
     // locate features
     dlib::cv_image<unsigned short> gray_img_dlib(gray_img);  // dlib image format
-    dlib::full_object_detection shape = pose_model(gray_img_dlib, selected_object_box);
+    dlib::full_object_detection shape = (*pose_model)(gray_img_dlib, selected_object_box);
 
     // load 2d image points to use
     image_pts.clear();
