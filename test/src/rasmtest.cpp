@@ -63,25 +63,27 @@ int option_type(string &str)
  */
 int main(int argc, char **argv)
 {
+  // help/usage printout
+  string usage = "usage: rasmtest [--help] [fileroot [--test systems] [--active | --non-active]"
+  " [--lest 'option1 ...']]\n       all systems: configuration:logging:battery:peripheral:"
+  "vision:control:http:shell:other";
+
   // move command-line options from argv to options
   std::vector<string> options;
   for (int arg_ind = 1; arg_ind < argc; arg_ind++)  // skip first arg
     options.push_back(argv[arg_ind]);
 
-  // print a help message and exit if --help option is present
-  if (contains(options, "--help"))
+  // print a help message and exit if --help option is present or if no options are present
+  if (argc <= 1 || contains(options, "--help") != -1)
   {
-    string help = "rasmtest [--help] [fileroot [--test systems] [--active | --non-active]"
-    " [--lest 'option1 ...']]\nall systems: configuration:logging:battery:peripheral:"
-    "vision:control:http:shell:other";
-    cout << help << endl;
+    cout << usage << endl;
     return 0;
   }
 
   // get the fileroot
   if (option_type(options[0]) != 0)
   {
-    cout << "First argument must by a file path." << endl;
+    cout << "First argument must be a file path." << endl;
     return 1;
   }
   string fileroot = options[0];
