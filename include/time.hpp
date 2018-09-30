@@ -14,28 +14,31 @@
 class RasmTime
 {
 private:
-  static Poco::Clock start_time;
+  Poco::Clock start_time;
 
-  /**
-   * Don't allow instance creation.
-   */
   RasmTime()
   {
   }
 
 public:
+  static RasmTime & get_instance()
+  {
+    static RasmTime rt;
+    return rt;
+  }
+
   /**
-   * Returns the elapsed milliseconds since this program was started.
+   * Returns the elapsed milliseconds since this singleton was initialized.
    */
-  static unsigned int current_time_millis()
+  unsigned int current_time_millis()
   {
     return start_time.elapsed();
   }
 
   /**
-   * Returns the elapsed seconds since this program was started.
+   * Returns the elapsed seconds since this singleton was initialized.
    */
-  static unsigned int current_time_seconds()
+  unsigned int current_time_seconds()
   {
     return 1000 * start_time.elapsed();
   }
