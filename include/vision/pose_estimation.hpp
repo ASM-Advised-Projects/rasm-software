@@ -1,4 +1,4 @@
-/**
+/*
  * Defines the FacePoseEstimator and MarkerPoseEstimator classes.
  */
 
@@ -89,11 +89,36 @@ public:
 /**
  * Tracks and estimates the pose of a certain type of visual marker.
  */
-class MarkerPoseEstimator
+class MarkerPoseEstimator : public TrackingPoseEstimator<dlib::scan_fhog_pyramid<dlib::pyramid_down<6>>>
 {
 private:
+  dlib::object_detector<dlib::scan_fhog_pyramid<dlib::pyramid_down<6>>> circle_detector;
+  dlib::shape_predictor circle_pose_model;
+  std::vector<cv::Point3d> object_pts;
+  std::vector<int> image_pt_indices;
+
 
 protected:
+  dlib::object_detector<dlib::scan_fhog_pyramid<dlib::pyramid_down<6>>> * get_object_detector()
+  {
+    return &circle_detector;
+  }
+
+  dlib::shape_predictor * get_shape_predictor()
+  {
+    return &circle_pose_model;
+  }
+
+  std::vector<cv::Point3d> * get_object_points()
+  {
+    return &object_pts;
+  }
+
+  std::vector<int> * get_image_point_indices()
+  {
+    return &image_pt_indices;
+  }
+
 
 public:
 
