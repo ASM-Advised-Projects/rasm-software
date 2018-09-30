@@ -5,6 +5,8 @@
 #ifndef BATTERY_TESTS_H
 #define BATTERY_TESTS_H
 
+#include "battery.hpp"
+
 
 
 #endif

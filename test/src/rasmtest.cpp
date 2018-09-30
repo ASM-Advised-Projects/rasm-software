@@ -3,11 +3,12 @@
  * tests for the RASM's software system.
  */
 
-#include "battery_tests.hpp"
+//#include "battery_tests.hpp"
 #include "configuration_tests.hpp"
 #include "logging_tests.hpp"
 #include "http_tests.hpp"
 #include "other_tests.hpp"
+#include "lest.hpp"
 
 #include <string>
 #include <vector>
@@ -33,7 +34,7 @@ std::vector<std::string> split(const std::string &s, char delim) {
     return elems;
 }
 
-int contains(std::vector<string> &string_list, const char *search_str)
+int find(std::vector<string> &string_list, const char *search_str)
 {
   string str(search_str);
   for (int i = 0; i < string_list.size(); i++)
@@ -58,15 +59,14 @@ int option_type(string &str)
 
 /**
  *
- * rasmtest [--help] [fileroot [--test systems] [--active | --non-active] [--lest "options"]]
- * possible systems: configuration:logging:battery:peripheral:vision:control:http:shell:other
+ * rasmtest [--help] [fileroot [--test systems] [--active | --non-active]]
+ * all systems: configuration:logging:battery:peripheral:vision:control:http:shell:other
  */
 int main(int argc, char **argv)
 {
   // help/usage printout
-  string usage = "usage: rasmtest [--help] [fileroot [--test systems] [--active | --non-active]"
-  " [--lest 'option1 ...']]\n       all systems: configuration:logging:battery:peripheral:"
-  "vision:control:http:shell:other";
+  string usage = "usage: rasmtest [--help] [fileroot [--test systems] [--active | --non-active]]\n"
+  "       all systems: configuration:logging:battery:peripheral:vision:control:http:shell:other";
 
   // move command-line options from argv to options
   std::vector<string> options;
@@ -74,7 +74,7 @@ int main(int argc, char **argv)
     options.push_back(argv[arg_ind]);
 
   // print a help message and exit if --help option is present or if no options are present
-  if (argc <= 1 || contains(options, "--help") != -1)
+  if (argc <= 1 || find(options, "--help") != -1)
   {
     cout << usage << endl;
     return 0;
@@ -101,7 +101,7 @@ int main(int argc, char **argv)
   systems.push_back("other");
 
   // get possibly reduced set of systems to test
-  int test_ind = contains(options, "--test");
+  int test_ind = find(options, "--test");
   if (test_ind != -1)
   {
     if (options.size() < test_ind+2)
@@ -114,44 +114,39 @@ int main(int argc, char **argv)
 
   // get possible interactive options
   int interactive = 0;  // 0 - both; 1 - only non-interactive; 2 - only interactive
-  if (contains(options, "--active"))
+  if (find(options, "--active") != -1)
   {
-    if (contains(options, "--non-active"))
+    if (find(options, "--non-active") != -1)
     {
       cout << "--active and --non-active options can't both be specified." << endl;
       return 1;
     }
     interactive = 2;
   }
-  else if (contains(options, "--non-active"))
+  else if (find(options, "--non-active") != -1)
   {
     interactive = 1;
   }
 
-  // get possible lest options
-  string lest_options;
-  int lest_ind = contains(options, "--lest");
-  if (lest_ind != -1)
-  {
-    if (options.size() < lest_ind+2)
-    {
-      cout << "A series of lest-specific options surrounded in quotes must"
-      " follow the '--lest' option." << endl;
-      return 0;
-    }
-    lest_options = options[lest_ind+1];
-  }
-
-  // fileroot, systems, lest_options
+  // fileroot, systems
   // for each subsystem, perform non-interactive tests
   if (interactive != 2)
   {
-
+    char *lest_opts[4] = {(char*)"-c", (char*)"-l", (char*)"-p", (char*)"-v"};
+    cout << "Running non-interactive tests." << endl;
+    for (auto iter = systems.begin(); iter != systems.end(); iter++)
+    {
+      if (*iter == "other")
+      {
+        lest::run(other_tests::nonactive, 4, lest_opts);
+      }
+    }
   }
 
   // for each subsystem, perform interactive tests
   if (interactive != 1)
   {
+
 
   }
 }

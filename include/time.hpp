@@ -8,13 +8,13 @@
 #include <array>
 
 /**
- * Keeps track of the amount of time that has elapsed since startup. This
- * elapsed time can be statically queried.
+ * A singleton that keeps track of the amount of time that has elapsed since
+ * program startup.
  */
 class RasmTime
 {
 private:
-  static Poco::Clock startup_time;
+  static Poco::Clock start_time;
 
   /**
    * Don't allow instance creation.
@@ -29,7 +29,7 @@ public:
    */
   static unsigned int current_time_millis()
   {
-    return startup_time.elapsed();
+    return start_time.elapsed();
   }
 
   /**
@@ -37,7 +37,7 @@ public:
    */
   static unsigned int current_time_seconds()
   {
-    return 1000 * startup_time.elapsed();
+    return 1000 * start_time.elapsed();
   }
 };
 
@@ -92,6 +92,12 @@ public:
   , elapsed_time(0)
   {
     start_times.fill(0);
+  }
+
+  ~Stopwatch()
+  {
+    clock.~Clock();
+    start_times.~array();
   }
 
   /**
