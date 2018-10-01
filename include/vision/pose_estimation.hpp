@@ -121,7 +121,28 @@ protected:
 
 
 public:
+  FacePoseEstimator(CameraImageBuffer &camera, const std::string &circle_detector_filepath,const std::string &pose_model_filepath)
+  : TrackingPoseEstimator(camera)
+  {
+    dlib:::deserialze(circle_detector_filepath) >> circle_detector;
+    dlib::deserialize(pose_model_filepath) >> circle_pose_model;
 
+    std::array<cv::Point3d, 14> temp_pts = {
+      cv::Point3d(-1,-1,0),     
+      cv::Point3d(-1, 1, 0),   
+      cv::Point3d(1, 1, 0),   
+      cv::Point3d(1, -1, 0),
+    }
+    object_pts = std::vector<cv::Point3d>(temp_pts.begin(), temp_pts.end());
+
+    std::array<int, 14> temp_inds = {
+      17,   
+      21,  
+      22, 
+      26,
+    }
+    image_pt_indices = std::vector<int>(temp_inds.begin(), temp_inds.end());
+     
 };
 
 #endif
