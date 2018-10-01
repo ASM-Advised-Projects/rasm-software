@@ -141,6 +141,15 @@ public:
   }
 
   /**
+   *
+   */
+  void get_framesize(int &width, int &height)
+  {
+    width = camera.get(cv::CAP_PROP_FRAME_WIDTH);
+    height = camera.get(cv::CAP_PROP_FRAME_HEIGHT);
+  }
+
+  /**
    * Returns th
    */
   const cv::Mat_<cv::Vec<unsigned short, 3>> & get_bgr_image()

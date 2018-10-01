@@ -210,10 +210,6 @@ int main(int argc, char **argv)
   std::cout << "2" << std::endl;
   imgbuffer.get_gray_image();
   std::cout << "3" << std::endl;
-  imgbuffer.get_small_bgr_image();
-  std::cout << "4" << std::endl;
-  imgbuffer.get_small_gray_image();
-  std::cout << "5" << std::endl;
 
   /*CameraImageBuffer imgbuffer(0);
   std::string path = "/Users/joepollard1/Projects/RASM/Software"
