@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset = "utf-8">
+		<meta name = "viewport" content = "width=device-width, intial-scale=1">
+		<title> RASM- Feedback</title>
+		<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+		<script src = "https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+		<script src = "https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+	</head>
+
+	<script language="Javascript" >
+		function download(filename, text) {
+		  var pom = document.createElement('a');
+		  pom.setAttribute('href', 'data:text/plain;charset=utf-8,' + 
+
+		encodeURIComponent(text));
+		  pom.setAttribute('download', filename);
+
+		  pom.style.display = 'none';
+		  document.body.appendChild(pom);
+
+		  pom.click();
+
+		  document.body.removeChild(pom);}
+	</script>
+
+  <!-- This is the navigation bar scrip -->
+  <nav class="navbar navbar-inverse navbar-fixed-top">
+  <div class="container-fluid">
+    <div class="navbar-header">
+	    <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#myNavbar">
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>                        
+      </button>
+      <a class="navbar-brand" href="RASM_website.html">R A S M</a>
+    </div>
+	<div class="collapse navbar-collapse" id="myNavbar">
+    <ul class="nav navbar-nav">
+      <!--li class="active"><a href="#home">Home</a></li-->
+	  <li><a href="#home">Home</a></li>
+	  <li><a href="#aboutUs">About Us</a></li>
+	  <li><a href="#guides">Guides</a></li>
+      <li><a href="configurations.html">Configuration</a></li>
+      <li><a href="feedback.html">Feedback/Report</a></li>
+    </ul>
+	<ul class="nav navbar-nav navbar-right">
+	  <li><a href="admin.html" class="text-right"><span class="glyphicon glyphicon-user"></span> Admin </a>
+	</ul>
+  </div>
+  </div>
+  </nav>
+ <br><br><br><br>
+  
+  <!-- Fedback Details -->
+	<body>
+	<h1>RASM Feedback</h1>
+		<form action = "responseReceived.html" method= "GET">
+			<fieldset>
+				<legend>Personal Details: </legend>
+				<label for="first name">First Name: </label><input type = "text" name="first name" id="first name" required placeholder="Your First Name" pattern = "[a-zA-Z]{3,}" title="PLease enter your first name">
+				
+				<label for="last name">Last Name: </label><input type = "text" name="last name" id="last name" required placeholder="Your Last Name" pattern = "[a-zA-Z]{3,}" title="PLease enter your first name">
+				
+				<label for="email"> Email: </label><input type="text" name="email" id="email" required placeholder="Your Email" pattern="[a-zA-Z]{3,}@[a-zA-Z]{3,}[.]{1}[a-zA-Z]{2,}" title="Please enter valid email address">
+				
+				<label for="phone">Phone: </label><input type="tel" name = "phone" id="phone" required placeholder="Phone number" pattern="[0-9]{4} [0-9]{3} [0-9]{3}" title="Please enter in a phone number in this format:1234 567 890">
+				
+				<label for="country">Country: </label><select name="country" required>
+					<option value=""> </option> 
+					<option value = "USA">USA</option>
+					<option value="Malaysia">Malaysia</option>					
+				</select>
+			</fieldset>
+			<br>
+
+			<fieldset>
+				<legend> Feedback Details: </legend>
+				<br>
+				<label for="date">Date : </label><p><code>JS will default to today's date</code></p> <!--input type="date" name="date" min="2018-8-20"-->
+				<p>Are you a: </p>
+				<input type="radio" name="identity" value="user"> <label for="RASM User">RASM User </label>
+				<input type="radio" name="identity" value="non-user"> <label for="Caretaker">Caretaker </label>
+					<br>
+				  <textarea rows=3 cols=50 name="text">Please type your feddback in this box.  </textarea>
+				<br><br>
+				<input type="submit" value="Submit">
+				<!--<input type ="image" src="surf.jpg" alt="Submit"-->
+			</fieldset>
+		</form>
+	
+	</body>
+<html>

@@ -4,9 +4,13 @@
  */
 
 //#include "battery_tests.hpp"
-#include "configuration_tests.hpp"
-#include "logging_tests.hpp"
-#include "http_tests.hpp"
+//#include "configuration_tests.hpp"
+//#include "logging_tests.hpp"
+//#include "battery_tests.hpp"
+//#include "peripheral_tests.hpp"
+#include "vision_tests.hpp"
+//#include "control_tests.hpp"
+//#include "http_tests.hpp"
 #include "other_tests.hpp"
 #include "lest.hpp"
 
@@ -133,20 +137,89 @@ int main(int argc, char **argv)
   if (interactive != 2)
   {
     char *lest_opts[4] = {(char*)"-c", (char*)"-l", (char*)"-p", (char*)"-v"};
-    cout << "Running non-interactive tests." << endl;
+    cout << endl << "**Running non-interactive tests.**" << endl;
+
+    //const lest::test *test_cases = {};
     for (auto iter = systems.begin(); iter != systems.end(); iter++)
     {
-      if (*iter == "other")
-      {
+      cout << endl;
+      cout << "Subsystem: " << (*iter) << endl;
+      /*if (*iter == "configuration")
+        lest::run(config_tests::nonactive, 4, lest_opts);
+      else if (*iter == "logging")
+        lest::run(logging_tests::nonactive, 4, lest_opts);
+      else if (*iter == "battery")
+        lest::run(battery_tests::nonactive, 4, lest_opts);
+      else if (*iter == "peripheral")
+        lest::run(periph_tests::nonactive, 4, lest_opts);
+      else if (*iter == "vision")
+        lest::run(vision_tests::nonactive, 4, lest_opts);
+      else if (*iter == "control")
+        lest::run(control_tests::nonactive, 4, lest_opts);
+      else if (*iter == "http")
+        lest::run(http_tests::nonactive, 4, lest_opts);
+      else */if (*iter == "other")
         lest::run(other_tests::nonactive, 4, lest_opts);
-      }
+      //else
+      //  cout << "Invalid subsystem name '" + *iter + "'." << endl;
     }
   }
 
   // for each subsystem, perform interactive tests
   if (interactive != 1)
   {
+    char *lest_opts[4] = {(char*)"-c", (char*)"-l", (char*)"-p", (char*)"-v"};
+    cout << endl << "**Running interactive tests.**" << endl;
 
-
+    for (auto iter = systems.begin(); iter != systems.end(); iter++)
+    {
+      cout << endl;
+      cout << "Subsystem: " << (*iter) << endl;
+      /*if (*iter == "configuration")
+        lest::run(config_tests::active);
+      else if (*iter == "logging")
+        lest::run(logging_tests::active);
+      else if (*iter == "battery")
+        lest::run(battery_tests::active);
+      else if (*iter == "peripheral")
+        lest::run(periph_tests::active);
+      else if (*iter == "vision")
+        lest::run(vision_tests::active, 4, lest_opts);
+      else if (*iter == "control")
+        lest::run(control_tests::active);
+      else if (*iter == "http")
+        lest::run(http_tests::active);
+      else */if (*iter == "other")
+        lest::run(other_tests::active, 4, lest_opts);
+      //else
+      //  cout << "Invalid subsystem name '" + *iter + "'." << endl;
+    }
   }
+
+  CameraImageBuffer imgbuffer(0);
+  std::cout << "1" << std::endl;
+  imgbuffer.get_bgr_image();
+  std::cout << "2" << std::endl;
+  imgbuffer.get_gray_image();
+  std::cout << "3" << std::endl;
+  imgbuffer.get_small_bgr_image();
+  std::cout << "4" << std::endl;
+  imgbuffer.get_small_gray_image();
+  std::cout << "5" << std::endl;
+
+  /*CameraImageBuffer imgbuffer(0);
+  std::string path = "/Users/joepollard1/Projects/RASM/Software"
+  "/test/filesysroot/rasm_2_1/data/vision/prediction/face_model_68_points.dat";
+  FacePoseEstimator pose_estimator(imgbuffer, path);
+
+  Pose pose;
+  for (int ord = 0; ord < 10; ord++)
+  {
+    std::cout << "get_pose" << std::endl;
+    pose = pose_estimator.get_pose();
+    for (int i = 0; i < pose.size(); i++)
+      std::cout << pose[i] << ",";
+    std::cout << std::endl;
+    usleep(1000*1000);
+  }*/
 }

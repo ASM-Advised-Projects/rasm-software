@@ -12,15 +12,17 @@
 namespace other_tests
 {
 
-const lest::test nonactive[] = {
+const lest::test nonactive[] =
+{
 
     CASE( "RasmTime methods are accurate" )
     {
-      int millis1 = RasmTime::current_time_millis();
-      int seconds1 = RasmTime::current_time_seconds();
+      RasmTime & rt = RasmTime::get_instance();
+      int millis1 = rt.current_time_millis();
+      int seconds1 = rt.current_time_seconds();
       usleep(20*1000);
-      int millis2 = RasmTime::current_time_millis();
-      int seconds2 = RasmTime::current_time_seconds();
+      int millis2 = rt.current_time_millis();
+      int seconds2 = rt.current_time_seconds();
 
       EXPECT( (1000*seconds1 >= millis1 && 1000*seconds1-10 <= millis1) );
       EXPECT( (1000*seconds2 >= millis2 && 1000*seconds2-10 <= millis2) );
@@ -36,7 +38,7 @@ const lest::test nonactive[] = {
 
     CASE( "Stopwatch throws error on start within 5th level" )
     {
-      Stopwatch sw;øº0‚0
+      Stopwatch sw;
       sw.start();
       sw.start();
       sw.start();
@@ -93,6 +95,16 @@ const lest::test nonactive[] = {
       sw.stop();
       EXPECT((sw.elapsed() >= 80 && sw.elapsed() <= 90));  // level 1
     },
+
+};
+
+const lest::test active[] =
+{
+
+  CASE( "" )
+  {
+
+  },
 
 };
 

@@ -16,14 +16,19 @@ include_dirs += ../test/src
 CPPFLAGS = $(addprefix -I, $(include_dirs))
 
 # library search directories
-lib_dirs = ../lib/bin ../lib/bin/openCV/native ../lib/bin/Poco/native
+lib_dirs = ../lib/bin ../lib/bin/Poco/native #../lib/bin/openCV/native
 
 # set LDFLAGS to the library directories prefixed with -L
 LDFLAGS = $(addprefix -L, $(lib_dirs))
 
 # list library names
-lib_names = stdc++ periphery dlib opencv_core
+lib_names = stdc++ periphery dlib
+#lib_names += opencv_core opencv_videoio opencv_calib3d
 lib_names += PocoFoundation PocoNet PocoUtil
+opencv_lib_files = $(wildcard ../lib/bin/openCV/native/libopencv_*.a)
+opencv_lib_names1 = $(subst ../lib/bin/openCV/native/lib,,$(opencv_lib_files))
+opencv_lib_names2 = $(subst .a,,$(opencv_lib_names1))
+#lib_names += $(opencv_lib_names2)
 
 # set LDLIBS to the library names prefixed with -l
 LDLIBS = $(addprefix -l, $(lib_names))
@@ -34,7 +39,7 @@ prog_headers = $(wildcard ../include/*.hpp) $(wildcard ../include/*/*.hpp)
 test_headers = $(wildcard ../test/src/*.hpp)
 
 rasmtest : rasmtest.o
-	$(CXX) $(LDFLAGS) $(LDLIBS) -o rasmtest rasmtest.o
+	$(CXX) $(LDFLAGS) $(LDLIBS) -o rasmtest rasmtest.o $(shell pkg-config --cflags --libs opencv)
 
 rasmtest.o : ../test/src/rasmtest.cpp $(prog_headers) $(test_headers)
 	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -Wno-missing-braces -DTEST ../test/src/rasmtest.cpp

@@ -1,15 +1,15 @@
 /**
- * Defines all interactive and non-interactive tests for the logging subsytem.
+ * Defines all interactive and non-interactive tests for the control subsytem.
  */
 
-#ifndef LOGGING_TESTS_H
-#define LOGGING_TESTS_H
+#ifndef CONTROL_TESTS_H
+#define CONTROL_TESTS_H
 
-#include "logging.hpp"
+//#include ""
 #include "lest.hpp"
 #include <unistd.h>
 
-namespace logging_tests
+namespace control_tests
 {
 
 const lest::test nonactive[] =

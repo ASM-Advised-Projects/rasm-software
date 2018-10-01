@@ -1,15 +1,15 @@
 /**
- * Defines all interactive and non-interactive tests for the logging subsytem.
+ * Defines all interactive and non-interactive tests for the peripheral subsytem.
  */
 
-#ifndef LOGGING_TESTS_H
-#define LOGGING_TESTS_H
+#ifndef PERIPHERAL_TESTS_H
+#define PERIPHERAL_TESTS_H
 
-#include "logging.hpp"
+//#include ""
 #include "lest.hpp"
 #include <unistd.h>
 
-namespace logging_tests
+namespace periph_tests
 {
 
 const lest::test nonactive[] =

@@ -39,7 +39,14 @@ public:
     modified = false;
   }
 
-  void operator=(const ConfigGroup &other)
+  ConfigGroup(ConfigGroup &other)
+  {
+    file_config_map = other.file_config_map;
+    filepath = other.filepath;
+    modified = other.modified;
+  }
+
+  void operator=(ConfigGroup &other)
   {
     file_config_map = other.file_config_map;
     filepath = other.filepath;
@@ -143,7 +150,7 @@ public:
 
 private:
   string root_working_dir;
-  std::map<Group, ConfigGroup> config_groups;
+  std::map<Group, ConfigGroup*> config_groups;
   std::unordered_set<string> modifiables;  // keys of modifiable values
   Poco::Util::Timer sync_timer;  // filesystem synchronization timer
   Poco::Clock::ClockDiff sync_interval;  // filesystem syncronization interval
@@ -156,14 +163,14 @@ private:
     string configroot = root_working_dir + "/config";
 
     // load all properties from each configuration file (one .properties file per group)
-    config_groups[Group::GENERAL] = ConfigGroup(configroot + "/general.properties");
-    config_groups[Group::LOGGING] = ConfigGroup(configroot + "/logging.properties");
-    config_groups[Group::BATTERY] = ConfigGroup(configroot + "/battery.properties");
-    config_groups[Group::POSE_ESTIMATION] = ConfigGroup(configroot + "/pose_estimation.properties");
-    config_groups[Group::CONTROL] = ConfigGroup(configroot + "/control.properties");
-    config_groups[Group::PERIPHERY] = ConfigGroup(configroot + "/periphery.properties");
-    config_groups[Group::HTTP_SERVER] = ConfigGroup(configroot + "/http_server.properties");
-    config_groups[Group::SHELL_SERVER] = ConfigGroup(configroot + "/shell_server.properties");
+    config_groups[Group::GENERAL] = new ConfigGroup(configroot + "/general.properties");
+    config_groups[Group::LOGGING] = new ConfigGroup(configroot + "/logging.properties");
+    config_groups[Group::BATTERY] = new ConfigGroup(configroot + "/battery.properties");
+    config_groups[Group::POSE_ESTIMATION] = new ConfigGroup(configroot + "/pose_estimation.properties");
+    config_groups[Group::CONTROL] = new ConfigGroup(configroot + "/control.properties");
+    config_groups[Group::PERIPHERY] = new ConfigGroup(configroot + "/periphery.properties");
+    config_groups[Group::HTTP_SERVER] = new ConfigGroup(configroot + "/http_server.properties");
+    config_groups[Group::SHELL_SERVER] = new ConfigGroup(configroot + "/shell_server.properties");
 
     // specify the keys whos values are modifiable
     // all keys should be lowercase
@@ -213,7 +220,7 @@ public:
   Poco::AutoPtr<MapConfiguration> get_config_group(Group group)
   {
     Poco::AutoPtr<MapConfiguration> mapCopy(new MapConfiguration());
-    config_groups[group].file_config_map->copyTo(*mapCopy);
+    config_groups[group]->file_config_map->copyTo(*mapCopy);
     mapCopy->setString("root_working_dir", root_working_dir);
     return mapCopy;
   }
@@ -229,7 +236,7 @@ public:
     // convert key to all lowercase with no leading/trailing whitespace
     Poco::trimInPlace(key);
     Poco::toLowerInPlace(key);
-    return config_groups[group].get_value(key, value);
+    return config_groups[group]->get_value(key, value);
   }
 
   /**
@@ -248,7 +255,7 @@ public:
     if (modifiables.count(key) == 0)
       return false;
 
-    return config_groups[group].change_value(key, value);
+    return config_groups[group]->change_value(key, value);
   }
 
   /**
@@ -259,7 +266,7 @@ public:
   void save_config_changes()
   {
     for (auto &pair : config_groups)
-      pair.second.push_to_file();
+      pair.second->push_to_file();
     reschedule_sync_timer();
   }
 };

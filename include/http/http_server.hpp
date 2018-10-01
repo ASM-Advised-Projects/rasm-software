@@ -29,6 +29,7 @@ using std::string;
 class HandlerFactory : public pnet::HTTPRequestHandlerFactory
 {
 private:
+
   GETRequestHandler *get_handler;
   POSTRequestHandler *post_handler;
   OtherRequestHandler *other_handler;
@@ -36,7 +37,7 @@ private:
 public:
   HandlerFactory()
   {
-    get_handler = new GETRequestHandler();
+    get_handler = new GETRequestHandler(ConfigurationManager::get_instance().rwd);
     post_handler = new POSTRequestHandler();
     other_handler = new OtherRequestHandler();
   }
@@ -71,7 +72,7 @@ private:
   pnet::HTTPServer *httpserver;
   pnet::ServerSocket socket;
 
-  virtual pnet::HTTPServerParams* load_params()
+  pnet::HTTPServerParams* load_params()
   {
     pnet::HTTPServerParams *serverparams = new pnet::HTTPServerParams;
 

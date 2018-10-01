@@ -16,6 +16,8 @@
 #include <Poco/Net/HTTPServerRequest.h>
 #include <Poco/Net/HTTPServerResponse.h>
 
+#include "configuration.hpp"
+
 namespace pnet = Poco::Net;
 using std::string;
 
@@ -38,17 +40,21 @@ public:
     ext_to_types[".css"] = "text/css";
     ext_to_types[".js"] = "text/javascript";
     ext_to_types[".png"] = "text/png";
-    ext_to_types[".jpg"] = "text/jpeg";
+    ext_to_types[".jpg"] = "text/jpg";
     ext_to_types[".jpeg"] = "text/jpeg";
   }
 
   void handleRequest(pnet::HTTPServerRequest &request, pnet::HTTPServerResponse &response)
   {
+    // get the full path of the requested resource (file)
     Poco::Path filepath = Poco::Path(root_dir + request.getURI());
     filepath.makeAbsolute();
     Poco::File requested_file = Poco::File(filepath);
+
+    // if the file exists...
     if (requested_file.isFile() && !requested_file.isHidden() && requested_file.exists())
     {
+      // file doesn't exist - respond with 200 code and requested file
       response.setStatus(pnet::HTTPResponse::HTTPStatus::HTTP_OK);
 
       string fileext = filepath.getExtension();
@@ -62,6 +68,7 @@ public:
     }
     else
     {
+      // file doesn't exist - respond with 404 code
       response.setStatus(pnet::HTTPResponse::HTTPStatus::HTTP_NOT_FOUND);
       response.setContentType("text/plain");
       response.setContentLength(0);
@@ -72,24 +79,26 @@ public:
 
 
 /**
- * Handles HTTP POST requests by parsing their headers to get the type of form
- * and subsequently parsing their data to update the backend with. Things like
- * the RASM's configuration or user-review databases are updated.
+ * Handles HTTP POST requests by parsing its data as new settings and sending
+ * them to the configuration subsystem.
  */
 class POSTRequestHandler : public pnet::HTTPRequestHandler
 {
 private:
-
+ConfigurationManager & config;
 
 public:
   POSTRequestHandler()
+  : config(ConfigurationManager::get_instance())
   {
-
   }
 
   void handleRequest(pnet::HTTPServerRequest &request, pnet::HTTPServerResponse &response)
   {
-    //request.
+    //response.setStatus(pnet::HTTPResponse::HTTPStatus::HTTP_ACCEPTED);
+    //response.setContentType("text/plain");
+    //response.setContentLength(0);
+    //response.send();
   }
 };
 

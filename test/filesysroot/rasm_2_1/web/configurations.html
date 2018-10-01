@@ -1,0 +1,272 @@
+<!DOCTYPE HTML>
+<html lang="en">  
+<!-- The head section -->
+<head>
+  <title>RASM-homepage</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+	<style>
+	.slidecontainer {
+		width: 50%;
+	}
+
+	.slider {
+		-webkit-appearance: none;
+		width: 50%;
+		height: 25px;
+		background: #d3d3d3;
+		outline: none;
+		opacity: 0.7;
+		-webkit-transition: .2s;
+		transition: opacity .2s;
+	}
+
+	.slider:hover {
+		opacity: 1;
+	}
+
+	.slider::-webkit-slider-thumb {
+		-webkit-appearance: none;
+		appearance: none;
+		width: 25px;
+		height: 25px;
+		background: #4CAF50;
+		cursor: pointer;
+	}
+
+	.slider::-moz-range-thumb {
+		width: 25px;
+		height: 25px;
+		background: #4CAF50;
+		cursor: pointer;
+	}
+	#sleepDIV {
+		width: 100%;
+		padding: 50px 0;
+		text-align: center;
+		background-color: lightblue;
+		margin-top: 20px;
+	}
+	</style>
+</head>
+
+
+<body>
+<nav class="navbar navbar-inverse navbar-fixed-top">
+  <div class="container-fluid">
+    <div class="navbar-header">
+        <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#myNavbar">
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>                        
+      </button>
+      <a class="navbar-brand" href="RASM_website.html">R A S M</a>
+    </div>
+    <div>
+      <div class="collapse navbar-collapse" id="myNavbar">
+        <ul class="nav navbar-nav">
+          <li><a href="RASM_website.html">Home</a></li>
+          <li><a href="RASM_website.html">About Us</a></li>
+          <li><a href="RASM_website.html">Guides</a></li>
+		  <li class="active"><a href="configurations.html">Configuration</a></li>
+		  <li><a href="feedback.html">Feedback/Report</a></li>
+        </ul>
+		<ul class="nav navbar-nav navbar-right">
+	  <li><a href="admin.html" class="text-right"><span class="glyphicon glyphicon-user"></span> Admin </a>
+		</ul>
+      </div>
+    </div>
+  </div>
+</nav>
+<br><br><br><br> 
+
+
+
+<!-- FIRST FIELDSET: RASM STATUS-->
+<fieldset>
+	<div class="row">
+		<div class="col-sm-1"></div>
+		<div class="col-sm-10"><h2> RASM Battery Status: </h2></div>
+		<div class="col-sm-1"></div>
+	</div>
+	
+	<div class="row">
+		<div class="col-sm-1"></div>
+		<div class="col-sm-4"><p class="text-right">Battery Status: </p></div>
+		<div class="col-sm-6"><img src="batteryLevel.jpg" alt="Battery Level" style="width:256px;height:230px;"></div>
+		<div class="col-sm-1"></div>
+	</div><br><br>
+	
+	<div class="row">
+		<div class="col-sm-1"></div>
+		<div class="col-sm-5"><p class="text-center">Estimated battery time remaining: <code>Display time</code> </p></div>
+		<div class="col-sm-5"><p class="text-center">RASM has been on for: <code>time RASM active</code></p></div>
+		<div class="col-sm-1"></div>
+	</div><br><br>
+	
+	<div class="row">
+		<div class="col-sm-1"></div>
+		<div class="col-sm-10"><h2> RASM Commands: </h2></div>
+		<div class="col-sm-1"></div>
+	</div>
+	
+	<div class="row">
+		<div class="col-sm-1"></div>
+		<div class="col-sm-4"><p class="text-center">Selfie with RASM: <br> 		
+		<input type="radio" name="identity" value="yes">Yes Take a Selfie 
+		<input type="radio" name="identity" value="no"> Nah not in mood </p></div>
+		<div class="col-sm-6"><p class="text-center"><img src="selfieCat.jpg" alt="Battery Level" style="width:600px;height:312px;"></p><br><br> <p class="text-center"> <input type="submit" value="SNAP!"> 
+		<input type="submit" value="Cancel"><br> The workspace will connect with RASM camera</p></div>
+		<div class="col-sm-1"></div>
+	</div><br><br>
+	
+	<!--div class="row">
+		<div class="col-sm-1"></div>
+		<div class="col-sm-4"><p class="text-right">Click the button to active RASM sleep mode:</p></div>
+		<div class="col-sm-6"><button onclick="myFunction()">Click to activate sleep mode</button> </div>
+		<div class="col-sm-1"></div>
+	</div>
+	
+	<div id="sleepDIV" class="row">
+		<div class="col-sm-1"></div>
+		<div class="col-sm-4"><p class="text-right">Hello There</p></div>
+		<div class="col-sm-6"><p class="text-right"> hello hello there</p></div>
+		<div class="col-sm-1"></div>
+	</div-->
+	
+	<!-- Sleep mode toggle JavaScript-->
+	<script>
+	function myFunction() {
+		var x = document.getElementById("sleepDIV");
+		if (x.style.display === "block") {
+			x.style.display = "none";
+		} else {
+			x.style.display = "block";
+		}
+	}
+	</script>
+	
+</fieldset><br><br>
+
+<form action="php_rasm_configuration.php" method="post">
+<!-- SECOND FIELDSET: RASM CONFIGURATION-->
+<fieldset>	
+	<div class="row">
+		<div class="col-sm-1"></div>
+		<div class="col-sm-10"><h2> RASM Configuration Settings: </h2></div>
+		<div class="col-sm-1"></div>
+	</div>
+	
+	
+	<!-- for left-right distance offset from center-->
+	<div class="row">
+		<div class="col-sm-1"></div>
+		<div class="col-sm-4"><p class="text-right">Left-right distance offset from center: </p></div>
+		<div class="col-sm-6"> 
+		  <input type="range" min="-90" max="90" value="0" class="slider" id="leftRightD" name="aa">
+		  <p class="text-center">Value: <span id="leftRightDVal"></span> </p>
+		</div>
+		<div class="col-sm-1"></div>
+	</div> 
+	<script>
+	var slider = document.getElementById("leftRightD");
+	var output1 = document.getElementById("leftRightDVal");
+	output1.innerHTML = slider.value;
+	slider.oninput = function() {
+	  output1.innerHTML = this.value;
+	}
+	</script>
+	
+	<!-- for up-down distance offset from center-->
+	<div class="row">
+		<div class="col-sm-1"></div>
+		<div class="col-sm-4"><p class="text-right">up-down distance offset from center: </p></div>
+		<div class="col-sm-6"> 
+		  <input type="range" min="-90" max="90" value="0" class="slider" id="upDownD" name="ba">
+		  <p class="text-center">Value: <span id="upDownDVal"></span> </p>
+		</div>
+		<div class="col-sm-1"></div>
+	</div> 
+	<script>
+	var slider = document.getElementById("upDownD");
+	var output2 = document.getElementById("upDownDVal");
+	output2.innerHTML = slider.value;
+	slider.oninput = function() {
+	  output2.innerHTML = this.value;
+	}
+	</script>
+	
+		<!-- for left-right angle offset from center-->
+	<div class="row">
+		<div class="col-sm-1"></div>
+		<div class="col-sm-4"><p class="text-right">Left-right angle offset from center: </p></div>
+		<div class="col-sm-6"> 
+		  <input type="range" min="-90" max="90" value="0" class="slider" id="leftRightA" name="ca">
+		  <p class="text-center">Angle: <span id="leftRightAVal"></span> degrees</p>
+		</div>
+		<div class="col-sm-1"></div>
+	</div> 
+	<script>
+	var slider = document.getElementById("leftRightA");
+	var output3 = document.getElementById("leftRightAVal");
+	output3.innerHTML = slider.value;
+	slider.oninput = function() {
+	  output3.innerHTML = this.value;
+	}
+	</script>
+	
+	<!-- for up-down angle offset from center-->
+	<div class="row">
+		<div class="col-sm-1"></div>
+		<div class="col-sm-4"><p class="text-right">up-down angle offset from center: </p></div>
+		<div class="col-sm-6"> 
+		  <input type="range" min="-90" max="90" value="0" class="slider" id="upDownA" name="da">
+		  <p class="text-center">Angle: <span id="upDownAVal"></span> degrees</p>
+		</div>
+		<div class="col-sm-1"></div>
+	</div> 
+	<script>
+	var slider = document.getElementById("upDownA");
+	var output4 = document.getElementById("upDownAVal");
+	output4.innerHTML = slider.value;
+	slider.oninput = function() {
+	  output4.innerHTML = this.value;
+	}
+	</script>
+	
+		<!-- for screen to face distance-->
+	<div class="row">
+		<div class="col-sm-1"></div>
+		<div class="col-sm-4"><p class="text-right">screen to face distance: </p></div>
+		<div class="col-sm-6"> 
+		  <input type="range" min="-90" max="90" value="0" class="slider" id="screenFaceD" name="ea">
+		  <p class="text-center">Distance: <span id="screenFaceDVal"></span> </p>
+		</div>
+		<div class="col-sm-1"></div>
+	</div> 
+	<script>
+	var slider = document.getElementById("screenFaceD");
+	var output5 = document.getElementById("screenFaceDVal");
+	output5.innerHTML = slider.value;
+	slider.oninput = function() {
+	  output5.innerHTML = this.value;
+	}
+	</script>
+	
+	
+	<div class="row">
+		<div class="col-sm-1"></div>
+		<div class="col-sm-10"><p class="text-right">
+		<input type="submit" value="Apply"> 
+		<input type="submit" value="Cancel"></p></div>
+		<div class="col-sm-1"></div>
+	</div>
+	
+</fieldset>
+</form>
+
+</body>
+</html>

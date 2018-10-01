@@ -8,7 +8,7 @@
 
 #include "camera_calibration.hpp"
 
-#include "opencv2/opencv.hpp"
+#include "opencv2/videoio.hpp"
 
 /**
  * An abstract base class for all image filters that qualify if an image is
@@ -98,7 +98,7 @@ private:
   {
     if (!camera.isOpened())
     {
-      // throw exception
+      throw std::runtime_error("Camera failed to open.");
     }
 
     index = 0;
@@ -139,21 +139,17 @@ public:
    */
   void update_image()
   {
-    while (true)
+    bool retake;
+    do
     {
       camera >> bgr_img;
 
-      // apply image filter
+      // apply image filter if it exists
       if (filter != nullptr)
-      {
-        bool retake = false;
         (*filter)(bgr_img, retake);
-        if (retake)
-          continue;
-      }
-
-      break;  // exit loop if retake isn't needed
-    }
+      else
+        retake = false;
+    } while (retake);
 
     index++;
     have_gray = false;
@@ -174,8 +170,8 @@ public:
    */
   void get_framesize(int &width, int &height)
   {
-    width = camera.get(CV_CAP_PROP_FRAME_WIDTH);
-    height = camera.get(CV_CAP_PROP_FRAME_HEIGHT);
+    width = camera.get(cv::CAP_PROP_FRAME_WIDTH);
+    height = camera.get(cv::CAP_PROP_FRAME_HEIGHT);
   }
 
   /**
@@ -192,8 +188,8 @@ public:
    */
   void set_preferred_framesize(unsigned int width, unsigned int height)
   {
-    camera.set(CV_CAP_PROP_FRAME_WIDTH, width);
-    camera.set(CV_CAP_PROP_FRAME_HEIGHT, height);
+    camera.set(cv::CAP_PROP_FRAME_WIDTH, width);
+    camera.set(cv::CAP_PROP_FRAME_HEIGHT, height);
   }
 
   /**
@@ -221,7 +217,7 @@ public:
   {
     if (!have_gray)
     {
-      cv:cvtColor(bgr_img, gray_img, cv::COLOR_BGR2GRAY);
+      cv::cvtColor(bgr_img, gray_img, cv::COLOR_BGR2GRAY);
       have_gray = true;
     }
     return gray_img;
@@ -251,7 +247,7 @@ public:
     {
       if (!have_gray)
       {
-        cv:cvtColor(bgr_img, gray_img, cv::COLOR_BGR2GRAY);
+        cv::cvtColor(bgr_img, gray_img, cv::COLOR_BGR2GRAY);
         have_gray = true;
       }
       cv::resize(gray_img, small_gray_img, cv::Size(), 1.0/downsample_ratio, 1.0/downsample_ratio);
