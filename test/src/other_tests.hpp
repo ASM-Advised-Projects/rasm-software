@@ -36,7 +36,7 @@ const lest::test nonactive[] = {
 
     CASE( "Stopwatch throws error on start within 5th level" )
     {
-      Stopwatch sw;
+      Stopwatch sw;øº0‚0
       sw.start();
       sw.start();
       sw.start();
