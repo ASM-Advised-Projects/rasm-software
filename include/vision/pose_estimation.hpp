@@ -97,7 +97,6 @@ private:
   std::vector<cv::Point3d> object_pts;
   std::vector<int> image_pt_indices;
 
-
 protected:
   dlib::object_detector<dlib::scan_fhog_pyramid<dlib::pyramid_down<6>>> * get_object_detector()
   {
@@ -119,30 +118,30 @@ protected:
     return &image_pt_indices;
   }
 
-
 public:
-  FacePoseEstimator(CameraImageBuffer &camera, const std::string &circle_detector_filepath,const std::string &pose_model_filepath)
+  MarkerPoseEstimator(CameraImageBuffer &camera, const std::string &circle_detector_filepath,
+      const std::string &pose_model_filepath)
   : TrackingPoseEstimator(camera)
   {
-    dlib:::deserialze(circle_detector_filepath) >> circle_detector;
+    dlib::deserialize(circle_detector_filepath) >> circle_detector;
     dlib::deserialize(pose_model_filepath) >> circle_pose_model;
 
     std::array<cv::Point3d, 14> temp_pts = {
-      cv::Point3d(-1,-1,0),     
-      cv::Point3d(-1, 1, 0),   
-      cv::Point3d(1, 1, 0),   
+      cv::Point3d(-1,-1,0),
+      cv::Point3d(-1, 1, 0),
+      cv::Point3d(1, 1, 0),
       cv::Point3d(1, -1, 0),
-    }
+    };
     object_pts = std::vector<cv::Point3d>(temp_pts.begin(), temp_pts.end());
 
     std::array<int, 14> temp_inds = {
-      17,   
-      21,  
-      22, 
-      26,
-    }
+      0,
+      1,
+      2,
+      3,
+    };
     image_pt_indices = std::vector<int>(temp_inds.begin(), temp_inds.end());
-     
+  }
 };
 
 #endif

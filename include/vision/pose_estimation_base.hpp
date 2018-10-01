@@ -242,39 +242,22 @@ public:
    */
   Pose get_pose()
   {
-    std::cout << "0" << std::endl;
-    // get downsample ratio for scaled down images
-    double img_scale = camera.get_downsample_ratio();
-    std::cout << "1" << std::endl;
-
-    // get normal and scaled-down grayscale images
+    // get current grayscale image
     const cv::Mat &gray_img = camera.get_gray_image();
-    std::cout << "2" << std::endl;
-    const cv::Mat &small_gray_img = camera.get_small_gray_image();
-    std::cout << "3" << std::endl;
 
-    // detect objects using the small image
-    cv::Mat img(small_gray_img);  // TODO - figure out how get around making a copy
-    std::cout << "4" << std::endl;
+    // detect objects
+    cv::Mat img(gray_img);  // TODO - figure out how get around making a copy
     std::vector<Rect> object_boxes = detect_objects(img);
-    std::cout << "5" << std::endl;
     object_count = object_boxes.size();
-    std::cout << "6" << std::endl;
 
     // select an object box
-    Rect selected_object_box = select_object(object_boxes, small_gray_img.size().width, small_gray_img.size().height);
+    Rect selected_object_box = select_object(object_boxes, gray_img.size().width, gray_img.size().height);
     std::cout << "7" << std::endl;
     if (selected_object_box == zero_box)  // no objects were detected
       return zero_pose;
 
     // update the last object box
     last_object_box = selected_object_box;
-
-    // scale up selected face box
-    selected_object_box.set_left(img_scale*selected_object_box.left());
-    selected_object_box.set_right(img_scale*selected_object_box.right());
-    selected_object_box.set_top(img_scale*selected_object_box.top());
-    selected_object_box.set_bottom(img_scale*selected_object_box.bottom());
 
     // locate features
     dlib::cv_image<unsigned short> gray_img_dlib(gray_img);  // dlib image format

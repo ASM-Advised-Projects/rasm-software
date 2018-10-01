@@ -144,7 +144,8 @@ int main(int argc, char **argv)
     {
       cout << endl;
       cout << "Subsystem: " << (*iter) << endl;
-      /*if (*iter == "configuration")
+      /*
+      if (*iter == "configuration")
         lest::run(config_tests::nonactive, 4, lest_opts);
       else if (*iter == "logging")
         lest::run(logging_tests::nonactive, 4, lest_opts);
@@ -158,10 +159,13 @@ int main(int argc, char **argv)
         lest::run(control_tests::nonactive, 4, lest_opts);
       else if (*iter == "http")
         lest::run(http_tests::nonactive, 4, lest_opts);
-      else */if (*iter == "other")
+      else if (*iter == "other")
         lest::run(other_tests::nonactive, 4, lest_opts);
-      //else
-      //  cout << "Invalid subsystem name '" + *iter + "'." << endl;
+      else
+        cout << "Invalid subsystem name '" + *iter + "'." << endl;
+      */
+      if (*iter == "vision")
+        lest::run(vision_tests::nonactive, 4, lest_opts);
     }
   }
 
@@ -175,7 +179,8 @@ int main(int argc, char **argv)
     {
       cout << endl;
       cout << "Subsystem: " << (*iter) << endl;
-      /*if (*iter == "configuration")
+      /*
+      if (*iter == "configuration")
         lest::run(config_tests::active);
       else if (*iter == "logging")
         lest::run(logging_tests::active);
@@ -189,10 +194,13 @@ int main(int argc, char **argv)
         lest::run(control_tests::active);
       else if (*iter == "http")
         lest::run(http_tests::active);
-      else */if (*iter == "other")
+      else if (*iter == "other")
         lest::run(other_tests::active, 4, lest_opts);
-      //else
-      //  cout << "Invalid subsystem name '" + *iter + "'." << endl;
+      else
+        cout << "Invalid subsystem name '" + *iter + "'." << endl;
+      */
+      if (*iter == "vision")
+        lest::run(vision_tests::active, 4, lest_opts);
     }
   }
 

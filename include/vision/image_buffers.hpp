@@ -9,6 +9,7 @@
 #include "camera_calibration.hpp"
 
 #include "opencv2/videoio.hpp"
+#include <iostream>
 
 /**
  * An abstract base class for all image filters that qualify if an image is
@@ -18,7 +19,7 @@
 class ImageFilter
 {
 public:
-  virtual void operator()(cv::Mat_<cv::Vec3b> &image, bool & retake) = 0;
+  virtual void filter(cv::Mat_<cv::Vec<unsigned short, 3>> &image, bool & retake) = 0;
 };
 
 
@@ -39,7 +40,7 @@ public:
     this->dist_coeffs = dist_coeffs;
   }
 
-  void operator()(cv::Mat_<cv::Vec3b> &image, bool &retake)
+  void filter(cv::Mat_<cv::Vec<unsigned short, 3>> &image, bool &retake)
   {
     // TODO: use initUndistortRectifyMap and remap
     retake = false;
@@ -61,7 +62,7 @@ public:
     threshold = blur_threshold;
   }
 
-  void operator()(cv::Mat_<cv::Vec3b> &image, bool &retake)
+  void filter(cv::Mat_<cv::Vec<unsigned short, 3>> &image, bool &retake)
   {
     // TODO: use laplacian transform to recognize blur
     retake = false;
@@ -72,6 +73,7 @@ public:
 /**
  * Instances of this class are single-image buffers that provide different
  * versions of the image like gray scale and reduced size.
+ * This class is not thread safe.
  */
 class CameraImageBuffer
 {
@@ -79,37 +81,12 @@ private:
   cv::VideoCapture camera;
   ImageFilter *filter;
 
-  cv::Mat_<cv::Vec3b> bgr_img;
-  cv::Mat_<unsigned short> gray_img;
-  cv::Mat_<cv::Vec3b> small_bgr_img;
-  cv::Mat_<unsigned short> small_gray_img;
+  cv::Mat_<cv::Vec<unsigned short, 3>> bgr_img;
+  cv::Mat_<cv::Vec<unsigned short, 1>> gray_img;
+  cv::Mat_<cv::Vec<unsigned short, 3>> conversion_img;
 
   bool have_gray;
-  bool have_small_bgr;
-  bool have_small_gray;
-
   int index;
-  double downsample_ratio;
-
-  /**
-   *
-   */
-  void initialize()
-  {
-    if (!camera.isOpened())
-    {
-      throw std::runtime_error("Camera failed to open.");
-    }
-
-    index = 0;
-    downsample_ratio = 2.0;
-    have_gray = false;
-    have_small_bgr = false;
-    have_small_gray = false;
-
-    set_preferred_framesize(1280, 720);
-    update_image();
-  }
 
 public:
   /**
@@ -117,19 +94,21 @@ public:
    */
   CameraImageBuffer(int camera_id, ImageFilter *filter=nullptr)
   : filter(filter)
+  , bgr_img(480, 640)
+  , gray_img(480, 640)
+  , conversion_img(480, 640)
   {
     camera.open(camera_id);
-    initialize();
-  }
+    camera.set(cv::CAP_PROP_FRAME_WIDTH, 640);
+    camera.set(cv::CAP_PROP_FRAME_HEIGHT, 480);
 
-  /**
-   *
-   */
-  CameraImageBuffer(const std::string &camera_filepath, ImageFilter *filter=nullptr)
-  : filter(filter)
-  {
-    camera.open(camera_filepath);
-    initialize();
+    if (!camera.isOpened())
+      throw std::runtime_error("Camera failed to open.");
+
+    index = 0;
+    have_gray = false;
+
+    update_image();
   }
 
   /**
@@ -139,22 +118,18 @@ public:
    */
   void update_image()
   {
-    bool retake;
+    bool retake = false;
     do
     {
       camera >> bgr_img;
 
       // apply image filter if it exists
       if (filter != nullptr)
-        (*filter)(bgr_img, retake);
-      else
-        retake = false;
+        filter->filter(bgr_img, retake);
     } while (retake);
 
     index++;
     have_gray = false;
-    have_small_bgr = false;
-    have_small_gray = false;
   }
 
   /**
@@ -166,46 +141,9 @@ public:
   }
 
   /**
-   *
-   */
-  void get_framesize(int &width, int &height)
-  {
-    width = camera.get(cv::CAP_PROP_FRAME_WIDTH);
-    height = camera.get(cv::CAP_PROP_FRAME_HEIGHT);
-  }
-
-  /**
-   *
-   */
-  double get_downsample_ratio()
-  {
-    return downsample_ratio;
-  }
-
-  /**
-   * Sets the preferred frame size for the images captured by the camera.
-   *
-   */
-  void set_preferred_framesize(unsigned int width, unsigned int height)
-  {
-    camera.set(cv::CAP_PROP_FRAME_WIDTH, width);
-    camera.set(cv::CAP_PROP_FRAME_HEIGHT, height);
-  }
-
-  /**
-   *
-   */
-  void set_downsample_ratio(double ratio)
-  {
-    downsample_ratio = ratio;
-    have_small_bgr = false;
-    have_small_gray = false;
-  }
-
-  /**
    * Returns th
    */
-  const cv::Mat_<cv::Vec3b> & get_bgr_image()
+  const cv::Mat_<cv::Vec<unsigned short, 3>> & get_bgr_image()
   {
     return bgr_img;
   }
@@ -213,47 +151,17 @@ public:
   /**
    *
    */
-  const cv::Mat_<unsigned short> & get_gray_image()
+  const cv::Mat_<cv::Vec<unsigned short, 1>> & get_gray_image()
   {
     if (!have_gray)
     {
-      cv::cvtColor(bgr_img, gray_img, cv::COLOR_BGR2GRAY);
+  std::cout << "hi1" << std::endl;
+      cv::cvtColor(bgr_img, conversion_img, cv::COLOR_BGR2GRAY);
+  std::cout << "hi2" << std::endl;
+      gray_img = conversion_img;
       have_gray = true;
     }
     return gray_img;
-  }
-
-  /**
-   * Returns a scaled down bgr version of the current image. The amount of
-   * scaling is set by the set_downsample_ratio method.
-   */
-  const cv::Mat_<cv::Vec3b> & get_small_bgr_image()
-  {
-    if (!have_small_bgr)
-    {
-      cv::resize(bgr_img, small_bgr_img, cv::Size(), 1.0/downsample_ratio, 1.0/downsample_ratio);
-      have_small_bgr = true;
-    }
-    return small_bgr_img;
-  }
-
-  /**
-   * Returns a scaled down grayscale version of the original image. The amount
-   * of scaling is set by the set_downsample_ratio method.
-   */
-  const cv::Mat_<unsigned short> & get_small_gray_image()
-  {
-    if (!have_small_gray)
-    {
-      if (!have_gray)
-      {
-        cv::cvtColor(bgr_img, gray_img, cv::COLOR_BGR2GRAY);
-        have_gray = true;
-      }
-      cv::resize(gray_img, small_gray_img, cv::Size(), 1.0/downsample_ratio, 1.0/downsample_ratio);
-      have_small_gray = true;
-    }
-    return small_gray_img;
   }
 };
 
