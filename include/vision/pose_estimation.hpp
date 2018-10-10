@@ -128,10 +128,10 @@ public:
     dlib::deserialize(pose_model_filepath) >> circle_pose_model;
 
     std::array<cv::Point3d, 14> temp_pts = {
-      cv::Point3d(-1,-1,0),     
-      cv::Point3d(-1, 1, 0),   
-      cv::Point3d(1, 1, 0),   
-      cv::Point3d(1, -1, 0),
+      cv::Point3d(-4,-1,0),     
+      cv::Point3d(-4, 1, 0),   
+      cv::Point3d(4, 1, 0),   
+      cv::Point3d(4, -1, 0),
     }
     object_pts = std::vector<cv::Point3d>(temp_pts.begin(), temp_pts.end());
 
