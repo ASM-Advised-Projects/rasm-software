@@ -1,0 +1,78 @@
+<?xml version='1.0' encoding='ISO-8859-1'?>
+<?xml-stylesheet type='text/xsl' href='image_metadata_stylesheet.xsl'?>
+<dataset>
+<name>imglab dataset</name>
+<comment>Created by imglab tool.</comment>
+<images>
+  <image file='training/rasm_text.png'>
+    <box top='572' left='475' width='280' height='68'>
+      <part name='01' x='494' y='607'/>
+      <part name='02' x='516' y='609'/>
+      <part name='03' x='562' y='611'/>
+      <part name='04' x='585' y='613'/>
+      <part name='05' x='657' y='589'/>
+      <part name='06' x='621' y='622'/>
+      <part name='07' x='672' y='577'/>
+      <part name='08' x='754' y='639'/>
+      <part name='09' x='754' y='576'/>
+      <part name='10' x='478' y='639'/>
+    </box>
+  </image>
+  <image file='training/withHexagons.png'>
+    <box top='572' left='476' width='279' height='68'>
+      <part name='01' x='494' y='611'/>
+      <part name='02' x='516' y='608'/>
+      <part name='03' x='563' y='611'/>
+      <part name='04' x='585' y='611'/>
+      <part name='05' x='657' y='589'/>
+      <part name='06' x='621' y='623'/>
+      <part name='07' x='672' y='577'/>
+      <part name='08' x='754' y='639'/>
+      <part name='09' x='754' y='575'/>
+      <part name='10' x='478' y='637'/>
+    </box>
+  </image>
+  <image file='training/withPatient.png'>
+    <box top='490' left='161' width='280' height='68'>
+      <part name='01' x='181' y='529'/>
+      <part name='02' x='202' y='527'/>
+      <part name='03' x='249' y='530'/>
+      <part name='04' x='271' y='529'/>
+      <part name='05' x='343' y='507'/>
+      <part name='06' x='307' y='540'/>
+      <part name='07' x='358' y='494'/>
+      <part name='08' x='440' y='557'/>
+      <part name='09' x='439' y='493'/>
+      <part name='10' x='164' y='556'/>
+    </box>
+  </image>
+  <image file='training/scaled350.png'>
+    <box top='467' left='127' width='976' height='235'>
+      <part name='01' x='192' y='595'/>
+      <part name='02' x='265' y='592'/>
+      <part name='03' x='430' y='601'/>
+      <part name='04' x='509' y='600'/>
+      <part name='05' x='761' y='520'/>
+      <part name='06' x='634' y='638'/>
+      <part name='07' x='813' y='474'/>
+      <part name='08' x='1102' y='695'/>
+      <part name='09' x='1100' y='472'/>
+      <part name='10' x='132' y='694'/>
+    </box>
+  </image>
+  <image file='training/scaled50.png'>
+    <box top='593' left='545' width='140' height='35'>
+      <part name='01' x='555' y='613'/>
+      <part name='02' x='566' y='612'/>
+      <part name='03' x='589' y='614'/>
+      <part name='04' x='601' y='614'/>
+      <part name='05' x='636' y='602'/>
+      <part name='06' x='618' y='620'/>
+      <part name='07' x='644' y='596'/>
+      <part name='08' x='684' y='627'/>
+      <part name='09' x='684' y='597'/>
+      <part name='10' x='547' y='627'/>
+    </box>
+  </image>
+</images>
+</dataset>
