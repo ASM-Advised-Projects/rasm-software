@@ -6,13 +6,13 @@
  *   RealTimeIntegrator
  */
 
-#ifndef _SIGNAL_PROCESSING_H_
-#define _SIGNAL_PROCESSING_H_
+#ifndef SIGNAL_PROCESSING_HPP
+#define SIGNAL_PROCESSING_HPP
 
+#include <iostream>
 #include <vector>
 
 using std::vector;
-
 
 /**
  * This class represents a ring buffer of numeric values. It's basically a
@@ -24,8 +24,8 @@ class CircularArray {
 private:
   static_assert(std::is_arithmetic<NumericType>::value, "NumericType must be numeric");
   NumericType *array;
-	unsigned int next_index;
-	unsigned int max_size_;
+  unsigned int next_index;
+  unsigned int max_size_;
   unsigned int size_;
 
 public:
@@ -33,15 +33,31 @@ public:
    * Constructs an empty circular array with the given fixed size as its
    * capacity.
    */
-	CircularArray(unsigned int max_size)
-	: array(new NumericType[max_size])
+  CircularArray(unsigned int max_size)
+  : array(new NumericType[max_size])
   , next_index(0)
-	, max_size_(max_size)
-	{
-    size_ = 0;
-
+  , max_size_(max_size)
+  , size_(0)
+  {
   }
 
+  /**
+   * Copy constructor.
+   */
+  CircularArray(const CircularArray &other)
+  {
+    next_index = other.next_index;
+    max_size_ = other.max_size_;
+    size_ = other.size_;
+
+    array = new NumericType[other.max_size_];
+    for (int i = 0; i < size_; i++)
+      array[i] = other.array[i];
+  }
+
+  /**
+   * Destructs this circular array.
+   */
   ~CircularArray()
   {
     delete[] array;
@@ -51,13 +67,13 @@ public:
    * Pushes a new value onto the front of this array. This will delete the
    * oldest value if this array is full.
    */
-	void push(NumericType val)
-	{
-	  array[next_index] = val;
+  void push(NumericType val)
+  {
+    array[next_index] = val;
     next_index = (next_index + 1) % max_size_;
     if (size_ < max_size_)
       ++size_;
-	}
+  }
 
   /**
    * Returns the value at the given index, which is a number of entries back.
@@ -65,7 +81,7 @@ public:
    */
   NumericType get(unsigned int entries_back)
   {
-    if (entries_back >= max_size_)
+    if (entries_back >= size_)
       return 0;
     return array[(next_index-1-entries_back) % max_size_];
   }
@@ -73,7 +89,7 @@ public:
   /**
    * The equivalent of calling the get(unsigned int) method.
    */
-  double operator[](unsigned int entries_back)
+  NumericType operator[](unsigned int entries_back)
   {
     return get(entries_back);
   }
@@ -84,7 +100,7 @@ public:
    */
   void modify(unsigned int entries_back, NumericType val)
   {
-    if (entries_back < max_size_)
+    if (entries_back < size_)
       array[(next_index-1-entries_back) % max_size_] = val;
   }
 
@@ -102,6 +118,41 @@ public:
   unsigned int capacity() const
   {
     return max_size_;
+  }
+
+  /**
+   * Equals assignment operator.
+   */
+  CircularArray & operator=(const CircularArray &other)
+  {
+    if (*this == other)
+      return *this;
+
+    next_index = other.next_index;
+    max_size_ = other.max_size_;
+    size_ = other.size_;
+
+    array = new NumericType[other.max_size_];
+    for (int i = 0; i < size_; i++)
+      array[i] = other.array[i];
+
+    return *this;
+  }
+
+  /**
+   * Equals comparison operator.
+   */
+  bool operator==(const CircularArray &other)
+  {
+    for (int i = 0; i < size_; i++)
+    {
+      if (array[i] != other.array[i])
+        return false;
+    }
+
+    return next_index == other.next_index &&
+        max_size_ == other.max_size_ &&
+        size_ == other.size_;
   }
 };
 
@@ -130,6 +181,9 @@ private:
   CircularArray<double> outputs;
 
 public:
+  RealTimeLTIFilter(const RealTimeLTIFilter &) = default;
+  RealTimeLTIFilter & operator=(const RealTimeLTIFilter &) = default;
+
   /**
    * Creates a new filter using the given feedforward (ff_coeffs) and feedback
    * (fb_coeffs) coefficients.
@@ -138,7 +192,7 @@ public:
   : ff_coeffs(ff_coeffs)
   , fb_coeffs(fb_coeffs)
   , inputs(ff_coeffs.size())
-  , outputs(fb_coeffs.size())
+  , outputs(1+fb_coeffs.size())
   {
   }
 
@@ -149,14 +203,18 @@ public:
   void input(double value)
   {
     inputs.push(value);
-
+    std::cout << "input1" << std::endl;
     double new_output = 0;
-    for (int i = 0; i < inputs.capacity(); ++i)
+    std::cout << "input2" << std::endl;
+    for (int i = 0; i < ff_coeffs.capacity(); ++i)
       new_output += ff_coeffs[i] * inputs[i];
-    for (int j = 0; j < outputs.capacity(); ++j)
+    std::cout << "input3" << std::endl;
+    for (int j = 0; j < fb_coeffs.capacity(); ++j)
       new_output += fb_coeffs[j] * outputs[j];
 
+    std::cout << "input4" << std::endl;
     outputs.push(new_output);
+    std::cout << "input5" << std::endl;
   }
 
   /**
@@ -194,6 +252,9 @@ private:
   double derivative_;
 
 public:
+  RealTimeDifferentiator(const RealTimeDifferentiator &) = default;
+  RealTimeDifferentiator & operator=(const RealTimeDifferentiator &) = default;
+
   /**
    * Creates a new differentiator with no initial input data.
    */
@@ -249,6 +310,8 @@ public:
  * Computes the integral of a series of dependent input values with respect
  * to a series of independent values (e.g., time). The trapezoidal rule is used
  * to calculate the integral over a series of values for a given range.
+ * Simplson's rule is not used here because it takes a complicated modification
+ * in order to deal with non-uniformly spaced data.
  */
 class RealTimeIntegrator
 {
@@ -258,6 +321,9 @@ private:
   double integral_;
 
 public:
+  RealTimeIntegrator(const RealTimeIntegrator &) = default;
+  RealTimeIntegrator & operator=(const RealTimeIntegrator &) = default;
+
   /**
    * Constructs a new integrator that integrates over the <range> latest data
    * points.
@@ -305,4 +371,4 @@ public:
   }
 };
 
-#endif
+#endif  // SIGNAL_PROCESSING_HPP
