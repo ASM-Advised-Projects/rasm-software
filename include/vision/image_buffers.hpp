@@ -18,7 +18,7 @@
 class ImageFilter
 {
 public:
-  virtual void operator()(cv::Mat_<cv::Vec3b> &image, bool & retake) = 0;
+  virtual void operator()(cv::Mat_<unsigned short> &image, bool & retake) = 0;
 };
 
 
@@ -39,7 +39,7 @@ public:
     this->dist_coeffs = dist_coeffs;
   }
 
-  void operator()(cv::Mat_<cv::Vec3b> &image, bool &retake)
+  void operator()(cv::Mat_<unsigned short> &image, bool &retake)
   {
     // TODO: use initUndistortRectifyMap and remap
     retake = false;
@@ -61,7 +61,7 @@ public:
     threshold = blur_threshold;
   }
 
-  void operator()(cv::Mat_<cv::Vec3b> &image, bool &retake)
+  void operator()(cv::Mat_<unsigned short> &image, bool &retake)
   {
     // TODO: use laplacian transform to recognize blur
     retake = false;
@@ -79,9 +79,9 @@ private:
   cv::VideoCapture camera;
   ImageFilter *filter;
 
-  cv::Mat_<cv::Vec3b> bgr_img;
+  cv::Mat_<unsigned short> bgr_img;
   cv::Mat_<unsigned short> gray_img;
-  cv::Mat_<cv::Vec3b> small_bgr_img;
+  cv::Mat_<unsigned short> small_bgr_img;
   cv::Mat_<unsigned short> small_gray_img;
 
   bool have_gray;
@@ -205,7 +205,7 @@ public:
   /**
    * Returns th
    */
-  const cv::Mat_<cv::Vec3b> & get_bgr_image()
+  const cv::Mat_<unsigned short> & get_bgr_image()
   {
     return bgr_img;
   }
@@ -227,7 +227,7 @@ public:
    * Returns a scaled down bgr version of the current image. The amount of
    * scaling is set by the set_downsample_ratio method.
    */
-  const cv::Mat_<cv::Vec3b> & get_small_bgr_image()
+  const cv::Mat_<unsigned short> & get_small_bgr_image()
   {
     if (!have_small_bgr)
     {
