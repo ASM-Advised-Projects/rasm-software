@@ -1,75 +1,54 @@
 /**
- * Defines the ImageBuffer class.
+ * Defines the CameraImageBuffer, UndistCameraImageBuffer, and
+ * UnblurCameraImageBuffer classes.
  */
 
-#ifndef VISION_IMAGE_BUFFERING_HPP
-#define VISION_IMAGE_BUFFERING_HPP
+#ifndef IMAGE_BUFFERS_INCLUDED
+#define IMAGE_BUFFERS_INCLUDED
 
+#include <iostream>
+#include <opencv2/videoio.hpp>
 #include "camera_calibration.hpp"
-#include "opencv2/videoio.hpp"
 
 /**
  * Instances of this class are single-image buffers that provide different
  * versions of the image like gray scale and reduced size.
- * Instances of this class are not thread safe.
  */
-class ImageBuffer
+class CameraImageBuffer
 {
-public:
-  /**
-   * This enumeration represents the allowable image sizes coming from the
-   * image source used by an instance of this class. Note that most cameras
-   * will only be able to do 480p and 720p.
-   */
-  enum FrameSize { _360P, _480P, _720P, _1080P };
-
-  /**
-   * Converts a frame size enumeration value to the width and height in pixels
-   * that it represents.
-   */
-  static void dimensions(FrameSize framesize, int &width, int &height)
-  {
-    switch (framesize)
-    {
-      case _360P:
-        width = 480;
-        height = 360;
-        break;
-      case _480P:
-        width = 858;
-        height = 480;
-        break;
-      case _720P:
-        width = 1280;
-        height = 720;
-        break;
-      case _1080P:
-        width = 1920;
-        height = 1080;
-        break;
-    }
-  }
-
 private:
-  cv::VideoCapture source;
+  cv::VideoCapture camera;
   ImageFilter *filter;
 
-  cv::Mat bgr_img;
-  cv::Mat gray_img;
+  cv::Mat_<cv::Vec3b> bgr_img;
+  cv::Mat_<unsigned short> gray_img;
+  cv::Mat_<cv::Vec3b> small_bgr_img;
+  cv::Mat_<unsigned short> small_gray_img;
+
   bool have_gray;
+  bool have_small_bgr;
+  bool have_small_gray;
+
   int index;
+  double downsample_ratio;
 
   /**
-   * Holds initialization/construction code that is common to both constructors.
+   *
    */
-  void init(FrameSize size)
+  void initialize()
   {
-    set_img_size(size);
-
-    if (!source.isOpened())
-      throw std::runtime_error("Image source failed to open.");
+    if (!camera.isOpened())
+    {
+      throw std::runtime_error("Camera failed to open.");
+    }
 
     index = 0;
+    downsample_ratio = 2.0;
+    have_gray = false;
+    have_small_bgr = false;
+    have_small_gray = false;
+
+    set_preferred_framesize(1280, 720);
     update_image();
   }
 
@@ -77,69 +56,46 @@ public:
   /**
    *
    */
-  ImageBuffer(int camera_id, FrameSize size, ImageFilter *filter=nullptr)
+  CameraImageBuffer(int camera_id, ImageFilter *filter=nullptr)
   : filter(filter)
-  , have_gray(false)
   {
-    source.open(camera_id);
-    init(size);
+    camera.open(camera_id);
+    initialize();
   }
 
   /**
    *
    */
-  ImageBuffer(std::string &filepath, FrameSize size, ImageFilter *filter=nullptr)
+  CameraImageBuffer(const std::string &camera_filepath, ImageFilter *filter=nullptr)
   : filter(filter)
   {
-    source.open(filepath);
-    init(size);
+    camera.open(camera_filepath);
+    initialize();
   }
 
   /**
-   * Grabs the next image from the image source and applies a filter if one was
+   * Grabs the next image in the camera file and applies a filter if one was
    * given during construction. This method will overwrite the previously set
    * image. Note that this method is internally called upon construction.
    */
   void update_image()
   {
-    bool retake = false;
+    bool retake;
     do
     {
-      source >> bgr_img;
+      camera >> bgr_img;
 
       // apply image filter if it exists
       if (filter != nullptr)
-        filter->filter(bgr_img, retake);
+        (*filter)(bgr_img, retake);
+      else
+        retake = false;
     } while (retake);
 
     index++;
-  }
-
-  /**
-   * Returns the current dimensions in pixels of the images coming from the
-   * image source.
-   */
-  void get_img_size(int &width, int &height)
-  {
-    width = source.get(cv::CAP_PROP_FRAME_WIDTH);
-    height = source.get(cv::CAP_PROP_FRAME_HEIGHT);
-  }
-
-  /**
-   * Sets the frame size of the images coming from the image source. A camera
-   * image source may or may not respect this setting so don't assume the
-   * images are of this size until verified with the get_img_size method. A
-   * file pattern image source will completely ignore this setting.
-   */
-  void set_img_size(FrameSize framesize)
-  {
-    int width, height;
-    dimensions(framesize, width, height);
-
-    // width and height are switched here because width corresponds to rows
-    // and height corresponds to columns in openCV
-    source.set(cv::CAP_PROP_FRAME_WIDTH, height);
-    source.set(cv::CAP_PROP_FRAME_HEIGHT, width);
+    have_gray = false;
+    have_small_bgr = false;
+    have_small_gray = false;
   }
 
   /**
@@ -151,25 +107,98 @@ public:
   }
 
   /**
-   * Returns the latest filtered image taken from the image source.
+   *
    */
-  const cv::Mat & get_bgr_image()
+  void get_framesize(int &width, int &height)
+  {
+    width = camera.get(cv::CAP_PROP_FRAME_WIDTH);
+    height = camera.get(cv::CAP_PROP_FRAME_HEIGHT);
+  }
+
+  /**
+   *
+   */
+  double get_downsample_ratio()
+  {
+    return downsample_ratio;
+  }
+
+  /**
+   * Sets the preferred frame size for the images captured by the camera.
+   *
+   */
+  void set_preferred_framesize(unsigned int width, unsigned int height)
+  {
+    camera.set(cv::CAP_PROP_FRAME_WIDTH, width);
+    camera.set(cv::CAP_PROP_FRAME_HEIGHT, height);
+  }
+
+  /**
+   *
+   */
+  void set_downsample_ratio(double ratio)
+  {
+    downsample_ratio = ratio;
+    have_small_bgr = false;
+    have_small_gray = false;
+  }
+
+  /**
+   * Returns th
+   */
+  const cv::Mat_<cv::Vec3b> & get_bgr_image()
   {
     return bgr_img;
   }
 
   /**
-   * Returns the grayscale version of the latest filtered image taken from the
-   * image source.
+   *
    */
-  const cv::Mat & get_gray_image()
+  const cv::Mat_<unsigned short> & get_gray_image()
   {
     if (!have_gray)
     {
+      if(bgr_img.empty())
+      {
+        std::cerr << "The image is empty!" << std::endl;
+      }
       cv::cvtColor(bgr_img, gray_img, cv::COLOR_BGR2GRAY);
       have_gray = true;
     }
     return gray_img;
+  }
+
+  /**
+   * Returns a scaled down bgr version of the current image. The amount of
+   * scaling is set by the set_downsample_ratio method.
+   */
+  const cv::Mat_<cv::Vec3b> & get_small_bgr_image()
+  {
+    if (!have_small_bgr)
+    {
+      cv::resize(bgr_img, small_bgr_img, cv::Size(), 1.0/downsample_ratio, 1.0/downsample_ratio);
+      have_small_bgr = true;
+    }
+    return small_bgr_img;
+  }
+
+  /**
+   * Returns a scaled down grayscale version of the original image. The amount
+   * of scaling is set by the set_downsample_ratio method.
+   */
+  const cv::Mat_<unsigned short> & get_small_gray_image()
+  {
+    if (!have_small_gray)
+    {
+      if (!have_gray)
+      {
+        cv::cvtColor(bgr_img, gray_img, cv::COLOR_BGR2GRAY);
+        have_gray = true;
+      }
+      cv::resize(gray_img, small_gray_img, cv::Size(), 1.0/downsample_ratio, 1.0/downsample_ratio);
+      have_small_gray = true;
+    }
+    return small_gray_img;
   }
 };
 

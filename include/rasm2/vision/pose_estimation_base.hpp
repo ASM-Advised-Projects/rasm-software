@@ -10,7 +10,6 @@
 #include "dlib/opencv.h"
 #include "dlib/image_processing.h"
 #include "dlib/image_processing/frontal_face_detector.h"
-#include <iostream>
 
 typedef std::array<double, 6> Pose;
 typedef dlib::rectangle Rect;
@@ -29,6 +28,11 @@ private:
   const double BOX_EXPAND_RATIO = 1.2;
 
   CameraImageBuffer &camera;
+  dlib::object_detector<ImageScannerType> *detector;
+  dlib::shape_predictor *pose_model;
+
+  std::vector<cv::Point3d> *object_pts;
+  std::vector<int> *image_pt_inds;
 
   cv::Mat cam_matrix;
   cv::Mat dist_coeffs;
@@ -47,10 +51,25 @@ private:
   Pose zero_pose;
 
 protected:
-  dlib::object_detector<ImageScannerType> *detector;
-  dlib::shape_predictor *pose_model;
-  std::vector<cv::Point3d> *object_pts;
-  std::vector<int> *image_pt_inds;
+  virtual dlib::object_detector<ImageScannerType> * get_object_detector()
+  {
+    return nullptr;
+  }
+
+  virtual dlib::shape_predictor * get_shape_predictor()
+  {
+    return nullptr;
+  }
+
+  virtual std::vector<cv::Point3d> * get_object_points()
+  {
+    return nullptr;
+  }
+
+  virtual std::vector<int> * get_image_point_indices()
+  {
+    return nullptr;
+  }
 
   /**
    *
@@ -63,6 +82,11 @@ protected:
     object_count = 0;
 
     zero_pose.fill(0);
+
+    detector = get_object_detector();
+    pose_model = get_shape_predictor();
+    object_pts = get_object_points();
+    image_pt_inds = get_image_point_indices();
   }
 
   /*
@@ -94,10 +118,8 @@ protected:
         return object_boxes;
     }
 
-    dlib::cv_image<dlib::bgr_pixel> img_dlib(img);  // dlib image format
-    std::vector<Rect> boxes = (*detector)(img_dlib);
-    std::cout << "faces detected: " << boxes.size() << std::endl;
-    return boxes;
+    dlib::cv_image<unsigned short> img_dlib(img);  // dlib image format
+    return (*detector)(img_dlib);
   }
 
   /**
@@ -182,7 +204,7 @@ public:
   , zero_box(0, 0, 0, 0)
   {
     int imgw, imgh;
-    camera.get_img_size(imgw, imgh);
+    camera.get_framesize(imgw, imgh);
     double cam_vals[9] = {(double)imgw, 0, (double)imgw/2, 0, (double)imgw, (double)imgh/2, 0, 0, 1};
     cam_matrix = cv::Mat(3, 3, CV_64FC1, cam_vals);
 
@@ -220,30 +242,45 @@ public:
    */
   Pose get_pose()
   {
-    // get current grayscale image
-    const cv::Mat &bgr_img = camera.get_bgr_image();
-
-    // detect objects
-    cv::Mat img(bgr_img);  // TODO - figure out how get around making a copy
     std::cout << "0" << std::endl;
+    // get downsample ratio for scaled down images
+    double img_scale = camera.get_downsample_ratio();
+    std::cout << "1" << std::endl;
+
+    // get normal and scaled-down grayscale images
+    const cv::Mat &gray_img = camera.get_gray_image();
+    std::cout << "2" << std::endl;
+    const cv::Mat &small_gray_img = camera.get_small_gray_image();
+    std::cout << "3" << std::endl;
+
+    // detect objects using the small image
+    cv::Mat img(small_gray_img);  // TODO - figure out how get around making a copy
+    std::cout << "4" << std::endl;
     std::vector<Rect> object_boxes = detect_objects(img);
+    std::cout << "5" << std::endl;
     object_count = object_boxes.size();
+    std::cout << "6" << std::endl;
 
     // select an object box
-    std::cout << "1" << std::endl;
-    Rect selected_object_box = select_object(object_boxes, bgr_img.size().width, bgr_img.size().height);
-    std::cout << "2" << std::endl;
+    Rect selected_object_box = select_object(object_boxes, small_gray_img.size().width, small_gray_img.size().height);
+    std::cout << "7" << std::endl;
     if (selected_object_box == zero_box)  // no objects were detected
       return zero_pose;
 
     // update the last object box
     last_object_box = selected_object_box;
 
+    // scale up selected face box
+    selected_object_box.set_left(img_scale*selected_object_box.left());
+    selected_object_box.set_right(img_scale*selected_object_box.right());
+    selected_object_box.set_top(img_scale*selected_object_box.top());
+    selected_object_box.set_bottom(img_scale*selected_object_box.bottom());
+
     // locate features
-    dlib::cv_image<dlib::bgr_pixel> bgr_img_dlib(bgr_img);  // dlib image format
-    std::cout << "3" << std::endl;
-    dlib::full_object_detection shape = (*pose_model)(bgr_img_dlib, selected_object_box);
-    std::cout << "4" << std::endl;
+    dlib::cv_image<unsigned short> gray_img_dlib(gray_img);  // dlib image format
+    std::cout << "8" << std::endl;
+    dlib::full_object_detection shape = (*pose_model)(gray_img_dlib, selected_object_box);
+    std::cout << "9" << std::endl;
 
     // load 2d image points to use
     image_pts.clear();
