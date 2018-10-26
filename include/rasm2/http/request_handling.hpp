@@ -1,9 +1,10 @@
 /**
- * Defines the GETRequestHandler, POSTRequestHandler, and OtherRequestHandler.
+ * Defines the GETRequestHandler, POSTRequestHandler, and OtherRequestHandler
+ * classes.
  */
 
-#ifndef REQUEST_HANDLING_INCLUDED
-#define REQUEST_HANDLING_INCLUDED
+#ifndef RASM2_HTTP_REQUEST_HANDLING_HPP
+#define RASM2_HTTP_REQUEST_HANDLING_HPP
 
 #include <map>
 
@@ -20,7 +21,6 @@
 
 namespace pnet = Poco::Net;
 using std::string;
-
 
 /**
  * Handles HTTP GET requests by sending the file that corresponds to the

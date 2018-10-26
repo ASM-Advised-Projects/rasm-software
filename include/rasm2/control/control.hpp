@@ -2,11 +2,10 @@
  * Defines the Controller class.
  */
 
-#ifndef _CONTROL_H_
-#define _CONTROL_H_
+#ifndef RASM2_CONTROL_CONTROL_HPP
+#define RASM2_CONTROL_CONTROL_HPP
 
-#include "pose_estimation.hpp"
-
+#include "vision/pose_estimation.hpp"
 
 /**
  *

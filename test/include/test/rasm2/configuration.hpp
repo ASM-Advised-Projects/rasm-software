@@ -1,12 +1,10 @@
 /**
- * Unit tests for the configuration.hpp file.
+ * Unit tests for the rasm2/configuration.hpp file.
  */
 
 #ifndef TEST_RASM2_CONFIGURATION_HPP
 #define TEST_RASM2_CONFIGURATION_HPP
 
-#include <iostream>
-#include <array>
 #include <cppunit/extensions/HelperMacros.h>
 #include "rasm2/configuration.hpp"
 

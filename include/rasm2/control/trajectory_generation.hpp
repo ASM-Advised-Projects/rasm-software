@@ -2,12 +2,11 @@
  *
  */
 
-#ifndef _TRAJECTORY_GENERATION_H_
-#define _TRAJECTORY_GENERATION_H_
+#ifndef RASM2_CONTROL_TRAJECTORY_GENERATION_HPP
+#define RASM2_CONTROL_TRAJECTORY_GENERATION_HPP
 
 #include "definitions.hpp"
 #include "trajectory_structures.hpp"
-
 
 /**
  * realizable trajectory – all trajectory points are reachable with no singularites (inf joint velocities)

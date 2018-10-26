@@ -1,5 +1,5 @@
 /**
- * Unit tests for the logging.hpp file.
+ * Unit tests for the rasm2/logging.hpp file.
  */
 
 #ifndef TEST_RASM2_LOGGING_HPP
@@ -50,4 +50,4 @@ public:
   }
 };
 
-#endif  // TEST_LOGGING_HPP
+#endif

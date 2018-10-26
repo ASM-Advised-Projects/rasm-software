@@ -7,16 +7,17 @@
  * was added to every function.
  */
 
-#ifndef DIABLO_COMMANDS_H
-#define	DIABLO_COMMANDS_H
+#ifndef RASM2_PERIPHERY_DIABLO_COMMANDS_H
+#define	RASM2_PERIPHERY_DIABLO_COMMANDS_H
 
 #ifdef __cplusplus
 extern "C"
 {
 #endif
 
-#include "diablo_constants.h"
 #include <string.h>
+
+#include "diablo_constants.h"
 
 // library communication structure used in every command method
 struct command_t

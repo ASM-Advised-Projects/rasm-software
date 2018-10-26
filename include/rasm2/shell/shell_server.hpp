@@ -2,10 +2,11 @@
  * Defines the ShellSession and RasmShellServer classes.
  */
 
-#ifndef RASM_SHELL_INCLUDED
-#define RASM_SHELL_INCLUDED
+#ifndef RASM2_SHELL_SHELL_SERVER_HPP
+#define RASM2_SHELL_SHELL_SERVER_HPP
 
 #include <string.h>
+
 #include <Poco/Net/ServerSocket.h>
 #include <Poco/Thread.h>
 #include <Poco/Runnable.h>

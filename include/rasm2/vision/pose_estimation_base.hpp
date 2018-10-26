@@ -2,18 +2,17 @@
  * Defines the TrackingPoseEstimator base class.
  */
 
-#ifndef POSE_ESTIMATION_BASE_INCLUDED
-#define POSE_ESTIMATION_BASE_INCLUDED
-
-#include "image_buffers.hpp"
+#ifndef RASM2_VISION_POSE_ESTIMATION_BASE_HPP
+#define RASM2_VISION_POSE_ESTIMATION_BASE_HPP
 
 #include "dlib/opencv.h"
 #include "dlib/image_processing.h"
 #include "dlib/image_processing/frontal_face_detector.h"
 
+#include "image_buffering.hpp"
+
 typedef std::array<double, 6> Pose;
 typedef dlib::rectangle Rect;
-
 
 /**
  * Abstract base class for optimized pose estimators that track a particular

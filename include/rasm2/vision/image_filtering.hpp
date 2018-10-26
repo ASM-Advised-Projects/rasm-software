@@ -2,11 +2,12 @@
  * Defines the ImageFilter superclass along with various subclasses.
  */
 
-#ifndef VISION_IMAGE_FILTERING_HPP
-#define VISION_IMAGE_FILTERING_HPP
+#ifndef RASM2_VISION_IMAGE_FILTERING_HPP
+#define RASM2_VISION_IMAGE_FILTERING_HPP
+
+#include "opencv2/videoio.hpp"
 
 #include "camera_calibration.hpp"
-#include "opencv2/videoio.hpp"
 
 /**
  * An abstract base class for all image filters that qualify if an image is

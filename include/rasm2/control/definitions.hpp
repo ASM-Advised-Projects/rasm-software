@@ -2,8 +2,8 @@
  *
  */
 
-#ifndef _CONTROL_DEFINITIONS_H_
-#define _CONTROL_DEFINITIONS_H_
+#ifndef RASM2_CONTROL_DEFINITIONS_HPP
+#define RASM2_CONTROL_DEFINITIONS_HPP
 
 #include <array>
 #include <limits>

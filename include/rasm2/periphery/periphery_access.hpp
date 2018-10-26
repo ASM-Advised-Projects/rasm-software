@@ -2,19 +2,20 @@
  * Defines the PeripheryAccess (singleton) class.
  */
 
-#ifndef PERIPHERY_ACCESS_H
-#define PERIPHERY_ACCESS_H
+#ifndef RASM2_PERIPHERY_PERIPHERY_ACCESS_HPP
+#define RASM2_PERIPHERY_PERIPHERY_ACCESS_HPP
+
+#include <map>
+
+#include "Poco/Format.h"
 
 #include "periphery/i2c.h"
 #include "periphery/spi.h"
 #include "periphery/serial.h"
+
 #include "periphery_config.hpp"
 #include "configuration.hpp"
 #include "logging.hpp"
-
-#include "Poco/Format.h"
-
-#include <map>
 
 using std::string;
 using Poco::format;

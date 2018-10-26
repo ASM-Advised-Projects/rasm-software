@@ -2,15 +2,14 @@
  *
  */
 
-#ifndef _SYSTEM_MODELING_H_
-#define _SYSTEM_MODELING_H_
-
-#include "definitions.hpp"
+#ifndef RASM2_CONTROL_SYSTEM_MODELING_HPP
+#define RASM2_CONTROL_SYSTEM_MODELING_HPP
 
 #include <vector>
 
-using std::string;
+#include "definitions.hpp"
 
+using std::string;
 
 /**
  *

@@ -5,8 +5,8 @@
  * functions that still remain in diablo_commands.
  */
 
-#ifndef DIABLO_CONSTANTS_H
-#define	DIABLO_CONSTANTS_H
+#ifndef RASM2_PERIPHERY_DIABLO_CONSTANTS_H
+#define	RASM2_PERIPHERY_DIABLO_CONSTANTS_H
 
 #ifdef __cplusplus
 extern "C"

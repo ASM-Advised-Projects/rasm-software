@@ -1,26 +1,20 @@
 /**
  * Implements the RASM's configuration subsystem.
- * Defines the ConfigGroup and ConfigurationManager (singleton) classes.
+ * Defines the ConfigGroup, ConfigurationManagerImpl, and ConfigurationManager
+ * (singleton) classes.
  */
 
 #ifndef RASM2_CONFIGURATION_HPP
 #define RASM2_CONFIGURATION_HPP
 
-#include <iostream>
-#include <unordered_set>
-#include <Poco/Exception.h>
 #include <Poco/Util/MapConfiguration.h>
 #include <Poco/Util/PropertyFileConfiguration.h>
 #include <Poco/String.h>
 #include <Poco/Clock.h>
 #include <Poco/Util/Timer.h>
 #include <Poco/Util/TimerTask.h>
-#include <Poco/AutoPtr.h>
 #include <Poco/File.h>
 #include <Poco/Path.h>
-#include <Poco/Pipe.h>
-#include <Poco/Process.h>
-#include <Poco/PipeStream.h>
 
 using std::string;
 using Poco::Util::MapConfiguration;

@@ -3,22 +3,21 @@
  * touch display module.
  */
 
-#ifndef DISPLAY_4D_H
-#define DISPLAY_4D_H
-
-#include "diablo_commands.h"
-
-#include "periphery_access.hpp"
-#include "periphery_config.h"
-#include "../configuration.hpp"
-
-#include "periphery/serial.h"
-
-#include <Poco/Thread.h>
+#ifndef RASM2_PERIPHERY_4D_DISPLAY_HPP
+#define RASM2_PERIPHERY_4D_DISPLAY_HPP
 
 #include <string>
 #include <array>
 #include <queue>
+
+#include <Poco/Thread.h>
+
+#include "periphery/serial.h"
+
+#include "diablo_commands.h"
+#include "periphery_access.hpp"
+#include "periphery_config.h"
+#include "configuration.hpp"
 
 using std::string;
 

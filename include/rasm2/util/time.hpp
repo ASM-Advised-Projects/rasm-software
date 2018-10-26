@@ -5,8 +5,8 @@
 #ifndef RASM2_UTIL_TIME_HPP
 #define RASM2_UTIL_TIME_HPP
 
-#include <chrono>
 #include <array>
+#include <chrono>
 #include <stdexcept>
 
 /**

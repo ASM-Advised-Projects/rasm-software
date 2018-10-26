@@ -2,14 +2,13 @@
  *
  */
 
-#ifndef _TRAJECTORY_STRUCTURES_H_
-#define _TRAJECTORY_STRUCTURES_H_
-
-#include "definitions.hpp"
+#ifndef RASM2_CONTROL_TRAJECTORY_STRUCTURES_HPP
+#define RASM2_CONTROL_TRAJECTORY_STRUCTURES_HPP
 
 #include <vector>
 #include <map>
 
+#include "definitions.hpp"
 
 /**
  *

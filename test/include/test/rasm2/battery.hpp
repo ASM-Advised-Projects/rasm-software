@@ -1,5 +1,5 @@
 /**
- * Unit tests for the battery.hpp file.
+ * Unit tests for the rasm2/battery.hpp file.
  */
 
 #ifndef TEST_RASM2_BATTERY_HPP
@@ -30,4 +30,4 @@ public:
   }
 };
 
-#endif  // TEST_BATTERY_HPP
+#endif

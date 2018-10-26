@@ -3,8 +3,8 @@
  * UART devices.
  */
 
-#ifndef PERIPHERY_CONFIG_INCLUDED
-#define PERIPHERY_CONFIG_INCLUDED
+#ifndef RASM2_PERIPHERY_PERIPHERY_CONFIG_H
+#define RASM2_PERIPHERY_PERIPHERY_CONFIG_H
 
 #ifdef __cplusplus
 extern "C"

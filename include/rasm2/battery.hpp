@@ -6,21 +6,20 @@
 #ifndef RASM2_BATTERY_HPP
 #define RASM2_BATTERY_HPP
 
-#include "util/time.hpp"
-#include "configuration.hpp"
-#include "util/signal_processing.hpp"
+#include <vector>
+#include <fstream>
 
 #include <Poco/StringTokenizer.h>
 #include <Poco/NumberParser.h>
 #include <Poco/Util/TimerTask.h>
 #include <Poco/Util/TimerTaskAdapter.h>
 
-#include <vector>
-#include <fstream>
+#include "util/time.hpp"
+#include "util/signal_processing.hpp"
+#include "configuration.hpp"
 
 using std::string;
 using std::vector;
-
 
 /**
  * An instance of this class periodically reads a battery's voltage, estimates

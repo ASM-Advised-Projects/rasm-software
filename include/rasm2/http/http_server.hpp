@@ -2,8 +2,8 @@
  * Defines the HandlerFactory and RasmHttpServer classes.
  */
 
-#ifndef HTTP_SERVER_INCLUDED
-#define HTTP_SERVER_INCLUDED
+#ifndef RASM2_HTTP_HTTP_SERVER_HPP
+#define RASM2_HTTP_HTTP_SERVER_HPP
 
 #include "request_handling.hpp"
 #include "configuration.hpp"
@@ -19,7 +19,6 @@ using std::string;
 #define LOG_LEVEL 0
 
 #define THREAD_PRIORITY Poco::Thread::Priority::PRIO_LOW
-
 
 /**
  * Overrides the HTTPRequestHandlerFactory::createRequestHandler method in

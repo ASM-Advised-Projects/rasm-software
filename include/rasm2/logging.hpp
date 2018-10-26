@@ -6,9 +6,6 @@
 #ifndef RASM2_LOGGING_HPP
 #define RASM2_LOGGING_HPP
 
-#include "configuration.hpp"
-#include "util/time.hpp"
-
 #include <fstream>
 #include <sstream>
 #include <sys/statvfs.h>
@@ -20,8 +17,10 @@
 #include <Poco/Util/TimerTask.h>
 #include <Poco/Util/TimerTaskAdapter.h>
 
-using std::string;
+#include "configuration.hpp"
+#include "util/time.hpp"
 
+using std::string;
 
 /**
  * For internal use by the LogManager class.

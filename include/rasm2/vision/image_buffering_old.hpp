@@ -2,11 +2,12 @@
  * Defines the ImageBuffer class.
  */
 
-#ifndef VISION_IMAGE_BUFFERING_HPP
-#define VISION_IMAGE_BUFFERING_HPP
+#ifndef RASM2_VISION_IMAGE_BUFFERING_OLD_HPP
+#define RASM2_VISION_IMAGE_BUFFERING_OLD_HPP
+
+#include "opencv2/videoio.hpp"
 
 #include "camera_calibration.hpp"
-#include "opencv2/videoio.hpp"
 
 /**
  * Instances of this class are single-image buffers that provide different

@@ -1,13 +1,12 @@
 /**
- * Defines the CameraImageBuffer, UndistCameraImageBuffer, and
- * UnblurCameraImageBuffer classes.
+ * Defines the CameraImageBuffer class.
  */
 
-#ifndef IMAGE_BUFFERS_INCLUDED
-#define IMAGE_BUFFERS_INCLUDED
+#ifndef RASM2_VISION_IMAGE_BUFFERING_HPP
+#define RASM2_VISION_IMAGE_BUFFERING_HPP
 
-#include <iostream>
 #include <opencv2/videoio.hpp>
+
 #include "camera_calibration.hpp"
 #include "image_filtering.hpp"
 

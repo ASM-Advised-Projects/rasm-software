@@ -2,8 +2,8 @@
  * Defines the CameraCalibration class.
  */
 
-#ifndef CAMERA_CALIBRATION_INCLUDED
-#define CAMERA_CALIBRATION_INCLUDED
+#ifndef RASM2_VISION_CAMERA_CALIBRATION_HPP
+#define RASM2_VISION_CAMERA_CALIBRATION_HPP
 
 #include <opencv2/core/core.hpp>
 #include <opencv2/imgproc/imgproc.hpp>
@@ -15,7 +15,6 @@
 class CameraCalibration
 {
 private:
-
 
 public:
   /**

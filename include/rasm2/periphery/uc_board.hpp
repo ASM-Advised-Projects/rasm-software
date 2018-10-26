@@ -2,16 +2,16 @@
  * Defines the UCBoard (singleton) class.
  */
 
-#ifndef UC_BOARD_INCLUDED
-#define UC_BOARD_INCLUDED
+#ifndef RASM2_PERIPHERY_UC_BOARD_HPP
+#define RASM2_PERIPHERY_UC_BOARD_HPP
 
-#include "periphery_access.hpp"
-#include "periphery_config.h"
-#include "../configuration.hpp"
+#include <array>
 
 #include "periphery/serial.h"
 
-#include <array>
+#include "periphery_access.hpp"
+#include "periphery_config.h"
+#include "configuration.hpp"
 
 /**
  * AVR uController; UART slave; motor driving / encoder reading / power
