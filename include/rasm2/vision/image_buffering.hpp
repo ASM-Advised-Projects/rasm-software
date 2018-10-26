@@ -9,6 +9,7 @@
 #include <iostream>
 #include <opencv2/videoio.hpp>
 #include "camera_calibration.hpp"
+#include "image_filtering.hpp"
 
 /**
  * Instances of this class are single-image buffers that provide different

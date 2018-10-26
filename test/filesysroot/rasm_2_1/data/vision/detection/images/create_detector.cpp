@@ -4,7 +4,7 @@
     for 5 concentric circles. In
     particular, we go though the steps to train the kind of sliding window
     object detector first published by Dalal and Triggs in 2005 in the paper
-    Histograms of Oriented Gradients for Human Detection.
+    Histograms of Oriented Gradients for Human Detection.  
 
     Note that this program executes fastest when compiled with at least SSE2
     instructions enabled.  So if you are using a PC with an Intel or AMD chip
@@ -18,7 +18,7 @@
     Studio, or the Intel compiler.  If you are using another compiler then you
     need to consult your compiler's manual to determine how to enable these
     instructions.  Note that AVX is the fastest but requires a CPU from at least
-    2011.  SSE4 is the next fastest and is supported by most current machines.
+    2011.  SSE4 is the next fastest and is supported by most current machines.  
 
     Follow along with the example file fhog_object_detector_ex.cpp to understand how this
     file works.
@@ -36,7 +36,7 @@
 using namespace std;
 using namespace dlib;
 int main(int argc, char** argv)
-{
+{  
 
     try
     {
@@ -52,25 +52,25 @@ int main(int argc, char** argv)
             cout << endl;
             return 0;
         }
-
+ 
         const std::string faces_directory = argv[1];
 
 
         dlib::array<array2d<unsigned char> > images_train, images_test;
         std::vector<std::vector<rectangle> > face_boxes_train, face_boxes_test;
 
-        load_image_dataset(images_train, face_boxes_train, faces_directory+"/training_data.xml");
-        load_image_dataset(images_test, face_boxes_test, faces_directory+"/testing_data.xml");
+        load_image_dataset(images_train, face_boxes_train, faces_directory+"/training.xml");
+        load_image_dataset(images_test, face_boxes_test, faces_directory+"/testing.xml");
 
-        psample_image_dataset<pyramid_down<2> >(images_train, face_boxes_train);
+        upsample_image_dataset<pyramid_down<2> >(images_train, face_boxes_train);
         upsample_image_dataset<pyramid_down<2> >(images_test,  face_boxes_test);
 
         typedef scan_fhog_pyramid<pyramid_down<6> > image_scanner_type;
         image_scanner_type scanner;
-        scanner.set_detection_window_size(80, 80);
+        scanner.set_detection_window_size(140, 40);
         structural_object_detection_trainer<image_scanner_type> trainer(scanner);
         trainer.set_num_threads(4);
-
+        
         // The trainer is a kind of support vector machine and therefore has the usual SVM
         // C parameter.  In general, a bigger C encourages it to fit the training data
         // better but might lead to overfitting.  You must find the best C value
@@ -78,13 +78,13 @@ int main(int argc, char** argv)
         // images you haven't trained on.  Don't just leave the value set at 1.  Try a few
         // different C values and see what works best for your data.
         trainer.set_c(1);
-        // We can tell the trainer to print it's progress to the console if we want.
+        // We can tell the trainer to print it's progress to the console if we want.  
         trainer.be_verbose();
         // The trainer will run until the "risk gap" is less than 0.01.  Smaller values
         // make the trainer solve the SVM optimization problem more accurately but will
         // take longer to train.  For most problems a value in the range of 0.1 to 0.01 is
         // plenty accurate.  Also, when in verbose mode the risk gap is printed on each
-        // iteration so you can see how close it is to finishing the training.
+        // iteration so you can see how close it is to finishing the training.  
         trainer.set_epsilon(0.01);
 
         object_detector<image_scanner_type> detector = trainer.train(images_train, face_boxes_train);
@@ -107,11 +107,10 @@ int main(int argc, char** argv)
 
 
 
-
         // Now for the really fun part.  Let's display the testing images on the screen and
         // show the output of the circle detector overlaid on each image.  You will see that
         // it finds all the circles without false alarming on any non-faces.
-        image_window win;
+        image_window win; 
         for (unsigned long i = 0; i < images_test.size(); ++i)
         {
             // Run the detector and get the face detections.
@@ -126,7 +125,7 @@ int main(int argc, char** argv)
 
         // Like everything in dlib, you can save your detector to disk using the
         // serialize() function.
-        serialize("concentric_circle_detector.svm") << detector;
+        serialize("detector.svm") << detector;
     }
     catch (exception& e)
     {
@@ -134,3 +133,4 @@ int main(int argc, char** argv)
         cout << e.what() << endl;
     }
 }
+

@@ -1,0 +1,19 @@
+Approximate aspect ratio of each image in the original rasm_text/training.xml
+3.40
+3.56
+3.56
+
+
+
+
+Approximate aspect ratio of each image in the original rasm_text/testing.xml
+3.83
+3.62
+3.75
+3.69
+
+
+
+Aspect ratio of image that causes error: 4.14074
+
+
