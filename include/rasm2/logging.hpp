@@ -1,6 +1,6 @@
 /**
  * Implements the RASM's logging subsystem.
- * Defines the LogManager (singleton) and LogFile classes.
+ * Defines the LogFile, LogManagerImpl, and LogManager (singleton) classes.
  */
 
 #ifndef RASM2_LOGGING_HPP
@@ -31,13 +31,6 @@ class LogFile
 public:
   string path;
   std::ofstream stream;
-
-  LogFile(const LogFile &lf) = delete;
-  void operator=(const LogFile &lf) = delete;
-
-  LogFile() : path("")
-  {
-  }
 
   /**
    * Sets the path field to the given filepath and opens the corresponding file
@@ -136,21 +129,9 @@ struct TimeStamp
  * this interval is set by the configuration system. All critical and error
  * logs will be immediately written to their log files.
  */
-class LogManager
+class LogManagerImpl
 {
 public:
-  LogManager(const LogManager &) = delete;
-  void operator=(const LogManager &) = delete;
-
-  /**
-   * Returns this singleton's instance.
-   */
-  static LogManager& get_instance()
-  {
-    static LogManager instance;
-    return instance;
-  }
-
   /**
    * An enumerator representation of each log level recognized by this log
    * manager.
@@ -163,186 +144,12 @@ public:
     CRITICAL
   };
 
-  /**
-   * Logs a message at the given priority level. The message will be placed in
-   * the log files with priority levels equal to and lower than the given level.
-   * The message will have this structure:
-   *   <priority level>
-   *   HH-MM-SS-LLL  <thread name>:<thread id>:<thread priority>
-   *   <message>\n\n
-   * That first line will only exist for the files whose priority levels are
-   * lower than the given level.
-   */
-  void log_message(const string &msg, LogLevel level)
-  {
-    Poco::Thread *current_thread = Poco::Thread::current();
-
-    // get the current thread's name, id, and priority
-    string thread_name;
-    int thread_id;
-    int thread_prio;
-    if (current_thread == 0)  // main thread
-    {
-      thread_name = "main";
-      thread_id = 0;
-      thread_prio = 0;
-    }
-    else
-    {
-      thread_name = current_thread->getName();
-      thread_id = current_thread->id();
-      thread_prio = current_thread->getOSPriority();
-    }
-
-    // get the current time stamp
-    TimeStamp ts = elapsed_time();
-
-    // assemble the log message header
-    std::ostringstream msg_builder;
-    msg_builder << ts.HH << "-" << ts.MM << "-" << ts.SS << "-" << ts.LLL
-        << "  " << thread_name << ":" << thread_id << ":" << thread_prio << "\n";
-    msg_builder << msg << "\n\n";
-
-    // log the headered message via switch case fall through
-    stream_mutex.lock();
-    switch (level)
-    {
-      case CRITICAL:
-        file_map[CRITICAL]->stream << msg_builder.str();
-        file_map[CRITICAL]->stream.flush();
-
-      case ERROR:
-        if (level != ERROR)
-            file_map[ERROR]->stream << level_as_string(level, true) << "\n";
-        file_map[ERROR]->stream << msg_builder.str();
-        file_map[ERROR]->stream.flush();
-
-      case WARNING:
-        if (level != WARNING)
-            file_map[WARNING]->stream << level_as_string(level, true) << "\n";
-        file_map[WARNING]->stream << msg_builder.str();
-
-      case NOTICE:
-        if (level != NOTICE)
-            file_map[NOTICE]->stream << level_as_string(level, true) << "\n";
-        file_map[NOTICE]->stream << msg_builder.str();
-    }
-    stream_mutex.unlock();
-
-    rotate_log_check(level);
-  }
-
 private:
-  std::map<LogLevel, LogFile*> file_map;
+  std::map< LogManagerImpl::LogLevel, std::shared_ptr<LogFile> > file_map;
   Poco::Util::Timer flush_timer;
   string log_dir;
   long max_filesize;
   Poco::Mutex stream_mutex;
-
-  /**
-   * Creates a new log manager instance. Retrieves some configurations, sets up
-   * a log directory, ensures there is enough requisite filespace for logging,
-   * creates and opens a log file for each priority level, and starts the log
-   * buffer flush timers.
-   */
-  LogManager() : flush_timer(Poco::Thread::PRIO_LOWEST)
-  {
-    // get logging configuration group
-    ConfigurationManager &configs = ConfigurationManager::get_instance();
-    const MapConfiguration *log_conf =
-        configs.get_config_group(ConfigurationManagerImpl::Group::LOGGING);
-
-    // get max log file size
-    max_filesize = 1000 * log_conf->getInt64("max_filesize_KB");
-
-    // get directory names
-    int dir_int = log_conf->getInt("next_log_num");
-    int max_dir_int = log_conf->getInt("max_log_num");
-
-    string root_dir = log_conf->getString("root_dir");
-    string toplevel_dir = log_conf->getString("toplevel_dir");
-
-    // wrap log directory number back to 1 if larger than max
-    if (dir_int > max_dir_int)
-      dir_int = 1;
-
-    // create new log directory file object (don't create actual directory yet)
-    log_dir = root_dir + toplevel_dir + "/" + std::to_string(dir_int);
-    Poco::File new_log_dir(log_dir);
-
-    // remove similarly named directory if it exists
-    if (new_log_dir.exists())
-      new_log_dir.remove(true);
-
-    // create new log directory
-    new_log_dir.createDirectory();
-
-    // increment the next log directory's name in configurations
-    configs.change_config_value(ConfigurationManagerImpl::Group::LOGGING,
-        "next_log_dir", std::to_string(dir_int + 1));
-
-    // delete some of the oldest directories if not enough filespace exists
-    // for the log system
-    struct statvfs partition_info;
-    if (statvfs("/", &partition_info) == 0)
-    {
-      long bytes_to_remove = 1000 * log_conf->getInt("min_log_space_KB")
-          - partition_info.f_bfree * partition_info.f_bsize;
-
-      for (int oldest_dir_int = dir_int + 1; bytes_to_remove > 0; oldest_dir_int++)
-      {
-        if (oldest_dir_int > max_dir_int)
-          oldest_dir_int = 1;
-
-        std::string old_dir_path = root_dir + toplevel_dir + "/"
-            + std::to_string(oldest_dir_int);
-        Poco::File old_dir(old_dir_path);
-        if (old_dir.isDirectory())
-        {
-          bytes_to_remove -= old_dir.getSize();
-          old_dir.remove(true);
-        }
-      }
-    }
-
-    // map each log level to a LogFile instance
-    file_map[NOTICE] = new LogFile();
-    file_map[WARNING] = new LogFile();
-    file_map[ERROR] = new LogFile();
-    file_map[CRITICAL] = new LogFile();
-
-    // initialize LogFile classes
-    for (const auto &pair : file_map)
-      rotate_log_check(pair.first);
-
-    // start the timer tasks for flushing the NOTICE and WARNING log buffers
-    Poco::AutoPtr<Poco::Util::TimerTask> flush_task_1 =
-        new Poco::Util::TimerTaskAdapter<LogManager>(
-        *this, &LogManager::flush_notice_log);
-    Poco::AutoPtr<Poco::Util::TimerTask> flush_task_2 =
-        new Poco::Util::TimerTaskAdapter<LogManager>(
-        *this, &LogManager::flush_warning_log);
-
-    Poco::AutoPtr<Poco::Util::TimerTask> task_ptr_1(flush_task_1);
-    Poco::AutoPtr<Poco::Util::TimerTask> task_ptr_2(flush_task_2);
-
-    int interval = 1000 * log_conf->getInt("flush_interval_sec");
-    flush_timer.scheduleAtFixedRate(task_ptr_1, interval, interval);
-    flush_timer.scheduleAtFixedRate(task_ptr_2, interval, interval);
-  }
-
-  /**
-   * Destructs this singleton.
-   */
-  ~LogManager()
-  {
-    flush_timer.cancel();
-    flush_timer.~Timer();
-    for (auto &pair : file_map)
-        delete pair.second;
-    file_map.~map();
-    log_dir.~basic_string();
-  }
 
   /**
    * Flushes the notice log message stream to the current notice log file.
@@ -449,6 +256,204 @@ private:
       case CRITICAL:
         return uppercase ? "CRITICAL" : "critical";
     }
+  }
+
+public:
+  LogManagerImpl(const LogManagerImpl &) = delete;
+  void operator=(const LogManagerImpl &) = delete;
+
+  /**
+   * Creates a new log manager instance. Retrieves some configurations, sets up
+   * a log directory, ensures there is enough requisite filespace for logging,
+   * creates and opens a log file for each priority level, and starts the log
+   * buffer flush timers.
+   */
+  LogManagerImpl()
+  : flush_timer(Poco::Thread::PRIO_LOWEST)
+  {
+    // get logging configuration group
+    ConfigurationManager &configs = ConfigurationManager::get_instance();
+    const MapConfiguration *log_conf =
+        configs.get_config_group(ConfigurationManagerImpl::Group::LOGGING);
+
+    // get max log file size
+    max_filesize = 1000 * log_conf->getInt64("max_filesize_KB");
+
+    // get directory names
+    int dir_int = log_conf->getInt("next_log_num");
+    int max_dir_int = log_conf->getInt("max_log_num");
+
+    string root_dir = log_conf->getString("root_dir");
+    string toplevel_dir = log_conf->getString("toplevel_dir");
+
+    // wrap log directory number back to 1 if larger than max
+    if (dir_int > max_dir_int)
+      dir_int = 1;
+
+    // create new log directory file object (don't create actual directory yet)
+    log_dir = root_dir + toplevel_dir + "/" + std::to_string(dir_int);
+    Poco::File new_log_dir(log_dir);
+
+    // remove similarly named directory if it exists
+    if (new_log_dir.exists())
+      new_log_dir.remove(true);
+
+    // create new log directory
+    new_log_dir.createDirectory();
+
+    // increment the next log directory's name in configurations
+    configs.change_config_value(ConfigurationManagerImpl::Group::LOGGING,
+        "next_log_dir", std::to_string(dir_int + 1));
+
+    // delete some of the oldest directories if not enough filespace exists
+    // for the log system
+    struct statvfs partition_info;
+    if (statvfs("/", &partition_info) == 0)
+    {
+      long bytes_to_remove = 1000 * log_conf->getInt("min_log_space_KB")
+          - partition_info.f_bfree * partition_info.f_bsize;
+
+      for (int oldest_dir_int = dir_int + 1; bytes_to_remove > 0; oldest_dir_int++)
+      {
+        if (oldest_dir_int > max_dir_int)
+          oldest_dir_int = 1;
+
+        std::string old_dir_path = root_dir + toplevel_dir + "/"
+            + std::to_string(oldest_dir_int);
+        Poco::File old_dir(old_dir_path);
+        if (old_dir.isDirectory())
+        {
+          bytes_to_remove -= old_dir.getSize();
+          old_dir.remove(true);
+        }
+      }
+    }
+
+    // map each log level to a LogFile instance
+    file_map[NOTICE].reset(new LogFile());
+    file_map[WARNING].reset(new LogFile());
+    file_map[ERROR].reset(new LogFile());
+    file_map[CRITICAL].reset(new LogFile());
+
+    // initialize LogFile classes
+    for (const auto &pair : file_map)
+      rotate_log_check(pair.first);
+
+    // start the timer tasks for flushing the NOTICE and WARNING log buffers
+    Poco::AutoPtr<Poco::Util::TimerTask> flush_task_1 =
+        new Poco::Util::TimerTaskAdapter<LogManagerImpl>(
+        *this, &LogManagerImpl::flush_notice_log);
+    Poco::AutoPtr<Poco::Util::TimerTask> flush_task_2 =
+        new Poco::Util::TimerTaskAdapter<LogManagerImpl>(
+        *this, &LogManagerImpl::flush_warning_log);
+
+    Poco::AutoPtr<Poco::Util::TimerTask> task_ptr_1(flush_task_1);
+    Poco::AutoPtr<Poco::Util::TimerTask> task_ptr_2(flush_task_2);
+
+    int interval = 1000 * log_conf->getInt("flush_interval_sec");
+    flush_timer.scheduleAtFixedRate(task_ptr_1, interval, interval);
+    flush_timer.scheduleAtFixedRate(task_ptr_2, interval, interval);
+  }
+
+  /**
+   * Logs a message at the given priority level. The message will be placed in
+   * the log files with priority levels equal to and lower than the given level.
+   * The message will have this structure:
+   *   <priority level>
+   *   HH-MM-SS-LLL  <thread name>:<thread id>:<thread priority>
+   *   <message>\n\n
+   * That first line will only exist for the files whose priority levels are
+   * lower than the given level.
+   */
+  void log_message(const string &msg, LogLevel level)
+  {
+    Poco::Thread *current_thread = Poco::Thread::current();
+
+    // get the current thread's name, id, and priority
+    string thread_name;
+    int thread_id;
+    int thread_prio;
+    if (current_thread == 0)  // main thread
+    {
+      thread_name = "main";
+      thread_id = 0;
+      thread_prio = 0;
+    }
+    else
+    {
+      thread_name = current_thread->getName();
+      thread_id = current_thread->id();
+      thread_prio = current_thread->getOSPriority();
+    }
+
+    // get the current time stamp
+    TimeStamp ts = elapsed_time();
+
+    // assemble the log message header
+    std::ostringstream msg_builder;
+    msg_builder << ts.HH << "-" << ts.MM << "-" << ts.SS << "-" << ts.LLL
+        << "  " << thread_name << ":" << thread_id << ":" << thread_prio << "\n";
+    msg_builder << msg << "\n\n";
+
+    // log the headered message via switch case fall through
+    stream_mutex.lock();
+    switch (level)
+    {
+      case CRITICAL:
+        file_map[CRITICAL]->stream << msg_builder.str();
+        file_map[CRITICAL]->stream.flush();
+
+      case ERROR:
+        if (level != ERROR)
+            file_map[ERROR]->stream << level_as_string(level, true) << "\n";
+        file_map[ERROR]->stream << msg_builder.str();
+        file_map[ERROR]->stream.flush();
+
+      case WARNING:
+        if (level != WARNING)
+            file_map[WARNING]->stream << level_as_string(level, true) << "\n";
+        file_map[WARNING]->stream << msg_builder.str();
+
+      case NOTICE:
+        if (level != NOTICE)
+            file_map[NOTICE]->stream << level_as_string(level, true) << "\n";
+        file_map[NOTICE]->stream << msg_builder.str();
+    }
+    stream_mutex.unlock();
+
+    rotate_log_check(level);
+  }
+};
+
+
+/**
+ *
+ */
+class LogManager
+{
+private:
+  LogManagerImpl impl;
+
+  LogManager()
+  {
+  }
+
+public:
+  LogManager(const LogManager &) = delete;
+  void operator=(const LogManager &) = delete;
+
+  /**
+   * Returns this singleton's instance.
+   */
+  static LogManager & get_instance()
+  {
+    static LogManager instance;
+    return instance;
+  }
+
+  void log_message(const string &msg, LogManagerImpl::LogLevel level)
+  {
+    impl.log_message(msg, level);
   }
 };
 
