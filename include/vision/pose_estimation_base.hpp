@@ -248,13 +248,14 @@ public:
     std::cout << "1" << std::endl;
 
     // get normal and scaled-down grayscale images
-    const cv::Mat &gray_img = camera.get_gray_image();
-    std::cout << "2" << std::endl;
-    const cv::Mat &small_gray_img = camera.get_small_gray_image();
-    std::cout << "3" << std::endl;
-
+//    const cv::Mat &gray_img = camera.get_gray_image();
+//    std::cout << "2" << std::endl;
+//    const cv::Mat &small_gray_img = camera.get_small_gray_image();
+//    std::cout << "3" << std::endl;
+//
     // detect objects using the small image
-    cv::Mat img(small_gray_img);  // TODO - figure out how get around making a copy
+    const cv::Mat_<cv::Vec3b>  &bgr_img = camera.get_image();
+    cv::Mat img(bgr_img);  // TODO - figure out how get around making a copy
     std::cout << "4" << std::endl;
     std::vector<Rect> object_boxes = detect_objects(img);
     std::cout << "5" << std::endl;
@@ -262,7 +263,7 @@ public:
     std::cout << "6" << std::endl;
 
     // select an object box
-    Rect selected_object_box = select_object(object_boxes, small_gray_img.size().width, small_gray_img.size().height);
+    Rect selected_object_box = select_object(object_boxes, bgr_img.size().width, bgr_img.size().height);
     std::cout << "7" << std::endl;
     if (selected_object_box == zero_box)  // no objects were detected
       return zero_pose;
@@ -277,7 +278,7 @@ public:
     selected_object_box.set_bottom(img_scale*selected_object_box.bottom());
 
     // locate features
-    dlib::cv_image<unsigned short> gray_img_dlib(gray_img);  // dlib image format
+    dlib::cv_image<unsigned short> gray_img_dlib(bgr_img);  // dlib image format
     std::cout << "8" << std::endl;
     dlib::full_object_detection shape = (*pose_model)(gray_img_dlib, selected_object_box);
     std::cout << "9" << std::endl;

@@ -227,6 +227,12 @@ public:
     return gray_img;
   }
 
+  const cv::Mat_<cv::Vec3b>  & get_image()
+  {
+    return bgr_img;
+  }
+
+
   /**
    * Returns a scaled down bgr version of the current image. The amount of
    * scaling is set by the set_downsample_ratio method.
