@@ -221,7 +221,7 @@ public:
       {
         std::cerr << "The image is empty!" << std::endl;
       }
-      cv::cvtColor(bgr_img, gray_img, cv::COLOR_BGR2GRAY);
+      cv::cvtColor(bgr_img, gray_img, cv::COLOR_BGR2Luv);
       have_gray = true;
     }
     return gray_img;
