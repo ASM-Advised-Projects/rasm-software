@@ -13,35 +13,64 @@ class TimeFunctionTests : public CppUnit::TestFixture
 {
 private:
   CPPUNIT_TEST_SUITE(TimeFunctionTests);
-  CPPUNIT_TEST(testMicros);
-  CPPUNIT_TEST(testMillis);
-  CPPUNIT_TEST(testSeconds);
+  CPPUNIT_TEST(testSystemMicros);
+  CPPUNIT_TEST(testSystemMillis);
+  CPPUNIT_TEST(testSystemSeconds);
+  CPPUNIT_TEST(testProgramMicros);
+  CPPUNIT_TEST(testProgramMillis);
+  CPPUNIT_TEST(testProgramSeconds);
   CPPUNIT_TEST_SUITE_END();
 
 public:
-  void testMicros()
+  void testSystemMicros()
   {
-    unsigned int t1 = current_time_micros();
+    unsigned int t1 = SystemTime::current_micros();
     usleep(50*1000);
-    unsigned int t2 = current_time_micros();
+    unsigned int t2 = SystemTime::current_micros();
     CPPUNIT_ASSERT(t2 - t1 >= 50000);
     CPPUNIT_ASSERT(t2 - t1 <= 60000);
   }
 
-  void testMillis()
+  void testSystemMillis()
   {
-    unsigned int t1 = current_time_millis();
+    unsigned int t1 = SystemTime::current_millis();
     usleep(50*1000);
-    unsigned int t2 = current_time_millis();
+    unsigned int t2 = SystemTime::current_millis();
     CPPUNIT_ASSERT(t2 - t1 >= 50);
     CPPUNIT_ASSERT(t2 - t1 <= 60);
   }
 
-  void testSeconds()
+  void testSystemSeconds()
   {
-    unsigned int t1 = current_time_seconds();
+    unsigned int t1 = SystemTime::current_seconds();
     usleep(1000*1000);
-    unsigned int t2 = current_time_seconds();
+    unsigned int t2 = SystemTime::current_seconds();
+    CPPUNIT_ASSERT(t2 - t1 == 1);
+  }
+
+  void testProgramMicros()
+  {
+    unsigned int t1 = ProgramTime::current_micros();
+    usleep(50*1000);
+    unsigned int t2 = ProgramTime::current_micros();
+    CPPUNIT_ASSERT(t2 - t1 >= 50000);
+    CPPUNIT_ASSERT(t2 - t1 <= 60000);
+  }
+
+  void testProgramMillis()
+  {
+    unsigned int t1 = ProgramTime::current_millis();
+    usleep(50*1000);
+    unsigned int t2 = ProgramTime::current_millis();
+    CPPUNIT_ASSERT(t2 - t1 >= 50);
+    CPPUNIT_ASSERT(t2 - t1 <= 60);
+  }
+
+  void testProgramSeconds()
+  {
+    unsigned int t1 = ProgramTime::current_seconds();
+    usleep(1000*1000);
+    unsigned int t2 = ProgramTime::current_seconds();
     CPPUNIT_ASSERT(t2 - t1 == 1);
   }
 };

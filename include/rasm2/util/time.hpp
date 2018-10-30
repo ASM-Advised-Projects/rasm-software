@@ -1,40 +1,100 @@
 /**
- * Defines the Stopwatch class along with some time-related functions.
+ * Defines the SystemTime, ProgramTime, and Stopwatch classes.
  */
 
 #ifndef RASM2_UTIL_TIME_HPP
 #define RASM2_UTIL_TIME_HPP
 
+#include <iostream>
 #include <array>
 #include <chrono>
 #include <stdexcept>
 
 /**
- * Returns the current system time in microseconds.
+ *
  */
-unsigned int current_time_micros()
+class SystemTime
 {
-  return std::chrono::duration_cast<std::chrono::microseconds>(
-    std::chrono::system_clock::now().time_since_epoch()).count();
-}
+public:
+  SystemTime() = delete;
+  SystemTime(const SystemTime &) = delete;
+  SystemTime(const SystemTime &&) = delete;
+  ~SystemTime() = delete;
+
+  /**
+   * Returns the current system time in microseconds.
+   */
+  static unsigned long current_micros()
+  {
+    return std::chrono::duration_cast<std::chrono::microseconds>(
+        std::chrono::system_clock::now().time_since_epoch()).count();
+  }
+
+  /**
+   * Returns the current system time in milliseconds.
+   */
+  static unsigned long current_millis()
+  {
+    return std::chrono::duration_cast<std::chrono::milliseconds>(
+        std::chrono::system_clock::now().time_since_epoch()).count();
+  }
+
+  /**
+   * Returns the current system time in seconds.
+   */
+  static unsigned long current_seconds()
+  {
+    return std::chrono::duration_cast<std::chrono::seconds>(
+        std::chrono::system_clock::now().time_since_epoch()).count();
+  }
+};
+
+unsigned long _start_time_micros =
+    std::chrono::duration_cast<std::chrono::microseconds>(
+    std::chrono::steady_clock::now().time_since_epoch()).count();
 
 /**
- * Returns the current system time in milliseconds.
+ *
  */
-unsigned int current_time_millis()
+class ProgramTime
 {
-  return std::chrono::duration_cast<std::chrono::milliseconds>(
-    std::chrono::system_clock::now().time_since_epoch()).count();
-}
+public:
+  ProgramTime() = delete;
+  ProgramTime(const ProgramTime &) = delete;
+  ProgramTime(const ProgramTime &&) = delete;
+  ~ProgramTime() = delete;
 
-/**
- * Returns the current system time in seconds.
- */
-unsigned int current_time_seconds()
-{
-  return std::chrono::duration_cast<std::chrono::seconds>(
-    std::chrono::system_clock::now().time_since_epoch()).count();
-}
+  /**
+   * Returns the current program time in microseconds.
+   */
+  static unsigned long current_micros()
+  {
+    return std::chrono::duration_cast<std::chrono::microseconds>(
+        std::chrono::steady_clock::now().time_since_epoch()).count()
+        - _start_time_micros;
+  }
+
+  /**
+   * Returns the current program time in milliseconds.
+   */
+  static unsigned long current_millis()
+  {
+    return std::chrono::duration_cast<std::chrono::milliseconds>(
+        std::chrono::steady_clock::now().time_since_epoch()).count()
+        - _start_time_micros / 1000;
+  }
+
+  /**
+   * Returns the current program time in seconds.
+   */
+  static unsigned long current_seconds()
+  {
+    return std::chrono::duration_cast<std::chrono::seconds>(
+        std::chrono::steady_clock::now().time_since_epoch()).count()
+        - _start_time_micros / 1000000;
+  }
+};
+
 
 /**
  * A simple class for clocking how long a section of code takes to execute.
@@ -73,11 +133,11 @@ unsigned int current_time_seconds()
 class Stopwatch
 {
 private:
-  std::array<unsigned int, 5> start_times;
+  std::array<unsigned long, 5> start_times;
   int timers_running;
   unsigned int elapsed_time;
 
-  unsigned int current_millis()
+  unsigned long current_millis()
   {
     return std::chrono::duration_cast<std::chrono::milliseconds>(
         std::chrono::steady_clock::now().time_since_epoch()).count();
@@ -139,4 +199,4 @@ public:
   }
 };
 
-#endif  // UTIL_TIME_HPP
+#endif
