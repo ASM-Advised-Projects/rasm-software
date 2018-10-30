@@ -47,7 +47,7 @@ public:
     modified = other.modified;
   }
 
-  ~ConfigGroup()
+  ~ConfigGroup() noexcept
   {
     file_config_map->release();
   }
@@ -154,7 +154,7 @@ public:
  * rwd stands for root working directory and is set by the ${HOME}/.rasm.conf
  * file which should have the key value pair 'root_working_dir = ...'.
  */
-class ConfigurationManagerImpl : public Poco::Util::TimerTask
+class ConfigurationManagerImpl
 {
 public:
   ConfigurationManagerImpl(const ConfigurationManagerImpl &) = delete;
@@ -176,30 +176,9 @@ public:
     SHELL
   };
 
-private:
+protected:
   string root_working_dir;
-  std::map<Group, std::shared_ptr<ConfigGroup> > config_groups;
-  Poco::Util::Timer sync_timer;  // filesystem synchronization timer
-  Poco::Clock::ClockDiff sync_interval;  // filesystem syncronization interval
-
-  /**
-   * Synchronization timer callback method (required via extension of TimerTask).
-   */
-  void run()
-  {
-    save_config_changes();
-  }
-
-  /**
-   * Cancels the currently running synchronization timer and reschedules it
-   * to run at sync_interval microseconds in the future.
-   */
-  void reschedule_sync_timer()
-  {
-    Poco::Clock currentTime;
-    sync_timer.cancel(false);
-    sync_timer.schedule(this, currentTime + sync_interval);
-  }
+  std::map< Group, std::shared_ptr<ConfigGroup> > config_groups;
 
 public:
   ConfigurationManagerImpl()
@@ -227,11 +206,9 @@ public:
     config_groups[Group::HTTP].reset(new ConfigGroup(configroot + "http.conf"));
     config_groups[Group::SHELL].reset(new ConfigGroup(configroot + "shell.conf"));
 
-    // start the filesystem synchronization timer; default to 60 seconds if
-    // period is not specified
-    sync_interval = 1000 * 1000 * config_groups[Group::OTHER]->
-        file_config_map->getInt("config.autosync.period_seconds", 60);
-    reschedule_sync_timer();
+    // add the root working directory as a configuration of the other group
+    // so that it can be queried normally by other code
+    config_groups[Group::OTHER]->file_config_map->setString("root_working_dir", root_working_dir);
   }
 
   /**
@@ -240,7 +217,7 @@ public:
    * configurations may not match what is currently contained in the
    * configuration files, but will be the most up-to-date settings.
    */
-  const MapConfiguration * get_config_group(Group group)
+  virtual const MapConfiguration * get_config_group(Group group)
   {
     return config_groups[group]->file_config_map;
   }
@@ -251,7 +228,7 @@ public:
    * doesn't exist then value is set to an empty string. Returns true if the
    * key exists; false otherwise.
    */
-  bool get_config_value(Group group, string key, string &value)
+  virtual bool get_config_value(Group group, string key, string &value)
   {
     // convert key to all lowercase with no leading/trailing whitespace
     Poco::trimInPlace(key);
@@ -265,24 +242,14 @@ public:
    * modifiable. If the value is successfully modified then true is returned,
    * otherwise false is returned.
    */
-  bool change_config_value(Group group, string key, const string &value)
+  virtual bool change_config_value(Group group, string key, const string &value)
   {
     // convert key to all lowercase with no leading/trailing whitespace
     Poco::trimInPlace(key);
     Poco::toLowerInPlace(key);
-    return config_groups[group]->change_value(key, value);
-  }
-
-  /**
-   * Overwrites certain configuration files in order to reflect the changes
-   * in the configuration groups that have had modifications via the
-   * change_config_value method.
-   */
-  void save_config_changes()
-  {
-    for (auto &pair : config_groups)
-      pair.second->push_to_file();
-    reschedule_sync_timer();
+    bool result = config_groups[group]->change_value(key, value);
+    config_groups[group]->push_to_file();
+    return result;
   }
 };
 
@@ -324,11 +291,6 @@ public:
   bool change_config_value(ConfigurationManagerImpl::Group group, string key, const string &value)
   {
     return impl.change_config_value(group, key, value);
-  }
-
-  void save_config_changes()
-  {
-    impl.save_config_changes();
   }
 };
 
