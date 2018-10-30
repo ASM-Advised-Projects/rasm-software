@@ -267,4 +267,4 @@ public:
   }
 };
 
-#endif  // UTIL_SIGNAL_PROCESSING_HPP
+#endif

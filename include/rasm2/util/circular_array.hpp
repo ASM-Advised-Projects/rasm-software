@@ -161,4 +161,4 @@ public:
   }
 };
 
-#endif  // UTIL_CIRCULAR_ARRAY_HPP
+#endif
