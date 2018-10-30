@@ -30,12 +30,6 @@
 # for experimenting and testing ideas
 spike/
 
-# holds image processing related data
-test/pseudo_rasm_filespace/root/rasm_2_1/data/
-
-# holds log files
-test/pseudo_rasm_filespace/root/rasm_2_1/log/
-
 # libs compiled by project; third-party or otherwise
 lib/
 
@@ -55,3 +49,11 @@ bin/
 
 # personal worklist
 TODO.txt
+
+## Other
+
+# holds image processing related data
+#test/filesysroot/rasm_2_1/data/
+
+# holds log files
+test/filesysroot/rasm_2_1/log/
