@@ -5,11 +5,6 @@
 #ifndef FILTER_CIRCULAR_ARRAY_HPP
 #define FILTER_CIRCULAR_ARRAY_HPP
 
-#include <StandardCplusplus.h>
-#include <vector>
-
-using std::vector;
-
 /**
  * This class represents a ring buffer of elements. It's basically a fixed-size
  * array that will remove the oldest values in order to add new values. Its

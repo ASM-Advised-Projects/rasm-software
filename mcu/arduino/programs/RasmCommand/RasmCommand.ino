@@ -9,7 +9,7 @@
  *   set motor
  *     receive: m[0-5][frz][0-9][0-9][0-9] (big-endian)
  *     transmit: a
- *   set encoder
+ *   read encoder
  *     receive: e[0-5]
  *     transmit: [0-9][0-9][0-9][0-9] (little-endian)
  *

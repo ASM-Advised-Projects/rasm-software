@@ -16,8 +16,6 @@
 #include <DualMC33926MotorDriver.hpp>
 #include <Filter.hpp>
 
-using std::vector;
-
 typedef DualMC33926MotorDriver::MotorState MotorState;
 typedef DualMC33926MotorDriver::Pins MotorPins;
 
@@ -26,12 +24,12 @@ typedef DualMC33926MotorDriver::Pins MotorPins;
  */
 enum Joint
 {
-  BASE = 0,
-  SHOULDER = 1,
-  ELBOW = 2,
-  WRIST_YAW = 3,
-  WRIST_PITCH = 4,
-  WRIST_ROLL = 5
+  BASE,
+  SHOULDER,
+  ELBOW,
+  WRIST_YAW,
+  WRIST_PITCH,
+  WRIST_ROLL
 };
 
 /**
@@ -126,8 +124,8 @@ public:
   };
 
   struct FilterCoeffs {
-    vector<double> ff_coeffs;
-    vector<double> fb_coeffs;
+    std::vector<double> ff_coeffs;
+    std::vector<double> fb_coeffs;
   };
 
   RasmEncoderSet(AdcPins &pins, FilterCoeffs &coeffs)
@@ -149,7 +147,7 @@ public:
     pin_map[Joint::WRIST_ROLL] = pins.wristroll;
 
     // initialize joint-to-filter map
-    for (Joint j = BASE; j < 6; j = j+1)
+    for (Joint j = 0; j < 6; j = j+1)
       filter_map[j] = new CausalLTIFilter(coeffs.ff_coeffs, coeffs.fb_coeffs);
   }
 
