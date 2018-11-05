@@ -1,22 +1,34 @@
 /**
  * This program runs a command interface over Serial for controlling the RASM's
- * six motors and reading the six encoders.
+ * six motors and reading the six encoders. The serial communication protocol
+ * for the three supported commands is defined below. Note that 'receive' and
+ * 'transmit' can also be view as 'request' and 'response'.
  *
- * Serial communication protocol:
- *   ping
+ * Ping
  *     receive: p
+ *       p - header char
  *     transmit: a
- *   set motor
- *     receive: m[0-5][frz][0-9][0-9][0-9] (big-endian)
+ *       a - acknowledgement char
+ * Set Motor
+ *     receive: m[0-5][frz][0-1][0-9][0-9]
+ *       m - header char
+ *       [0-5] - joint select
+ *       [frz] - motor state (forward, reverse, or high-z)
+ *       [0-1][0-9][0-9] - big-endian motor duty cycle in range [0,100]
  *     transmit: a
- *   read encoder
+ *       a - acknowledgement char
+ * Read Encoder
  *     receive: e[0-5]
- *     transmit: [0-9][0-9][0-9][0-9] (little-endian)
+ *       e - header char
+ *       [0-5] - joint select
+ *     transmit: [0-9][0-9][0-9][0-1]
+ *       [0-9][0-9][0-9][0-1] - little-endian encoder value in range [0,1023]
  *
- * If a timeout (set to 50 milliseconds) ever occurs when waiting for the rest
- * of a received command then an 'n' char is transmitted instead. Note that the
- * 'a' char stands for ACK (acknowledgement) while the 'n' char stands for NAK
- * (negative acknowledgement).
+ * The serial read timeout is set to 50 milliseconds. If a timeout ever occurs
+ * when waiting for the rest of a received command after the initial 'header
+ * char' has been read, then only an 'n' char will be transmitted. By the way,
+ * the 'a' char stands for 'acknowledgement' while the 'n' char stands for
+ * 'negative acknowledgement'.
  */
 
 #include <Rasm.hpp>
@@ -31,7 +43,8 @@ void setup()
   Serial.setTimeout(50);
 
   // initialize motors
-  MotorPins motor_pins1; // for dual motor driver 1
+  // pin assignments for dual motor driver #1
+  MotorPins motor_pins1;
   motor_pins1.m1_IN1 = 10;
   motor_pins1.m1_IN2 = 10;
   motor_pins1.m1_D1 = 10;
@@ -43,7 +56,8 @@ void setup()
   motor_pins1.enable = 10;
   motor_pins1.slew = 10;
 
-  MotorPins motor_pins2;  // for dual motor driver 2
+  // pin assignments for dual motor driver #2
+  MotorPins motor_pins2;
   motor_pins2.m1_IN1 = 10;
   motor_pins2.m1_IN2 = 10;
   motor_pins2.m1_D1 = 10;
@@ -55,7 +69,8 @@ void setup()
   motor_pins2.enable = 10;
   motor_pins2.slew = 10;
 
-  MotorPins motor_pins3;  // for dual motor driver 3
+  // pin assignments for dual motor driver #3
+  MotorPins motor_pins3;
   motor_pins3.m1_IN1 = 10;
   motor_pins3.m1_IN2 = 10;
   motor_pins3.m1_D1 = 10;
@@ -67,6 +82,7 @@ void setup()
   motor_pins3.enable = 10;
   motor_pins3.slew = 10;
 
+  // driver-to-joint assignments
   RasmMotorSet::DriversToJoints dtj;
   dtj.driver1_m1_joint = Joint::SHOULDER;
   dtj.driver1_m2_joint = Joint::ELBOW;
@@ -78,6 +94,7 @@ void setup()
   motors = new RasmMotorSet(motor_pins1, motor_pins2, motor_pins3, dtj);
 
   // initialize encoders
+  // analog-read pin assignments for each joint
   RasmEncoderSet::AdcPins encoder_pins;
   encoder_pins.base = A0;
   encoder_pins.shoulder = A1;
@@ -86,6 +103,7 @@ void setup()
   encoder_pins.wristpitch = A4;
   encoder_pins.wristroll = A5;
 
+  // filter coefficients that are applied to each encoder
   RasmEncoderSet::FilterCoeffs encoder_coeffs;
   encoder_coeffs.ff_coeffs.push_back(1);
   encoder_coeffs.fb_coeffs.push_back(0);

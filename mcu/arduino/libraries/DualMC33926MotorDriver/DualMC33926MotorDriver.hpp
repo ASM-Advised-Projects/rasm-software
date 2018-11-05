@@ -6,6 +6,8 @@
 
 /**
  * This class is for controlling the Pololu dual MC33926 motor driver board.
+ * The two motor drivers are referred to as 'left' and 'right' which follows
+ * when viewing the motor output terminals edge of the board, driver-side up.
  */
 class DualMC33926MotorDriver
 {
@@ -85,6 +87,10 @@ public:
     set_right_motor_state(HIGHZ);
     set_left_motor_speed(0);
     set_right_motor_speed(0);
+
+    // additional default settings
+    enable();
+    set_low_slew();
   }
 
   void enable()

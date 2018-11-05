@@ -2,6 +2,19 @@
  * Defines the RasmMotorSet and RasmEncoderSet classes.
  * This file also defines the Joint enumeration and typedefs the MotorState and
  * Pins enumerations from the DualMC33926MotorDriver class.
+ *
+ * Summary
+ *   structs
+ *     MotorPins
+ *     RasmMotorSet::DriversToJoints
+ *     RasmEncoderSet::AdcPins
+ *   enumerations
+ *     MotorState
+ *     Joint
+ *   methods
+ *     void RasmMotorSet::set_motor_state(Joint joint, MotorState state)
+ *     void RasmMotorSet::set_motor_speed(Joint joint, unsigned int duty_cycle)
+ *     unsigned int RasmEncoderSet::get_encoder_output(Joint joint)
  */
 
 #ifndef RASM_RASM_HPP
@@ -55,7 +68,8 @@ private:
   DriversToJoints dj_map;
 
 public:
-  RasmMotorSet(MotorPins &driver1_pins, MotorPins &driver2_pins, MotorPins &driver3_pins, DriversToJoints &dtj)
+  RasmMotorSet(MotorPins &driver1_pins, MotorPins &driver2_pins,
+  MotorPins &driver3_pins, DriversToJoints &dtj)
   {
     dual_driver_1 = new DualMC33926MotorDriver(driver1_pins);
     dual_driver_2 = new DualMC33926MotorDriver(driver2_pins);
@@ -155,7 +169,7 @@ public:
    * Takes a new encoder reading for the given joint, filters it, and returns
    * the new filter output.
    */
-  int get_encoder_output(Joint joint)
+  unsigned int get_encoder_output(Joint joint)
   {
     filter_map[joint]->input(analogRead(pin_map[joint]));
     return filter_map[joint]->output();
