@@ -1,6 +1,7 @@
 /**
- * Defines the Joint enumeration along with the RasmMotorSet and RasmEncoderSet
- * classes.
+ * Defines the RasmMotorSet and RasmEncoderSet classes.
+ * This file also defines the Joint enumeration and typedefs the MotorState and
+ * Pins enumerations from the DualMC33926MotorDriver class.
  */
 
 #ifndef RASM_RASM_HPP
@@ -10,16 +11,15 @@
 
 #include <StandardCplusplus.h>
 #include <vector>
-#include <valarray>
 #include <map>
 
 #include <DualMC33926MotorDriver.hpp>
 #include <Filter.hpp>
 
 using std::vector;
-using std::valarray;
 
-typedef MotorState DualMC33926MotorDriver::MotorState;
+typedef DualMC33926MotorDriver::MotorState MotorState;
+typedef DualMC33926MotorDriver::Pins MotorPins;
 
 /**
  * Represents the six motorized joints of the RASM.
@@ -35,79 +35,74 @@ enum Joint
 };
 
 /**
- * This class is for controlling all rasm motor drivers.
+ * This class is for controlling all rasm motors via three dual motor drivers.
  */
 class RasmMotorSet
 {
+public:
+  struct DriversToJoints
+  {
+    Joint driver1_m1_joint;
+    Joint driver1_m2_joint;
+    Joint driver2_m1_joint;
+    Joint driver2_m2_joint;
+    Joint driver3_m1_joint;
+    Joint driver3_m2_joint;
+  };
+
 private:
   DualMC33926MotorDriver *dual_driver_1;  // base & shoulder
   DualMC33926MotorDriver *dual_driver_2;  // elbow & wrist-yaw
   DualMC33926MotorDriver *dual_driver_3;  // wrist-pitch & wrist-roll
+  DriversToJoints dj_map;
 
 public:
-  RasmMotorSet(DualMC33926MotorDriver::Pins driver1_pins)
+  RasmMotorSet(MotorPins &driver1_pins, MotorPins &driver2_pins, MotorPins &driver3_pins, DriversToJoints &dtj)
   {
     dual_driver_1 = new DualMC33926MotorDriver(driver1_pins);
+    dual_driver_2 = new DualMC33926MotorDriver(driver2_pins);
+    dual_driver_3 = new DualMC33926MotorDriver(driver3_pins);
+    dj_map = dtj;
   }
 
+  /**
+   * Sets the operating mode of the motor for the given joint to one of the
+   * states in MotorState.
+   */
   void set_motor_state(Joint joint, MotorState state)
   {
-    switch (joint)
-    {
-      case BASE:
-        return;
-        break;
-
-      case SHOULDER:
-        dual_driver_1->set_right_motor_state(state);
-        break;
-
-      case ELBOW:
-        return;
-        break;
-
-      case WRIST_YAW:
-        return;
-        break;
-
-      case WRIST_PITCH:
-        return;
-        break;
-
-      case WRIST_ROLL:
-        return;
-        break;
-    }
+    if (joint == dj_map.driver1_m1_joint)
+      dual_driver_1->set_left_motor_state(state);
+    else if (joint == dj_map.driver1_m2_joint)
+      dual_driver_1->set_right_motor_state(state);
+    else if (joint == dj_map.driver2_m1_joint)
+      dual_driver_2->set_left_motor_state(state);
+    else if (joint == dj_map.driver2_m2_joint)
+      dual_driver_2->set_right_motor_state(state);
+    else if (joint == dj_map.driver3_m1_joint)
+      dual_driver_3->set_left_motor_state(state);
+    else if (joint == dj_map.driver3_m2_joint)
+      dual_driver_3->set_right_motor_state(state);
   }
 
+  /**
+   * Sets the magnitude of the motor speed for the given joint to an integer
+   * percentage from 0 to 100 which is given by duty_cycle.
+   */
   void set_motor_speed(Joint joint, unsigned int duty_cycle)
   {
-    switch (joint)
-    {
-      case BASE:
-        return;
-        break;
-
-      case SHOULDER:
-        dual_driver_1->set_right_motor_speed(duty_cycle);
-        break;
-
-      case ELBOW:
-        return;
-        break;
-
-      case WRIST_YAW:
-        return;
-        break;
-
-      case WRIST_PITCH:
-        return;
-        break;
-
-      case WRIST_ROLL:
-        return;
-        break;
-    }
+    if (joint == dj_map.driver1_m1_joint)
+      dual_driver_1->set_left_motor_speed(duty_cycle);
+    else if (joint == dj_map.driver1_m2_joint)
+      dual_driver_1->set_right_motor_speed(duty_cycle);
+    else if (joint == dj_map.driver2_m1_joint)
+      dual_driver_2->set_left_motor_speed(duty_cycle);
+    else if (joint == dj_map.driver2_m2_joint)
+      dual_driver_2->set_right_motor_speed(duty_cycle);
+    else if (joint == dj_map.driver3_m1_joint)
+      dual_driver_3->set_left_motor_speed(duty_cycle);
+    else if (joint == dj_map.driver3_m2_joint)
+      dual_driver_3->set_right_motor_speed(duty_cycle);
   }
 };
 
@@ -166,19 +161,6 @@ public:
   {
     filter_map[joint]->input(analogRead(pin_map[joint]));
     return filter_map[joint]->output();
-  }
-
-  /**
-   * reads all encoders, filters each of the readings, and returns the new
-   * output of the filters as an array with the following order of represenation:
-   *   base, shoulder, elbow, wrist-yaw, wrist-pitch, wrist-roll
-   */
-  valarray<int> get_encoder_outputs()
-  {
-    valarray<int> outputs(6);
-    for (Joint j = BASE; j < 6; j = j+1)
-      outputs[(int)j] = get_encoder_output(j);
-    return outputs;
   }
 };
 
