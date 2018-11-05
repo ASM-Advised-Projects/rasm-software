@@ -5,6 +5,9 @@
 #ifndef FILTER_FILTER_HPP
 #define FILTER_FILTER_HPP
 
+#include <StandardCplusplus.h>
+#include <vector>
+
 #include "CircularArray.hpp"
 
 /**
@@ -23,8 +26,8 @@
 class CausalLTIFilter
 {
 private:
-  vector<double> ff_coeffs;
-  vector<double> fb_coeffs;
+  std::vector<double> ff_coeffs;
+  std::vector<double> fb_coeffs;
 
   CircularArray<double> inputs;
   CircularArray<double> outputs;
@@ -37,7 +40,7 @@ public:
    * Creates a new filter using the given feedforward (ff_coeffs) and feedback
    * (fb_coeffs) coefficients.
    */
-  CausalLTIFilter(const vector<double> &ff_coeffs, const vector<double> &fb_coeffs)
+  CausalLTIFilter(const std::vector<double> &ff_coeffs, const std::vector<double> &fb_coeffs)
   : ff_coeffs(ff_coeffs)
   , fb_coeffs(fb_coeffs)
   , inputs(ff_coeffs.size())
