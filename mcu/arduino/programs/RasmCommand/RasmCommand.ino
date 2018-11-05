@@ -36,6 +36,17 @@
 RasmMotorSet *motors;
 RasmEncoderSet *encoders;
 
+void set_pwm_frequency()
+{
+  // set divisors of 8 for timers 3 and 4
+  // this will provide a frequency of 16MHz / 256 / 8 = 7812.5 Hz
+  TCCR3B = (TCCR3B & 0b11111000) | 0x02;
+  TCCR4B = (TCCR4B & 0b11111000) | 0x02;
+
+  //struct Timer {T0, T1, T2, T3, T4, T5};
+  //struct Divisor {_1, _8, _64, _256, _1024};
+}
+
 void setup()
 {
   // initialize serial port
@@ -71,8 +82,10 @@ void setup()
   set_pwm_frequency();
 
   // initialize motors
-  //   - all pins are digital-output except for the m1_IN2 and m2_IN2 pins which
-  //   are analog output and hence must be pwm capable
+  //   - All pins are digital-output except for the m1_IN2 and m2_IN2 pins which
+  //     are analog output and hence must be pwm capable.
+  //   - Right now all digital pins are 22 but should be changed to something
+  //     between 22 and 53 and should all be unique.
   // pin assignments for dual motor driver #1
   MotorPins motor_pins1;
   motor_pins1.m1_IN1 = 22;
@@ -232,14 +245,4 @@ MotorState char_to_motor_state(char c)
     default:
       return MotorState::HIGHZ;
   }
-}
-
-//struct Timer {T0, T1, T2, T3, T4, T5};
-//struct Divisor {_1, _8, _64, _256, _1024};
-void set_pwm_frequency()
-{
-  // set divisors of 8 for timers 3 and 4
-  // this will provide a frequency of 16MHz / 256 / 8 = 7812.5 Hz
-  TCCR3B = (TCCR3B & 0b11111000) | 0x02;
-  TCCR4B = (TCCR4B & 0b11111000) | 0x02;
 }
