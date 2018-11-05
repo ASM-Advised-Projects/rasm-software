@@ -68,6 +68,9 @@ private:
   DriversToJoints dj_map;
 
 public:
+  RasmMotorSet(const RasmMotorSet &) = delete;
+  RasmMotorSet & operator=(const RasmMotorSet &) = delete;
+
   RasmMotorSet(MotorPins &driver1_pins, MotorPins &driver2_pins,
   MotorPins &driver3_pins, DriversToJoints &dtj)
   {
@@ -128,6 +131,9 @@ private:
   std::map<Joint, CausalLTIFilter*> filter_map;
 
 public:
+  RasmEncoderSet(const RasmEncoderSet &) = delete;
+  RasmEncoderSet & operator=(const RasmEncoderSet &) = delete;
+
   struct AdcPins {
     unsigned int base;
     unsigned int shoulder;
