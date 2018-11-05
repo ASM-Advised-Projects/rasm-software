@@ -8,6 +8,8 @@
  * This class is for controlling the Pololu dual MC33926 motor driver board.
  * The two motor drivers are referred to as 'left' and 'right' which follows
  * when viewing the motor output terminals edge of the board, driver-side up.
+ *
+ * PWM output is required for the Pins::m1_IN2 and Pins::m2_IN2 pins.
  */
 class DualMC33926MotorDriver
 {
@@ -25,11 +27,11 @@ public:
 
   struct Pins {
     unsigned int m1_IN1;
-    unsigned int m1_IN2;
+    unsigned int m1_IN2;  // pwm
     unsigned int m1_D1;
     unsigned int m1_D2;
     unsigned int m2_IN1;
-    unsigned int m2_IN2;
+    unsigned int m2_IN2;  // pwm
     unsigned int m2_D1;
     unsigned int m2_D2;
     unsigned int enable;
@@ -154,14 +156,14 @@ public:
     {
       case FORWARD:
         enable_right_motor();
-        digitalWrite(pins.m1_IN1, HIGH);
-        analogWrite(pins.m1_IN2, 255-right_motor_speed);
+        digitalWrite(pins.m2_IN1, HIGH);
+        analogWrite(pins.m2_IN2, 255-right_motor_speed);
         break;
 
       case REVERSE:
         enable_right_motor();
-        digitalWrite(pins.m1_IN1, LOW);
-        analogWrite(pins.m1_IN2, right_motor_speed);
+        digitalWrite(pins.m2_IN1, LOW);
+        analogWrite(pins.m2_IN2, right_motor_speed);
         break;
 
       case HIGHZ:
