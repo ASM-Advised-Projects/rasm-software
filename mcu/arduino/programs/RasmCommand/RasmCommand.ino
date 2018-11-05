@@ -42,45 +42,75 @@ void setup()
   Serial.begin(115200);
   Serial.setTimeout(50);
 
+  /*
+   * Set frequencies for pwm pins (MotorPins::mx_IN2) used by motor drivers.
+   * The default frequency for pwm (analogWrite) output is <1kHz unless the
+   * prescalar/divisor for the timer backing that pwm pin is modified.
+   *
+   * Note that Timer0 is used by the arduino core so no-touchy.
+   * Here's a timer-to-pin map for the Mega 2650 (ATmega1280):
+   * timer   pin1  pin2  pin3
+   * ------  ----  ----  ----
+   * Timer0   4     13    --
+   * Timer1   11    12    --
+   * Timer2   9     10    --
+   * Timer3   2     3     5
+   * Timer4   6     7     8
+   * Timer5   44    45    46
+   *
+   * The millis() and delay() functions rely on some combination of timers 0, 1,
+   * and 2, so timers 3 and 4 will have their frequencies set to be used by the
+   * motor drivers. This will allow for 6 total pwm outputs on pins 2,3,5,6,7,8
+   * that are of the desired frequency.
+   *
+   * The frequency should be greater than 1k (will likely reduce how obnoxious
+   * the humming sound of a slow-moving motor is) but less than 11k (so that
+   * the motor drivers don't need to be put into a high slew-rate mode).
+   * This function changes the frequency of timers 3 and 4 to 7812.5 Hz.
+   */
+  set_pwm_frequency();
+
   // initialize motors
+  //   - all pins are digital-output except for the m1_IN2 and m2_IN2 pins which
+  //   are analog output and hence must be pwm capable
   // pin assignments for dual motor driver #1
   MotorPins motor_pins1;
-  motor_pins1.m1_IN1 = 10;
-  motor_pins1.m1_IN2 = 10;
-  motor_pins1.m1_D1 = 10;
-  motor_pins1.m1_D2 = 10;
-  motor_pins1.m2_IN1 = 2;
+  motor_pins1.m1_IN1 = 22;
+  motor_pins1.m1_IN2 = 2;
+  motor_pins1.m1_D1 = 22;
+  motor_pins1.m1_D2 = 22;
+  motor_pins1.m2_IN1 = 22;
   motor_pins1.m2_IN2 = 3;
-  motor_pins1.m2_D1 = 10;
-  motor_pins1.m2_D2 = 10;
-  motor_pins1.enable = 10;
-  motor_pins1.slew = 10;
+  motor_pins1.m2_D1 = 22;
+  motor_pins1.m2_D2 = 22;
+  motor_pins1.enable = 22;
+  motor_pins1.slew = 22;
 
   // pin assignments for dual motor driver #2
   MotorPins motor_pins2;
-  motor_pins2.m1_IN1 = 10;
-  motor_pins2.m1_IN2 = 10;
-  motor_pins2.m1_D1 = 10;
-  motor_pins2.m1_D2 = 10;
-  motor_pins2.m2_IN1 = 10;
-  motor_pins2.m2_IN2 = 10;
-  motor_pins2.m2_D1 = 10;
-  motor_pins2.m2_D2 = 10;
-  motor_pins2.enable = 10;
-  motor_pins2.slew = 10;
+  motor_pins2.m1_IN1 = 22;
+  motor_pins2.m1_IN2 = 5;
+  motor_pins2.m1_D1 = 22;
+  motor_pins2.m1_D2 = 22;
+  motor_pins2.m2_IN1 = 22;
+  motor_pins2.m2_IN2 = 6;
+  motor_pins2.m2_D1 = 22;
+  motor_pins2.m2_D2 = 22;
+  motor_pins2.enable = 22;
+  motor_pins2.slew = 22;
 
   // pin assignments for dual motor driver #3
   MotorPins motor_pins3;
-  motor_pins3.m1_IN1 = 10;
-  motor_pins3.m1_IN2 = 10;
-  motor_pins3.m1_D1 = 10;
-  motor_pins3.m1_D2 = 10;
-  motor_pins3.m2_IN1 = 10;
-  motor_pins3.m2_IN2 = 10;
-  motor_pins3.m2_D1 = 10;
-  motor_pins3.m2_D2 = 10;
-  motor_pins3.enable = 10;
-  motor_pins3.slew = 10;
+  motor_pins3.m1_IN1 = 22;
+  motor_pins3.m1_IN2 = 7;
+  motor_pins3.m1_D1 = 22;
+  motor_pins3.m1_D2 = 22;
+  motor_pins3.m2_IN1 = 22;
+  motor_pins3.m2_IN2 = 8;
+  motor_pins3.m2_D1 = 22;
+  motor_pins3.m2_D2 = 22;
+  motor_pins3.enable = 22;
+  motor_pins3.slew = 22;
 
   // driver-to-joint assignments
   RasmMotorSet::DriversToJoints dtj;
@@ -202,4 +232,14 @@ MotorState char_to_motor_state(char c)
     default:
       return MotorState::HIGHZ;
   }
+}
+
+//struct Timer {T0, T1, T2, T3, T4, T5};
+//struct Divisor {_1, _8, _64, _256, _1024};
+void set_pwm_frequency()
+{
+  // set divisors of 8 for timers 3 and 4
+  // this will provide a frequency of 16MHz / 256 / 8 = 7812.5 Hz
+  TCCR3B = (TCCR3B & 0b11111000) | 0x02;
+  TCCR4B = (TCCR4B & 0b11111000) | 0x02;
 }
