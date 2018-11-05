@@ -74,10 +74,10 @@ public:
    *
    * Specification for signal processing microcontroller (uC):
    *   - communication over UART port at baud rate of 115200
-   *   - data sent to uC: {BEL}
-   *   - data received from uC: {ACK}
+   *   - data sent to uC: p
+   *   - data received from uC: a
    */
-  bool connected()
+  bool is_connected()
   {
     return false;
   }
@@ -88,8 +88,8 @@ public:
    *
    * Specification for signal processing microcontroller (uC):
    *   - communication over UART port at baud rate of 115200
-   *   - data sent to uC: {'p'}
-   *   - data received from uC: {'[0-1]'}
+   *   - data sent to uC: o
+   *   - data received from uC: [0-1]
    */
   bool is_pmb_on()
   {
@@ -102,8 +102,8 @@ public:
    *
    * Specification for signal processing microcontroller (uC):
    *   - communication over UART port at baud rate of 115200
-   *   - data sent to uC: {'b'}
-   *   - data received from uC: {'[0-1]', '[0-9]', '[0-9]', '[0-9]'}
+   *   - data sent to uC: b
+   *   - data received from uC: [0-1][0-9][0-9][0-9] (little-endian)
    */
   double get_battery_voltage()
   {
@@ -116,8 +116,8 @@ public:
    *
    * Specification for signal processing microcontroller (uC):
    *   - communication over UART port at baud rate of 115200
-   *   - data sent to uC: {'e'}
-   *   - data received from uC: 6 x {'[0-1]', '[0-9]', '[0-9]', '[0-9]'}
+   *   - data sent to uC: e[0-5]
+   *   - data received from uC: [0-1][0-9][0-9][0-9] (little-endian)
    */
   std::array<int, 6> get_encoder_outputs()
   {
@@ -134,31 +134,13 @@ public:
    *
    * Specification for signal processing microcontroller (uC):
    *   - communication over UART port at baud rate of 115200
-   *   - data sent to uC: {'m'}, 6 x {'[0-1]', '[0-1]', '[0-9]', '[0-9]', '[0-9]'}
-   *   - data received from uC: {ACK}
+   *   - data sent to uC: m[0-5][frz][0-9][0-9][0-9] (big-endian)
+   *   - data received from uC: a
    */
   bool set_motor_pwms(std::array<float, 6> pwmlevels)
   {
     return;
   }
-
-  /**
-   *
-   */
-  /*std::array<unsigned char, 6> get_md_currents()
-  {
-    std::array<unsigned char, 6> empty;
-    return empty;
-  }*/
-
-  /**
-   *
-   */
-  /*std::array<unsigned char, 6> get_md_errors()
-  {
-    std::array<unsigned char, 6> empty;
-    return empty;
-  }*/
 };
 
 #endif
