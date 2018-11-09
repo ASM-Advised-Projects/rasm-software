@@ -1,3 +1,10 @@
+//      translation_vec.at<double>(1, 1),
+//      translation_vec.at<double>(2, 1), 
+//      translation_vec.at<double>(3, 1), 
+//      rotation_vec.at<double>(1, 1),
+//      rotation_vec.at<double>(2, 1), 
+//      rotation_vec.at<double>(3, 1)
+
 #include <iostream>
 #include <dlib/opencv.h>
 #include <opencv2/highgui/highgui.hpp>
@@ -61,10 +68,10 @@ int main(int argc, char** argv)
     }
     else
     {
-    object_pts.push_back(cv::Point3d(-4, -1, 0));
-    object_pts.push_back(cv::Point3d(-4, 1, 0));
-    object_pts.push_back(cv::Point3d(4, 1, 0));
-    object_pts.push_back(cv::Point3d(4, -1, 0));
+    object_pts.push_back(cv::Point3d(61, 97, 0));
+    object_pts.push_back(cv::Point3d(249, 118, 0));
+    object_pts.push_back(cv::Point3d(249, 70, 0));
+    object_pts.push_back(cv::Point3d(48, 118, 0));
     }
     //2D ref points(image coordinates), referenced from detected facial feature
     std::vector<cv::Point2d> image_pts;
@@ -143,10 +150,10 @@ int main(int argc, char** argv)
             else
             {
             
-            image_pts.push_back(cv::Point2d(shape.part(1).x(), shape.part(1).y())); //#57 mouth central bottom corner
-            image_pts.push_back(cv::Point2d(shape.part(2).x(), shape.part(2).y()));   //#8 chin corner
-            image_pts.push_back(cv::Point2d(shape.part(3).x(), shape.part(3).y()));   //#8 chin corner
-            image_pts.push_back(cv::Point2d(shape.part(4).x(), shape.part(4).y()));   //#8 chin corner
+            image_pts.push_back(cv::Point2d(shape.part(0).x(), shape.part(0).y())); //#57 mouth central bottom corner
+            image_pts.push_back(cv::Point2d(shape.part(7).x(), shape.part(7).y()));   //#8 chin corner
+            image_pts.push_back(cv::Point2d(shape.part(8).x(), shape.part(8).y()));   //#8 chin corner
+            image_pts.push_back(cv::Point2d(shape.part(9).x(), shape.part(9).y()));   //#8 chin corner
             }
 
             //calc pose
@@ -174,18 +181,25 @@ int main(int argc, char** argv)
             cv::hconcat(rotation_mat, translation_vec, pose_mat);
             cv::decomposeProjectionMatrix(pose_mat, out_intrinsics, out_rotation, out_translation, cv::noArray(), cv::noArray(), cv::noArray(), euler_angle);
 
-            //show angle result
-            outtext << "X: " << std::setprecision(3) << euler_angle.at<double>(0);
+                          //show angle result
+            outtext << "trans_vec 1: " << std::setprecision(3) << translation_vec.at<double>(1, 1);
             cv::putText(temp, outtext.str(), cv::Point(50, 40), cv::FONT_HERSHEY_SIMPLEX, 0.75, cv::Scalar(0, 0, 0));
             outtext.str("");
-            outtext << "Y: " << std::setprecision(3) << euler_angle.at<double>(1);
+            outtext << "trans_vec 2: " << std::setprecision(3) << translation_vec.at<double>(2, 1);
             cv::putText(temp, outtext.str(), cv::Point(50, 60), cv::FONT_HERSHEY_SIMPLEX, 0.75, cv::Scalar(0, 0, 0));
             outtext.str("");
-            outtext << "Z: " << std::setprecision(3) << euler_angle.at<double>(2);
+            outtext << "trans_vec 3: " << std::setprecision(3) << translation_vec.at<double>(3, 1);
             cv::putText(temp, outtext.str(), cv::Point(50, 80), cv::FONT_HERSHEY_SIMPLEX, 0.75, cv::Scalar(0, 0, 0));
             outtext.str("");
-
-            image_pts.clear();
+            outtext << "rot_vec 1: " << std::setprecision(3) << rotation_vec.at<double>(1, 1);
+            cv::putText(temp, outtext.str(), cv::Point(50, 100), cv::FONT_HERSHEY_SIMPLEX, 0.75, cv::Scalar(0, 0, 0));
+            outtext.str("");
+            outtext << "rot_vec 2: " << std::setprecision(3) << rotation_vec.at<double>(2, 1);
+            cv::putText(temp, outtext.str(), cv::Point(50, 120), cv::FONT_HERSHEY_SIMPLEX, 0.75, cv::Scalar(0, 0, 0));
+            outtext.str("");
+            outtext << "rot_vec 3: " << std::setprecision(3) << rotation_vec.at<double>(3, 1);
+            cv::putText(temp, outtext.str(), cv::Point(50, 140), cv::FONT_HERSHEY_SIMPLEX, 0.75, cv::Scalar(0, 0, 0));
+            outtext.str("");
             }
 
         //press esc to end
