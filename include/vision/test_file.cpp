@@ -182,12 +182,15 @@ int main(int argc, char** argv)
             cv::decomposeProjectionMatrix(pose_mat, out_intrinsics, out_rotation, out_translation, cv::noArray(), cv::noArray(), cv::noArray(), euler_angle);
 
                           //show angle result
+            //outtext << "X: " << std::setprecision(3) << euler_angle.at<double>(0);
             outtext << "trans_vec 1: " << std::setprecision(3) << translation_vec.at<double>(1, 1);
             cv::putText(temp, outtext.str(), cv::Point(50, 40), cv::FONT_HERSHEY_SIMPLEX, 0.75, cv::Scalar(0, 0, 0));
             outtext.str("");
             outtext << "trans_vec 2: " << std::setprecision(3) << translation_vec.at<double>(2, 1);
+            //outtext << "Y: " << std::setprecision(3) << euler_angle.at<double>(1);
             cv::putText(temp, outtext.str(), cv::Point(50, 60), cv::FONT_HERSHEY_SIMPLEX, 0.75, cv::Scalar(0, 0, 0));
             outtext.str("");
+            //outtext << "Z: " << std::setprecision(3) << euler_angle.at<double>(2);
             outtext << "trans_vec 3: " << std::setprecision(3) << translation_vec.at<double>(3, 1);
             cv::putText(temp, outtext.str(), cv::Point(50, 80), cv::FONT_HERSHEY_SIMPLEX, 0.75, cv::Scalar(0, 0, 0));
             outtext.str("");
@@ -200,6 +203,7 @@ int main(int argc, char** argv)
             outtext << "rot_vec 3: " << std::setprecision(3) << rotation_vec.at<double>(3, 1);
             cv::putText(temp, outtext.str(), cv::Point(50, 140), cv::FONT_HERSHEY_SIMPLEX, 0.75, cv::Scalar(0, 0, 0));
             outtext.str("");
+            image_pts.clear();
             }
 
         //press esc to end
