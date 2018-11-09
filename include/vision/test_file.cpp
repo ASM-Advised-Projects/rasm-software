@@ -22,6 +22,11 @@ double D[5] = { 7.0834633684407095e-002, 6.9140193737175351e-002, 0.0, 0.0, -1.3
 
 int main(int argc, char** argv)
 {
+  std::ifstream picture_list("pictures.txt");
+    if(!picture_list) {
+      std::cout << "Cannot open input file.\n";
+    return 1;
+  }
     std::ofstream results_file;
     results_file.open("results_file.txt");
     //open cam
@@ -47,8 +52,8 @@ int main(int argc, char** argv)
     }
 
     //fill in cam intrinsics and distortion coefficients
-    cv::Mat cam_matrix = cv::Mat(3, 3, CV_64FC1, K);
-    cv::Mat dist_coeffs = cv::Mat(5, 1, CV_64FC1, D);
+    //cv::Mat cam_matrix = cv::Mat(3, 3, CV_64FC1, K);
+    //cv::Mat dist_coeffs = cv::Mat(5, 1, CV_64FC1, D);
 
     //fill in 3D ref points(world coordinates), model referenced from http://aifi.isr.uc.pt/Downloads/OpenGL/glAnthropometric3DModel.cpp
     std::vector<cv::Point3d> object_pts;
@@ -110,11 +115,29 @@ int main(int argc, char** argv)
     std::ostringstream outtext;
 
     //main loop
+#ifdef FILES
+
+  while(picture_list) {
+    char str[255];
+    picture_list.getline(str, 255);  // delim defaults to '\n'
+    cv::Mat temp = cv::imread(str);
+#else
     while (1)
     {
         // Grab a frame
         cv::Mat temp;
         cap >> temp;
+#endif
+        //experimental!!
+            // Camera internals
+    double focal_length = temp.cols; // Approximate focal length.
+    cv::Point2d center = cv::Point2d(temp.cols/2,temp.rows/2);
+    cv::Mat cam_matrix = (cv::Mat_<double>(3,3) << focal_length, 0, center.x, 0 , focal_length, center.y, 0, 0, 1);
+    cv::Mat dist_coeffs = cv::Mat::zeros(4,1,cv::DataType<double>::type); // Assuming no lens distortion
+
+
+
+        //experimental!!!
         dlib::cv_image<dlib::bgr_pixel> cimg(temp);
 
         // Detect faces
@@ -210,6 +233,10 @@ int main(int argc, char** argv)
 
             // Put the results of the image processing into a file so that it can read and
             // compared
+            results_file << std::endl;
+#ifdef FILES
+            results_file << str << std::endl;
+#endif
             results_file << "trans_vec 1: " << std::setprecision(3) << translation_vec.at<double>(1, 1) << std::endl;
             results_file << "trans_vec 2: " << std::setprecision(3) << translation_vec.at<double>(2, 1) << std::endl;
             results_file << "trans_vec 3: " << std::setprecision(3) << translation_vec.at<double>(3, 1) << std::endl;
@@ -229,6 +256,7 @@ int main(int argc, char** argv)
             break;
             }
     }
+    picture_list.close();
     results_file.close();
     return 0;
 }

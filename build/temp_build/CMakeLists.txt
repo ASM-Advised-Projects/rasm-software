@@ -10,6 +10,7 @@ add_executable(video_test_shape
   /home/browse/Documents/fall_2018/me4010/rasm-v2/include/vision/test_file.cpp)
 target_link_libraries(temp_main dlib::dlib)
 target_link_libraries(video_test_shape dlib::dlib)
+target_compile_definitions(video_test_shape PRIVATE FILES)
 #target_link_libraries(temp_main opencv::opencv)
 target_link_libraries( temp_main ${OpenCV_LIBS} )
 target_link_libraries( video_test_shape ${OpenCV_LIBS} )
