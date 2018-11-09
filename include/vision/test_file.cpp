@@ -13,6 +13,7 @@
 #include <dlib/image_processing/frontal_face_detector.h>
 #include <dlib/image_processing/render_face_detections.h>
 #include <dlib/image_processing.h>
+#include <fstream>
 
 //Intrisics can be calculated using opencv sample code under opencv/sources/samples/cpp/tutorial_code/calib3d
 //Normally, you can also apprximate fx and fy by image width, cx by half image width, cy by half image height instead
@@ -21,6 +22,8 @@ double D[5] = { 7.0834633684407095e-002, 6.9140193737175351e-002, 0.0, 0.0, -1.3
 
 int main(int argc, char** argv)
 {
+    std::ofstream results_file;
+    results_file.open("results_file.txt");
     //open cam
     cv::VideoCapture cap(1);
     if (!cap.isOpened())
@@ -203,6 +206,18 @@ int main(int argc, char** argv)
             outtext << "rot_vec 3: " << std::setprecision(3) << rotation_vec.at<double>(3, 1);
             cv::putText(temp, outtext.str(), cv::Point(50, 140), cv::FONT_HERSHEY_SIMPLEX, 0.75, cv::Scalar(0, 0, 0));
             outtext.str("");
+
+
+            // Put the results of the image processing into a file so that it can read and
+            // compared
+            results_file << "trans_vec 1: " << std::setprecision(3) << translation_vec.at<double>(1, 1) << std::endl;
+            results_file << "trans_vec 2: " << std::setprecision(3) << translation_vec.at<double>(2, 1) << std::endl;
+            results_file << "trans_vec 3: " << std::setprecision(3) << translation_vec.at<double>(3, 1) << std::endl;
+            results_file << "rot_vec 1: " << std::setprecision(3) << rotation_vec.at<double>(1, 1) << std::endl;
+            results_file << "rot_vec 2: " << std::setprecision(3) << rotation_vec.at<double>(2, 1) << std::endl;
+            results_file << "rot_vec 3: " << std::setprecision(3) << rotation_vec.at<double>(3, 1) << std::endl;
+
+
             image_pts.clear();
             }
 
@@ -214,6 +229,6 @@ int main(int argc, char** argv)
             break;
             }
     }
-
+    results_file.close();
     return 0;
 }
