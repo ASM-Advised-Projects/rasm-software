@@ -17,8 +17,9 @@
 
 //Intrisics can be calculated using opencv sample code under opencv/sources/samples/cpp/tutorial_code/calib3d
 //Normally, you can also apprximate fx and fy by image width, cx by half image width, cy by half image height instead
-double K[9] = { 6.5308391993466671e+002, 0.0, 3.1950000000000000e+002, 0.0, 6.5308391993466671e+002, 2.3950000000000000e+002, 0.0, 0.0, 1.0 };
-double D[5] = { 7.0834633684407095e-002, 6.9140193737175351e-002, 0.0, 0.0, -1.3073460323689292e+000 };
+double K[9] = {7.3530833553043510e+02, 0.0, 320.0, 0.0, 7.3530833553043510e+02, 240.0, 0.0, 0.0, 1.0};
+double D[5] = {-2.3528667558034226e-02, 1.3301431879108856e+00, 0.0, 0.0,
+    -6.0786673300480434e+00};
 
 int main(int argc, char** argv)
 {
@@ -28,7 +29,9 @@ int main(int argc, char** argv)
     return 1;
   }
     std::ofstream results_file;
+    std::ofstream results_file_euler;
     results_file.open("results_file.txt");
+    results_file_euler.open("results_file_euler.txt");
     //open cam
     cv::VideoCapture cap(1);
     if (!cap.isOpened())
@@ -52,8 +55,8 @@ int main(int argc, char** argv)
     }
 
     //fill in cam intrinsics and distortion coefficients
-    //cv::Mat cam_matrix = cv::Mat(3, 3, CV_64FC1, K);
-    //cv::Mat dist_coeffs = cv::Mat(5, 1, CV_64FC1, D);
+    cv::Mat cam_matrix = cv::Mat(3, 3, CV_64FC1, K);
+    cv::Mat dist_coeffs = cv::Mat(5, 1, CV_64FC1, D);
 
     //fill in 3D ref points(world coordinates), model referenced from http://aifi.isr.uc.pt/Downloads/OpenGL/glAnthropometric3DModel.cpp
     std::vector<cv::Point3d> object_pts;
@@ -130,10 +133,10 @@ int main(int argc, char** argv)
 #endif
         //experimental!!
             // Camera internals
-    double focal_length = temp.cols; // Approximate focal length.
-    cv::Point2d center = cv::Point2d(temp.cols/2,temp.rows/2);
-    cv::Mat cam_matrix = (cv::Mat_<double>(3,3) << focal_length, 0, center.x, 0 , focal_length, center.y, 0, 0, 1);
-    cv::Mat dist_coeffs = cv::Mat::zeros(4,1,cv::DataType<double>::type); // Assuming no lens distortion
+    //double focal_length = temp.cols; // Approximate focal length.
+    //cv::Point2d center = cv::Point2d(temp.cols/2,temp.rows/2);
+    //cv::Mat cam_matrix = (cv::Mat_<double>(3,3) << focal_length, 0, center.x, 0 , focal_length, center.y, 0, 0, 1);
+    //cv::Mat dist_coeffs = cv::Mat::zeros(4,1,cv::DataType<double>::type); // Assuming no lens distortion
 
 
 
@@ -234,15 +237,33 @@ int main(int argc, char** argv)
             // Put the results of the image processing into a file so that it can read and
             // compared
             results_file << std::endl;
+            results_file_euler << std::endl;
+            results_file_euler << std::endl;
 #ifdef FILES
             results_file << str << std::endl;
+            results_file_euler << str << std::endl;
 #endif
-            results_file << "trans_vec 1: " << std::setprecision(3) << translation_vec.at<double>(1, 1) << std::endl;
+           results_file << "trans_vec 1: " << std::setprecision(3) << translation_vec.at<double>(1, 1) << std::endl;
+            //std::cout << "trans_vec 1: " << std::setprecision(3) << translation_vec.at<double>(1, 1) << std::endl;
             results_file << "trans_vec 2: " << std::setprecision(3) << translation_vec.at<double>(2, 1) << std::endl;
+            //std::cout << "trans_vec 2: " << std::setprecision(3) << translation_vec.at<double>(2, 1) << std::endl;
             results_file << "trans_vec 3: " << std::setprecision(3) << translation_vec.at<double>(3, 1) << std::endl;
+            //std::cout << "trans_vec 3: " << std::setprecision(3) << translation_vec.at<double>(3, 1) << std::endl;
             results_file << "rot_vec 1: " << std::setprecision(3) << rotation_vec.at<double>(1, 1) << std::endl;
+            //std::cout << "rot_vec 1: " << std::setprecision(3) << rotation_vec.at<double>(1, 1) << std::endl;
             results_file << "rot_vec 2: " << std::setprecision(3) << rotation_vec.at<double>(2, 1) << std::endl;
+            //std::cout << "rot_vec 2: " << std::setprecision(3) << rotation_vec.at<double>(2, 1) << std::endl;
             results_file << "rot_vec 3: " << std::setprecision(3) << rotation_vec.at<double>(3, 1) << std::endl;
+            //std::cout << "rot_vec 3: " << std::setprecision(3) << rotation_vec.at<double>(3, 1) << std::endl;
+
+            std::cout << std::endl;
+            results_file_euler << "X: " << std::setprecision(3) << euler_angle.at<double>(0) << " ";
+            std::cout << "X: " << std::setprecision(3) << euler_angle.at<double>(0) << " ";
+            results_file_euler << "Y: " << std::setprecision(3) << euler_angle.at<double>(1) << " ";
+            std::cout << "Y: " << std::setprecision(3) << euler_angle.at<double>(1) << " ";
+            results_file_euler << "Z: " << std::setprecision(3) << euler_angle.at<double>(2) << " ";
+            std::cout << "Z: " << std::setprecision(3) << euler_angle.at<double>(2) << " ";
+            std::cout << std::endl;
 
 
             image_pts.clear();
@@ -258,5 +279,6 @@ int main(int argc, char** argv)
     }
     picture_list.close();
     results_file.close();
+    results_file_euler.close();
     return 0;
 }
