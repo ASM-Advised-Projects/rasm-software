@@ -36,6 +36,9 @@
 RasmMotorSet *motors;
 RasmEncoderSet *encoders;
 
+Joint joint;
+int level;
+
 void set_pwm_frequency()
 {
   // set divisors of 8 for timers 3 and 4
@@ -50,8 +53,8 @@ void set_pwm_frequency()
 void setup()
 {
   // initialize serial port
-  Serial.begin(115200);
-  Serial.setTimeout(50);
+  Serial.begin(9600);
+  Serial.setTimeout(100);
 
   /*
    * Set frequencies for pwm pins (MotorPins::mx_IN2) used by motor drivers.
@@ -86,13 +89,15 @@ void setup()
   //     are analog output and hence must be pwm capable.
   //   - Right now all digital pins are 22 but should be changed to something
   //     between 22 and 53 and should all be unique.
+
   // pin assignments for dual motor driver #1
+  // elbow (m1) and shoulder (m2)
   MotorPins motor_pins1;
-  motor_pins1.m1_IN1 = 22;
+  motor_pins1.m1_IN1 = 23;
   motor_pins1.m1_IN2 = 2;
   motor_pins1.m1_D1 = 22;
   motor_pins1.m1_D2 = 22;
-  motor_pins1.m2_IN1 = 22;
+  motor_pins1.m2_IN1 = 24;
   motor_pins1.m2_IN2 = 3;
   motor_pins1.m2_D1 = 22;
   motor_pins1.m2_D2 = 22;
@@ -101,11 +106,11 @@ void setup()
 
   // pin assignments for dual motor driver #2
   MotorPins motor_pins2;
-  motor_pins2.m1_IN1 = 22;
+  motor_pins2.m1_IN1 = 25;
   motor_pins2.m1_IN2 = 5;
   motor_pins2.m1_D1 = 22;
   motor_pins2.m1_D2 = 22;
-  motor_pins2.m2_IN1 = 22;
+  motor_pins2.m2_IN1 = 26;
   motor_pins2.m2_IN2 = 6;
   motor_pins2.m2_D1 = 22;
   motor_pins2.m2_D2 = 22;
@@ -114,11 +119,11 @@ void setup()
 
   // pin assignments for dual motor driver #3
   MotorPins motor_pins3;
-  motor_pins3.m1_IN1 = 22;
+  motor_pins3.m1_IN1 = 27;
   motor_pins3.m1_IN2 = 7;
   motor_pins3.m1_D1 = 22;
   motor_pins3.m1_D2 = 22;
-  motor_pins3.m2_IN1 = 22;
+  motor_pins3.m2_IN1 = 28;
   motor_pins3.m2_IN2 = 8;
   motor_pins3.m2_D1 = 22;
   motor_pins3.m2_D2 = 22;
@@ -127,14 +132,19 @@ void setup()
 
   // driver-to-joint assignments
   RasmMotorSet::DriversToJoints dtj;
-  dtj.driver1_m1_joint = Joint::SHOULDER;
-  dtj.driver1_m2_joint = Joint::ELBOW;
-  dtj.driver2_m1_joint = Joint::BASE;
-  dtj.driver2_m2_joint = Joint::WRIST_PITCH;
+  dtj.driver1_m1_joint = Joint::ELBOW;
+  dtj.driver1_m2_joint = Joint::SHOULDER;
+  dtj.driver2_m1_joint = Joint::WRIST_ROLL;
+  dtj.driver2_m2_joint = Joint::BASE;
   dtj.driver3_m1_joint = Joint::WRIST_YAW;
-  dtj.driver3_m2_joint = Joint::WRIST_ROLL;
+  dtj.driver3_m2_joint = Joint::WRIST_PITCH;
 
   motors = new RasmMotorSet(motor_pins1, motor_pins2, motor_pins3, dtj);
+  for (Joint joint = 0; joint < 6; joint = joint + 1)
+  {
+    motors->set_motor_state(joint, MotorState::FORWARD);
+    motors->set_motor_speed(joint, 0);
+  }
 
   // initialize encoders
   // analog-read pin assignments for each joint
@@ -142,8 +152,8 @@ void setup()
   encoder_pins.base = A0;
   encoder_pins.shoulder = A1;
   encoder_pins.elbow = A2;
-  encoder_pins.wristyaw = A3;
-  encoder_pins.wristpitch = A4;
+  encoder_pins.wristyaw = A5;
+  encoder_pins.wristpitch = A5;
   encoder_pins.wristroll = A5;
 
   // filter coefficients that are applied to each encoder
@@ -152,10 +162,51 @@ void setup()
   encoder_coeffs.fb_coeffs.push_back(0);
 
   encoders = new RasmEncoderSet(encoder_pins, encoder_coeffs);
+
+  joint = Joint::BASE;
+  level = 0;
 }
 
 void loop()
 {
+  if (Serial.available())
+  {
+    String s = Serial.readString();
+    char c = s.charAt(0);
+    if (c == 'j')  // change joint
+    {
+      char j = s.charAt(1) - '0';
+      joint = (Joint)(j);
+    }
+    else if (c == 'f')
+    {
+      motors->set_motor_state(joint, MotorState::FORWARD);
+    }
+    else if (c == 'r')
+    {
+      motors->set_motor_state(joint, MotorState::REVERSE);
+    }
+    else
+    {
+      Serial.println();
+      Serial.println();
+      level = c - '0';
+      if (level >= 0 && level <= 9)
+      {
+        motors->set_motor_speed(joint, 10*level);
+      }
+    }
+  }
+
+  if (level != 0)
+  {
+    Serial.print(millis());
+    Serial.print("\t");
+    Serial.println(encoders->get_encoder_output(joint));
+  }
+
+  return;
+
   // continue only if serial data is available
   if (!Serial.available())
     return;
