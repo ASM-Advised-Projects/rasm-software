@@ -7,6 +7,7 @@
 
 #include "definitions.hpp"
 #include "trajectory_structures.hpp"
+#include "rasm2/util/pose.hpp"
 
 /**
  * realizable trajectory – all trajectory points are reachable with no singularites (inf joint velocities)
@@ -15,59 +16,70 @@
 class TrajectoryGenerator
 {
 public:
-  TrajectoryGenerator(JointLinkKinematics params)
+  /**
+   *
+   */
+  struct TrajectoryParams
+  {
+    double initial_pos;
+    double final_pos;
+    double initial_vel;
+    double final_vel;
+    double initial_acc;
+    double final_acc;
+    double max_vel;
+    double max_acc;
+  };
+
+  /**
+   *
+   */
+  TrajectoryGenerator()
   {
 
   }
 
-  int compute_trajectory(const sixvector &current_pose, const sixvector &final_pose,
-      const sixvector &face_pose, Trajectory6D &trajectory)
+  // returns the true final global pose
+  Pose generate_trajectory(const Pose &initial_global_pose,
+      const Pose &final_global_pose, Trajectory6D &trajectory)
   {
 
   }
 
   // forward kinematics
-  sixvector compute_pose(const sixvector &joint_positions)
+  // joint_to_cartesian
+  void joint_to_cartesian(const std::array<double, 6> &joint_positions, Pose &pose)
   {
 
   }
 
   // inverse kinematics – returns true if reachable
-  bool compute_joint_positions(const sixvector &pose, sixvector &joint_positions)
+  // cartesian_to_joint
+  bool cartesian_to_joint(const Pose &pose, std::array<double, 6> &joint_positions)
   {
 
   }
 
-  /**
-  *
-  */
-  static Trajectory1D trapezoidal_trajectory(const TrajectoryParams &params)
+  /*static Trajectory1D trapezoidal_trajectory(const TrajectoryParams &params)
   {
 
   }
 
-
-  /**
-  *
-  */
   static Trajectory1D cubic_poly_trajectory(const TrajectoryParams &params)
   {
 
   }
 
-
-  /**
-  *
-  */
   static Trajectory1D quintic_poly_trajectory(const TrajectoryParams &params)
   {
 
   }
 
-  static Trajectory1D optimal_trajectory(const TrajectoryParams &params, Trajectory2Cost cost_function)
+  static Trajectory1D optimal_trajectory(const TrajectoryParams &params,
+      std::function<double (Trajectory6D &)> cost_function)
   {
 
-  }
+  }*/
 };
 
 #endif
