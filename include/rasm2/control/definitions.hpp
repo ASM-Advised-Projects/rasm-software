@@ -11,16 +11,6 @@
 /**
  *
  */
-typedef std::array<double, 6> sixvector;
-
-/**
- *
- */
-typedef double (Time2Pos)(int);
-
-/**
- *
- */
 enum Joint
 {
   BASE,
@@ -34,25 +24,8 @@ enum Joint
 /**
  *
  */
-struct TrajectoryParams
-{
-  double initial_pos;
-  double via_pos = std::numeric_limits<double>::quiet_NaN();
-  double final_pos;
-  double initial_vel;
-  double final_vel;
-  double initial_acc;
-  double final_acc;
-  double max_vel;
-  double max_acc;
-};
-
-/**
- *
- */
 struct JointLinkKinematics
 {
-
 double base_link_min_height;
 double base_link_max_height;
 double shoulder_link_length;
