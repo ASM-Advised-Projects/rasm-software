@@ -10,8 +10,8 @@
 #include "rasm2/logging.hpp"
 
 /**
- * A subclass of LogManagerImpl that exposes all it's inherited protected
- * methods as public methods so they can be tested.
+ * A subclass of LogManagerImpl that exposes all it's protected methods as
+ * public methods so they can be tested.
  */
 class LogManagerImplSub : protected LogManagerImpl
 {
@@ -125,7 +125,7 @@ public:
     manager.notice_flush = false;
     manager.warning_flush = false;
 
-    usleep(1000*1000);
+    usleep(1100*1000);
     CPPUNIT_ASSERT(manager.notice_flush);
     CPPUNIT_ASSERT(manager.warning_flush);
   }
@@ -189,10 +189,9 @@ public:
         int time1sec = std::atoi(time1.SS.c_str());
         if (time1sec < 59)
         {
-          CPPUNIT_ASSERT(time2.SS == time1.SS);
+          CPPUNIT_ASSERT(time2.MM == time1.MM);
         }
       }
-      CPPUNIT_ASSERT(time2.MM == time1.MM);
       CPPUNIT_ASSERT(time2.HH == time1.HH);
     }
   }
