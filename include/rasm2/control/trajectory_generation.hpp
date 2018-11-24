@@ -17,12 +17,15 @@ class TrajectoryGenerator
 public:
   TrajectoryGenerator(JointLinkKinematics params)
   {
+    
 
   }
 
   int compute_trajectory(const sixvector &current_pose, const sixvector &final_pose,
       const sixvector &face_pose, Trajectory6D &trajectory)
   {
+    //double theta0 = theta_s;
+    //double thetatf = theta_f;
 
   }
 
@@ -64,10 +67,10 @@ public:
 
   }
 
-  static Trajectory1D optimal_trajectory(const TrajectoryParams &params, Trajectory2Cost cost_function)
-  {
-
-  }
+//  static Trajectory1D optimal_trajectory(const TrajectoryParams &params, Trajectory2Cost cost_function)
+//  {
+//
+//  }
 };
 
 #endif
