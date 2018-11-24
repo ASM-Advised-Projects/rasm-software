@@ -43,17 +43,19 @@ def run_incoming_pipe():
         pass
 
 if __name__ == "__main__":
-    if len(sys.argv) > 2:
-        serial_port = serial.Serial(sys.argv[1], int(sys.argv[2]))
-        serial_port.timeout = 0.1;
+    if len(sys.argv) != 3:
+        print("Exactly two command line arguments are required.")
 
-        outpipe_thread = threading.Thread(target=run_outgoing_pipe)
-        inpipe_thread = threading.Thread(target=run_incoming_pipe)
+    serial_port = serial.Serial(sys.argv[1], int(sys.argv[2]))
+    serial_port.timeout = 0.1;
 
-        outpipe_thread.start()
-        inpipe_thread.start()
+    outpipe_thread = threading.Thread(target=run_outgoing_pipe)
+    inpipe_thread = threading.Thread(target=run_incoming_pipe)
 
-        outpipe_thread.join()
-        closing = True
-        inpipe_thread.join()
-        serial_port.close()
+    outpipe_thread.start()
+    inpipe_thread.start()
+
+    outpipe_thread.join()
+    closing = True
+    inpipe_thread.join()
+    serial_port.close()

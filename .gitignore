@@ -46,6 +46,7 @@ bin/
 
 # specific to Visual Studio Code
 .vscode/
+.cquery
 
 # personal worklist
 TODO.txt

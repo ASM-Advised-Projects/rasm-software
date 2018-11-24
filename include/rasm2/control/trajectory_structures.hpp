@@ -8,8 +8,6 @@
 #include <vector>
 #include <map>
 
-#include "definitions.hpp"
-
 /**
  *
  */
@@ -18,16 +16,16 @@ class TrajectorySegment
 private:
   std::vector<double> times;
   std::vector<double> positions;
-  Time2Pos position_func;
+  std::function<double (int)> position_function;
 
 public:
-  TrajectorySegment(std::vector<double> times, std::vector<double> positions)
+  TrajectorySegment(const std::vector<double> &times, const std::vector<double> &positions)
   {
     this->times = times;
     this->positions = positions;
   }
 
-  TrajectorySegment(int start_time, int end_time, Time2Pos function)
+  TrajectorySegment(int start_time, int end_time, const std::function<double (int)> &time_to_pos)
   {
     times = std::vector<double>(2);
     positions = std::vector<double>(2);
@@ -38,7 +36,7 @@ public:
     //position_func = function;
   }
 
-  double position(int time_ms)
+  double position(int time_millis)
   {
 
   }
@@ -121,7 +119,7 @@ public:
     trajectories[joint] = trajectory;
   }
 
-  double position(Joint joint, int time_ms)
+  double position(Joint joint, int time_millis)
   {
 
   }
