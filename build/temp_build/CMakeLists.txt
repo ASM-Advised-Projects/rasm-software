@@ -12,7 +12,7 @@ add_executable(camera_calibration
   /home/browse/Documents/fall_2018/me4010/lib/lib/download/opencv-3.4.1/samples/cpp/tutorial_code/calib3d/camera_calibration/camera_calibration.cpp)
 target_link_libraries(temp_main dlib::dlib)
 target_link_libraries(video_test_shape dlib::dlib)
-target_compile_definitions(video_test_shape PRIVATE FILES)
+#target_compile_definitions(video_test_shape PRIVATE FILES)
 #target_link_libraries(temp_main opencv::opencv)
 target_link_libraries( temp_main ${OpenCV_LIBS} )
 target_link_libraries( video_test_shape ${OpenCV_LIBS} )

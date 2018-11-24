@@ -270,6 +270,7 @@ int main(int argc, char** argv)
             }
 
         //press esc to end
+        cv::namedWindow( "demo", cv::WINDOW_NORMAL);
         cv::imshow("demo", temp);
         unsigned char key = cv::waitKey(1);
         if (key == 27)
