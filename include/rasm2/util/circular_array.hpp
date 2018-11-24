@@ -5,10 +5,6 @@
 #ifndef RASM2_UTIL_CIRCULAR_ARRAY_HPP
 #define RASM2_UTIL_CIRCULAR_ARRAY_HPP
 
-#include <vector>
-
-using std::vector;
-
 /**
  * This class represents a ring buffer of numeric values. It's basically a
  * fixed-size array that will remove the oldest values in order to add new
