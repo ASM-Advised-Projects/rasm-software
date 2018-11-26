@@ -7,7 +7,8 @@
 
 #include "definitions.hpp"
 #include "trajectory_structures.hpp"
-#include "rasm2/util/pose.hpp"
+//TODO: fix the include here
+#include "../../rasm2/util/pose.hpp"
 
 /**
  * realizable trajectory – all trajectory points are reachable with no singularites (inf joint velocities)

@@ -7,6 +7,7 @@
 
 #include <vector>
 #include <map>
+#include <functional>
 
 /**
  *
@@ -31,8 +32,8 @@ public:
     positions = std::vector<double>(2);
     times[0] = (double)start_time;
     times[1] = (double)end_time;
-    positions[0] = function(start_time);
-    positions[1] = function(end_time);
+    positions[0] = time_to_pos(start_time);
+    positions[1] = time_to_pos(end_time);
     //position_func = function;
   }
 
