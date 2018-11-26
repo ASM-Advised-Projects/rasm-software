@@ -34,7 +34,7 @@ public:
     times[1] = (double)end_time;
     positions[0] = time_to_pos(start_time);
     positions[1] = time_to_pos(end_time);
-    //position_func = function;
+    position_function = time_to_pos;
   }
 
   double position(int time_millis)
