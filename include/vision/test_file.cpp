@@ -45,9 +45,8 @@ int main(int argc, char** argv)
     if(!strcmp(argv[1], "--marker"))
     {
       std::cout << "The marker will be detected" << std::endl;
-      detector = dlib::get_frontal_face_detector();
 
-      //dlib::deserialize("/home/browse/Documents/fall_2018/me4010/rasm-v2/test/filesysroot/rasm_2_1/data/vision/detection/images/detector.svm") >> detector;
+      dlib::deserialize("/home/browse/Documents/fall_2018/me4010/rasm-v2/test/filesysroot/rasm_2_1/data/vision/detection/images/detector.svm") >> detector;
       dlib::deserialize("/home/browse/Documents/fall_2018/me4010/rasm-v2/test/filesysroot/rasm_2_1/data/vision/detection/images/sp.dat") >> predictor;
     }
     else
