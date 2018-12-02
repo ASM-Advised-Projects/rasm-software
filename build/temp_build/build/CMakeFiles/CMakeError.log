@@ -1,0 +1,97 @@
+Determining if the pthread_create exist failed with the following output:
+Change Dir: /home/browse/Documents/fall_2018/me4010/rasm-v2/build/temp_build/build/CMakeFiles/CMakeTmp
+
+Run Build Command:"/usr/bin/make" "cmTC_69599/fast"
+/usr/bin/make -f CMakeFiles/cmTC_69599.dir/build.make CMakeFiles/cmTC_69599.dir/build
+make[1]: Entering directory '/home/browse/Documents/fall_2018/me4010/rasm-v2/build/temp_build/build/CMakeFiles/CMakeTmp'
+Building C object CMakeFiles/cmTC_69599.dir/CheckSymbolExists.c.o
+/usr/bin/cc    -o CMakeFiles/cmTC_69599.dir/CheckSymbolExists.c.o   -c /home/browse/Documents/fall_2018/me4010/rasm-v2/build/temp_build/build/CMakeFiles/CMakeTmp/CheckSymbolExists.c
+Linking C executable cmTC_69599
+/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTC_69599.dir/link.txt --verbose=1
+/usr/bin/cc      -rdynamic CMakeFiles/cmTC_69599.dir/CheckSymbolExists.c.o  -o cmTC_69599 
+CMakeFiles/cmTC_69599.dir/CheckSymbolExists.c.o: In function `main':
+CheckSymbolExists.c:(.text+0x1b): undefined reference to `pthread_create'
+collect2: error: ld returned 1 exit status
+CMakeFiles/cmTC_69599.dir/build.make:97: recipe for target 'cmTC_69599' failed
+make[1]: *** [cmTC_69599] Error 1
+make[1]: Leaving directory '/home/browse/Documents/fall_2018/me4010/rasm-v2/build/temp_build/build/CMakeFiles/CMakeTmp'
+Makefile:126: recipe for target 'cmTC_69599/fast' failed
+make: *** [cmTC_69599/fast] Error 2
+
+File /home/browse/Documents/fall_2018/me4010/rasm-v2/build/temp_build/build/CMakeFiles/CMakeTmp/CheckSymbolExists.c:
+/* */
+#include <pthread.h>
+
+int main(int argc, char** argv)
+{
+  (void)argv;
+#ifndef pthread_create
+  return ((int*)(&pthread_create))[argc];
+#else
+  (void)argc;
+  return 0;
+#endif
+}
+
+Determining if the function pthread_create exists in the pthreads failed with the following output:
+Change Dir: /home/browse/Documents/fall_2018/me4010/rasm-v2/build/temp_build/build/CMakeFiles/CMakeTmp
+
+Run Build Command:"/usr/bin/make" "cmTC_33ca8/fast"
+/usr/bin/make -f CMakeFiles/cmTC_33ca8.dir/build.make CMakeFiles/cmTC_33ca8.dir/build
+make[1]: Entering directory '/home/browse/Documents/fall_2018/me4010/rasm-v2/build/temp_build/build/CMakeFiles/CMakeTmp'
+Building C object CMakeFiles/cmTC_33ca8.dir/CheckFunctionExists.c.o
+/usr/bin/cc   -DCHECK_FUNCTION_EXISTS=pthread_create   -o CMakeFiles/cmTC_33ca8.dir/CheckFunctionExists.c.o   -c /usr/share/cmake-3.10/Modules/CheckFunctionExists.c
+Linking C executable cmTC_33ca8
+/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTC_33ca8.dir/link.txt --verbose=1
+/usr/bin/cc  -DCHECK_FUNCTION_EXISTS=pthread_create    -rdynamic CMakeFiles/cmTC_33ca8.dir/CheckFunctionExists.c.o  -o cmTC_33ca8 -lpthreads 
+/usr/bin/ld: cannot find -lpthreads
+collect2: error: ld returned 1 exit status
+CMakeFiles/cmTC_33ca8.dir/build.make:97: recipe for target 'cmTC_33ca8' failed
+make[1]: *** [cmTC_33ca8] Error 1
+make[1]: Leaving directory '/home/browse/Documents/fall_2018/me4010/rasm-v2/build/temp_build/build/CMakeFiles/CMakeTmp'
+Makefile:126: recipe for target 'cmTC_33ca8/fast' failed
+make: *** [cmTC_33ca8/fast] Error 2
+
+
+Determining if the function sgesv exists failed with the following output:
+Change Dir: /home/browse/Documents/fall_2018/me4010/rasm-v2/build/temp_build/build/CMakeFiles/CMakeTmp
+
+Run Build Command:"/usr/bin/make" "cmTC_bac0d/fast"
+/usr/bin/make -f CMakeFiles/cmTC_bac0d.dir/build.make CMakeFiles/cmTC_bac0d.dir/build
+make[1]: Entering directory '/home/browse/Documents/fall_2018/me4010/rasm-v2/build/temp_build/build/CMakeFiles/CMakeTmp'
+Building C object CMakeFiles/cmTC_bac0d.dir/CheckFunctionExists.c.o
+/usr/bin/cc   -DCHECK_FUNCTION_EXISTS=sgesv   -o CMakeFiles/cmTC_bac0d.dir/CheckFunctionExists.c.o   -c /usr/share/cmake-3.10/Modules/CheckFunctionExists.c
+Linking C executable cmTC_bac0d
+/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTC_bac0d.dir/link.txt --verbose=1
+/usr/bin/cc  -DCHECK_FUNCTION_EXISTS=sgesv    -rdynamic CMakeFiles/cmTC_bac0d.dir/CheckFunctionExists.c.o  -o cmTC_bac0d 
+CMakeFiles/cmTC_bac0d.dir/CheckFunctionExists.c.o: In function `main':
+CheckFunctionExists.c:(.text+0x10): undefined reference to `sgesv'
+collect2: error: ld returned 1 exit status
+CMakeFiles/cmTC_bac0d.dir/build.make:97: recipe for target 'cmTC_bac0d' failed
+make[1]: *** [cmTC_bac0d] Error 1
+make[1]: Leaving directory '/home/browse/Documents/fall_2018/me4010/rasm-v2/build/temp_build/build/CMakeFiles/CMakeTmp'
+Makefile:126: recipe for target 'cmTC_bac0d/fast' failed
+make: *** [cmTC_bac0d/fast] Error 2
+
+
+Determining if the function sgesv_ exists failed with the following output:
+Change Dir: /home/browse/Documents/fall_2018/me4010/rasm-v2/build/temp_build/build/CMakeFiles/CMakeTmp
+
+Run Build Command:"/usr/bin/make" "cmTC_fa76d/fast"
+/usr/bin/make -f CMakeFiles/cmTC_fa76d.dir/build.make CMakeFiles/cmTC_fa76d.dir/build
+make[1]: Entering directory '/home/browse/Documents/fall_2018/me4010/rasm-v2/build/temp_build/build/CMakeFiles/CMakeTmp'
+Building C object CMakeFiles/cmTC_fa76d.dir/CheckFunctionExists.c.o
+/usr/bin/cc   -DCHECK_FUNCTION_EXISTS=sgesv_   -o CMakeFiles/cmTC_fa76d.dir/CheckFunctionExists.c.o   -c /usr/share/cmake-3.10/Modules/CheckFunctionExists.c
+Linking C executable cmTC_fa76d
+/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTC_fa76d.dir/link.txt --verbose=1
+/usr/bin/cc  -DCHECK_FUNCTION_EXISTS=sgesv_    -rdynamic CMakeFiles/cmTC_fa76d.dir/CheckFunctionExists.c.o  -o cmTC_fa76d 
+CMakeFiles/cmTC_fa76d.dir/CheckFunctionExists.c.o: In function `main':
+CheckFunctionExists.c:(.text+0x10): undefined reference to `sgesv_'
+collect2: error: ld returned 1 exit status
+CMakeFiles/cmTC_fa76d.dir/build.make:97: recipe for target 'cmTC_fa76d' failed
+make[1]: *** [cmTC_fa76d] Error 1
+make[1]: Leaving directory '/home/browse/Documents/fall_2018/me4010/rasm-v2/build/temp_build/build/CMakeFiles/CMakeTmp'
+Makefile:126: recipe for target 'cmTC_fa76d/fast' failed
+make: *** [cmTC_fa76d/fast] Error 2
+
+

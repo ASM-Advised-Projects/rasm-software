@@ -1,0 +1,34 @@
+#IncludeRegexLine: ^[ 	]*[#%][ 	]*(include|import)[ 	]*[<"]([^">]+)([">])
+
+#IncludeRegexScan: ^.*$
+
+#IncludeRegexComplain: ^$
+
+#IncludeRegexTransform: 
+
+/home/browse/Documents/fall_2018/me4010/lib/lib/download/opencv-3.4.1/samples/cpp/tutorial_code/calib3d/camera_calibration/camera_calibration.cpp
+iostream
+-
+sstream
+-
+string
+-
+ctime
+-
+cstdio
+-
+opencv2/core.hpp
+-
+opencv2/core/utility.hpp
+-
+opencv2/imgproc.hpp
+-
+opencv2/calib3d.hpp
+-
+opencv2/imgcodecs.hpp
+-
+opencv2/videoio.hpp
+-
+opencv2/highgui.hpp
+-
+

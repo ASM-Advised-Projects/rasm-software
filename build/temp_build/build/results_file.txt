@@ -1,0 +1,539 @@
+
+trans_vec 1: 211
+trans_vec 2: 2.4e-321
+trans_vec 3: 3.16e-322
+rot_vec 1: -0.359
+rot_vec 2: 486
+rot_vec 3: 3.16e-322
+
+trans_vec 1: 335
+trans_vec 2: 2.4e-321
+trans_vec 3: 3.16e-322
+rot_vec 1: -0.0905
+rot_vec 2: 486
+rot_vec 3: 3.16e-322
+
+trans_vec 1: 307
+trans_vec 2: 2.4e-321
+trans_vec 3: 3.16e-322
+rot_vec 1: -0.126
+rot_vec 2: 486
+rot_vec 3: 3.16e-322
+
+trans_vec 1: 275
+trans_vec 2: 2.4e-321
+trans_vec 3: 3.16e-322
+rot_vec 1: -0.09
+rot_vec 2: 486
+rot_vec 3: 3.16e-322
+
+trans_vec 1: 199
+trans_vec 2: 2.4e-321
+trans_vec 3: 3.16e-322
+rot_vec 1: -0.288
+rot_vec 2: 486
+rot_vec 3: 3.16e-322
+
+trans_vec 1: 199
+trans_vec 2: 2.4e-321
+trans_vec 3: 3.16e-322
+rot_vec 1: -0.294
+rot_vec 2: 486
+rot_vec 3: 3.16e-322
+
+trans_vec 1: 199
+trans_vec 2: 2.4e-321
+trans_vec 3: 3.16e-322
+rot_vec 1: -0.291
+rot_vec 2: 486
+rot_vec 3: 3.16e-322
+
+trans_vec 1: 222
+trans_vec 2: 2.4e-321
+trans_vec 3: 3.16e-322
+rot_vec 1: -0.247
+rot_vec 2: 486
+rot_vec 3: 3.16e-322
+
+trans_vec 1: 318
+trans_vec 2: 2.4e-321
+trans_vec 3: 3.16e-322
+rot_vec 1: -0.102
+rot_vec 2: 486
+rot_vec 3: 3.16e-322
+
+trans_vec 1: 330
+trans_vec 2: 2.4e-321
+trans_vec 3: 3.16e-322
+rot_vec 1: -0.094
+rot_vec 2: 486
+rot_vec 3: 3.16e-322
+
+trans_vec 1: 326
+trans_vec 2: 2.4e-321
+trans_vec 3: 3.16e-322
+rot_vec 1: -0.0903
+rot_vec 2: 486
+rot_vec 3: 3.16e-322
+
+trans_vec 1: 322
+trans_vec 2: 2.4e-321
+trans_vec 3: 3.16e-322
+rot_vec 1: -0.0954
+rot_vec 2: 486
+rot_vec 3: 3.16e-322
+
+trans_vec 1: 326
+trans_vec 2: 2.4e-321
+trans_vec 3: 3.16e-322
+rot_vec 1: -0.0902
+rot_vec 2: 486
+rot_vec 3: 3.16e-322
+
+trans_vec 1: 326
+trans_vec 2: 2.4e-321
+trans_vec 3: 3.16e-322
+rot_vec 1: -0.0929
+rot_vec 2: 486
+rot_vec 3: 3.16e-322
+
+trans_vec 1: 200
+trans_vec 2: 2.4e-321
+trans_vec 3: 3.16e-322
+rot_vec 1: -0.293
+rot_vec 2: 486
+rot_vec 3: 3.16e-322
+
+trans_vec 1: 222
+trans_vec 2: 2.4e-321
+trans_vec 3: 3.16e-322
+rot_vec 1: -0.244
+rot_vec 2: 486
+rot_vec 3: 3.16e-322
+
+trans_vec 1: 222
+trans_vec 2: 2.4e-321
+trans_vec 3: 3.16e-322
+rot_vec 1: -0.242
+rot_vec 2: 486
+rot_vec 3: 3.16e-322
+
+trans_vec 1: 223
+trans_vec 2: 2.4e-321
+trans_vec 3: 3.16e-322
+rot_vec 1: -0.248
+rot_vec 2: 486
+rot_vec 3: 3.16e-322
+
+trans_vec 1: 222
+trans_vec 2: 2.4e-321
+trans_vec 3: 3.16e-322
+rot_vec 1: -0.244
+rot_vec 2: 486
+rot_vec 3: 3.16e-322
+
+trans_vec 1: 222
+trans_vec 2: 2.4e-321
+trans_vec 3: 3.16e-322
+rot_vec 1: -0.237
+rot_vec 2: 486
+rot_vec 3: 3.16e-322
+
+trans_vec 1: 222
+trans_vec 2: 2.4e-321
+trans_vec 3: 3.16e-322
+rot_vec 1: -0.239
+rot_vec 2: 486
+rot_vec 3: 3.16e-322
+
+trans_vec 1: 222
+trans_vec 2: 2.4e-321
+trans_vec 3: 3.16e-322
+rot_vec 1: -0.243
+rot_vec 2: 486
+rot_vec 3: 3.16e-322
+
+trans_vec 1: 223
+trans_vec 2: 2.4e-321
+trans_vec 3: 3.16e-322
+rot_vec 1: -0.243
+rot_vec 2: 486
+rot_vec 3: 3.16e-322
+
+trans_vec 1: 327
+trans_vec 2: 2.4e-321
+trans_vec 3: 3.16e-322
+rot_vec 1: -0.0912
+rot_vec 2: 486
+rot_vec 3: 3.16e-322
+
+trans_vec 1: 47.1
+trans_vec 2: 2.4e-321
+trans_vec 3: 3.16e-322
+rot_vec 1: 0.366
+rot_vec 2: 486
+rot_vec 3: 3.16e-322
+
+trans_vec 1: -66.2
+trans_vec 2: 2.4e-321
+trans_vec 3: 3.16e-322
+rot_vec 1: 0.774
+rot_vec 2: 486
+rot_vec 3: 3.16e-322
+
+trans_vec 1: 143
+trans_vec 2: 2.4e-321
+trans_vec 3: 3.16e-322
+rot_vec 1: 0.128
+rot_vec 2: 486
+rot_vec 3: 3.16e-322
+
+trans_vec 1: 225
+trans_vec 2: 2.4e-321
+trans_vec 3: 3.16e-322
+rot_vec 1: 0.0372
+rot_vec 2: 486
+rot_vec 3: 3.16e-322
+
+trans_vec 1: 180
+trans_vec 2: 2.4e-321
+trans_vec 3: 3.16e-322
+rot_vec 1: -0.221
+rot_vec 2: 486
+rot_vec 3: 3.16e-322
+
+trans_vec 1: 210
+trans_vec 2: 2.4e-321
+trans_vec 3: 3.16e-322
+rot_vec 1: 0.418
+rot_vec 2: 486
+rot_vec 3: 3.16e-322
+
+trans_vec 1: 179
+trans_vec 2: 2.4e-321
+trans_vec 3: 3.16e-322
+rot_vec 1: -0.218
+rot_vec 2: 486
+rot_vec 3: 3.16e-322
+
+trans_vec 1: 177
+trans_vec 2: 2.4e-321
+trans_vec 3: 3.16e-322
+rot_vec 1: -0.395
+rot_vec 2: 486
+rot_vec 3: 3.16e-322
+
+trans_vec 1: 179
+trans_vec 2: 2.4e-321
+trans_vec 3: 3.16e-322
+rot_vec 1: -0.218
+rot_vec 2: 486
+rot_vec 3: 3.16e-322
+
+trans_vec 1: 178
+trans_vec 2: 2.4e-321
+trans_vec 3: 3.16e-322
+rot_vec 1: -0.398
+rot_vec 2: 486
+rot_vec 3: 3.16e-322
+
+trans_vec 1: 178
+trans_vec 2: 2.4e-321
+trans_vec 3: 3.16e-322
+rot_vec 1: -0.395
+rot_vec 2: 486
+rot_vec 3: 3.16e-322
+
+trans_vec 1: 180
+trans_vec 2: 2.4e-321
+trans_vec 3: 3.16e-322
+rot_vec 1: -0.217
+rot_vec 2: 486
+rot_vec 3: 3.16e-322
+
+trans_vec 1: 196
+trans_vec 2: 2.4e-321
+trans_vec 3: 3.16e-322
+rot_vec 1: -0.0757
+rot_vec 2: 486
+rot_vec 3: 3.16e-322
+
+trans_vec 1: 183
+trans_vec 2: 2.4e-321
+trans_vec 3: 3.16e-322
+rot_vec 1: -0.217
+rot_vec 2: 486
+rot_vec 3: 3.16e-322
+
+trans_vec 1: 196
+trans_vec 2: 2.4e-321
+trans_vec 3: 3.16e-322
+rot_vec 1: -0.0741
+rot_vec 2: 486
+rot_vec 3: 3.16e-322
+
+trans_vec 1: 196
+trans_vec 2: 2.4e-321
+trans_vec 3: 3.16e-322
+rot_vec 1: -0.0737
+rot_vec 2: 486
+rot_vec 3: 3.16e-322
+
+trans_vec 1: 180
+trans_vec 2: 2.4e-321
+trans_vec 3: 3.16e-322
+rot_vec 1: -0.217
+rot_vec 2: 486
+rot_vec 3: 3.16e-322
+
+trans_vec 1: 180
+trans_vec 2: 2.4e-321
+trans_vec 3: 3.16e-322
+rot_vec 1: -0.217
+rot_vec 2: 486
+rot_vec 3: 3.16e-322
+
+trans_vec 1: 197
+trans_vec 2: 2.4e-321
+trans_vec 3: 3.16e-322
+rot_vec 1: -0.0722
+rot_vec 2: 486
+rot_vec 3: 3.16e-322
+
+trans_vec 1: 178
+trans_vec 2: 2.4e-321
+trans_vec 3: 3.16e-322
+rot_vec 1: -0.391
+rot_vec 2: 486
+rot_vec 3: 3.16e-322
+
+trans_vec 1: 181
+trans_vec 2: 2.4e-321
+trans_vec 3: 3.16e-322
+rot_vec 1: -0.217
+rot_vec 2: 486
+rot_vec 3: 3.16e-322
+
+trans_vec 1: 178
+trans_vec 2: 2.4e-321
+trans_vec 3: 3.16e-322
+rot_vec 1: -0.389
+rot_vec 2: 486
+rot_vec 3: 3.16e-322
+
+trans_vec 1: 181
+trans_vec 2: 2.4e-321
+trans_vec 3: 3.16e-322
+rot_vec 1: -0.214
+rot_vec 2: 486
+rot_vec 3: 3.16e-322
+
+trans_vec 1: 178
+trans_vec 2: 2.4e-321
+trans_vec 3: 3.16e-322
+rot_vec 1: -0.388
+rot_vec 2: 486
+rot_vec 3: 3.16e-322
+
+trans_vec 1: 197
+trans_vec 2: 2.4e-321
+trans_vec 3: 3.16e-322
+rot_vec 1: -0.0687
+rot_vec 2: 486
+rot_vec 3: 3.16e-322
+
+trans_vec 1: 197
+trans_vec 2: 2.4e-321
+trans_vec 3: 3.16e-322
+rot_vec 1: -0.0687
+rot_vec 2: 486
+rot_vec 3: 3.16e-322
+
+trans_vec 1: 197
+trans_vec 2: 2.4e-321
+trans_vec 3: 3.16e-322
+rot_vec 1: -0.0692
+rot_vec 2: 486
+rot_vec 3: 3.16e-322
+
+trans_vec 1: 184
+trans_vec 2: 2.4e-321
+trans_vec 3: 3.16e-322
+rot_vec 1: -0.211
+rot_vec 2: 486
+rot_vec 3: 3.16e-322
+
+trans_vec 1: 181
+trans_vec 2: 2.4e-321
+trans_vec 3: 3.16e-322
+rot_vec 1: -0.213
+rot_vec 2: 486
+rot_vec 3: 3.16e-322
+
+trans_vec 1: 178
+trans_vec 2: 2.4e-321
+trans_vec 3: 3.16e-322
+rot_vec 1: -0.391
+rot_vec 2: 486
+rot_vec 3: 3.16e-322
+
+trans_vec 1: 178
+trans_vec 2: 2.4e-321
+trans_vec 3: 3.16e-322
+rot_vec 1: -0.392
+rot_vec 2: 486
+rot_vec 3: 3.16e-322
+
+trans_vec 1: 178
+trans_vec 2: 2.4e-321
+trans_vec 3: 3.16e-322
+rot_vec 1: -0.389
+rot_vec 2: 486
+rot_vec 3: 3.16e-322
+
+trans_vec 1: 178
+trans_vec 2: 2.4e-321
+trans_vec 3: 3.16e-322
+rot_vec 1: -0.391
+rot_vec 2: 486
+rot_vec 3: 3.16e-322
+
+trans_vec 1: 180
+trans_vec 2: 2.4e-321
+trans_vec 3: 3.16e-322
+rot_vec 1: -0.215
+rot_vec 2: 486
+rot_vec 3: 3.16e-322
+
+trans_vec 1: 181
+trans_vec 2: 2.4e-321
+trans_vec 3: 3.16e-322
+rot_vec 1: -0.215
+rot_vec 2: 486
+rot_vec 3: 3.16e-322
+
+trans_vec 1: 197
+trans_vec 2: 2.4e-321
+trans_vec 3: 3.16e-322
+rot_vec 1: -0.0714
+rot_vec 2: 486
+rot_vec 3: 3.16e-322
+
+trans_vec 1: 181
+trans_vec 2: 2.4e-321
+trans_vec 3: 3.16e-322
+rot_vec 1: -0.213
+rot_vec 2: 486
+rot_vec 3: 3.16e-322
+
+trans_vec 1: 178
+trans_vec 2: 2.4e-321
+trans_vec 3: 3.16e-322
+rot_vec 1: -0.389
+rot_vec 2: 486
+rot_vec 3: 3.16e-322
+
+trans_vec 1: 197
+trans_vec 2: 2.4e-321
+trans_vec 3: 3.16e-322
+rot_vec 1: -0.0701
+rot_vec 2: 486
+rot_vec 3: 3.16e-322
+
+trans_vec 1: 197
+trans_vec 2: 2.4e-321
+trans_vec 3: 3.16e-322
+rot_vec 1: -0.0718
+rot_vec 2: 486
+rot_vec 3: 3.16e-322
+
+trans_vec 1: 181
+trans_vec 2: 2.4e-321
+trans_vec 3: 3.16e-322
+rot_vec 1: -0.212
+rot_vec 2: 486
+rot_vec 3: 3.16e-322
+
+trans_vec 1: 197
+trans_vec 2: 2.4e-321
+trans_vec 3: 3.16e-322
+rot_vec 1: -0.0726
+rot_vec 2: 486
+rot_vec 3: 3.16e-322
+
+trans_vec 1: 197
+trans_vec 2: 2.4e-321
+trans_vec 3: 3.16e-322
+rot_vec 1: -0.0726
+rot_vec 2: 486
+rot_vec 3: 3.16e-322
+
+trans_vec 1: 176
+trans_vec 2: 2.4e-321
+trans_vec 3: 3.16e-322
+rot_vec 1: -0.235
+rot_vec 2: 486
+rot_vec 3: 3.16e-322
+
+trans_vec 1: 176
+trans_vec 2: 2.4e-321
+trans_vec 3: 3.16e-322
+rot_vec 1: -0.234
+rot_vec 2: 486
+rot_vec 3: 3.16e-322
+
+trans_vec 1: 197
+trans_vec 2: 2.4e-321
+trans_vec 3: 3.16e-322
+rot_vec 1: -0.0725
+rot_vec 2: 486
+rot_vec 3: 3.16e-322
+
+trans_vec 1: 176
+trans_vec 2: 2.4e-321
+trans_vec 3: 3.16e-322
+rot_vec 1: -0.233
+rot_vec 2: 486
+rot_vec 3: 3.16e-322
+
+trans_vec 1: 176
+trans_vec 2: 2.4e-321
+trans_vec 3: 3.16e-322
+rot_vec 1: -0.234
+rot_vec 2: 486
+rot_vec 3: 3.16e-322
+
+trans_vec 1: 176
+trans_vec 2: 2.4e-321
+trans_vec 3: 3.16e-322
+rot_vec 1: -0.23
+rot_vec 2: 486
+rot_vec 3: 3.16e-322
+
+trans_vec 1: 176
+trans_vec 2: 2.4e-321
+trans_vec 3: 3.16e-322
+rot_vec 1: -0.231
+rot_vec 2: 486
+rot_vec 3: 3.16e-322
+
+trans_vec 1: 176
+trans_vec 2: 2.4e-321
+trans_vec 3: 3.16e-322
+rot_vec 1: -0.232
+rot_vec 2: 486
+rot_vec 3: 3.16e-322
+
+trans_vec 1: 197
+trans_vec 2: 2.4e-321
+trans_vec 3: 3.16e-322
+rot_vec 1: -0.0727
+rot_vec 2: 486
+rot_vec 3: 3.16e-322
+
+trans_vec 1: 197
+trans_vec 2: 2.4e-321
+trans_vec 3: 3.16e-322
+rot_vec 1: -0.0719
+rot_vec 2: 486
+rot_vec 3: 3.16e-322

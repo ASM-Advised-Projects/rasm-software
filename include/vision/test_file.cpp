@@ -45,7 +45,9 @@ int main(int argc, char** argv)
     if(!strcmp(argv[1], "--marker"))
     {
       std::cout << "The marker will be detected" << std::endl;
-      dlib::deserialize("/home/browse/Documents/fall_2018/me4010/rasm-v2/test/filesysroot/rasm_2_1/data/vision/detection/images/detector.svm") >> detector;
+      detector = dlib::get_frontal_face_detector();
+
+      //dlib::deserialize("/home/browse/Documents/fall_2018/me4010/rasm-v2/test/filesysroot/rasm_2_1/data/vision/detection/images/detector.svm") >> detector;
       dlib::deserialize("/home/browse/Documents/fall_2018/me4010/rasm-v2/test/filesysroot/rasm_2_1/data/vision/detection/images/sp.dat") >> predictor;
     }
     else
@@ -149,6 +151,7 @@ int main(int argc, char** argv)
         // Find the pose of each face
         if (faces.size() > 0)
             {
+            std::cout << "DETECTED " << faces.size() << std::endl << std::endl;
             //track features
             dlib::full_object_detection shape = predictor(cimg, faces[0]);
 
@@ -211,25 +214,25 @@ int main(int argc, char** argv)
             cv::decomposeProjectionMatrix(pose_mat, out_intrinsics, out_rotation, out_translation, cv::noArray(), cv::noArray(), cv::noArray(), euler_angle);
 
                           //show angle result
-            //outtext << "X: " << std::setprecision(3) << euler_angle.at<double>(0);
-            outtext << "trans_vec 1: " << std::setprecision(3) << translation_vec.at<double>(1, 1);
+            outtext << "X: " << std::setprecision(3) << euler_angle.at<double>(0);
+            //outtext << "trans_vec 1: " << std::setprecision(3) << translation_vec.at<double>(1, 1);
             cv::putText(temp, outtext.str(), cv::Point(50, 40), cv::FONT_HERSHEY_SIMPLEX, 0.75, cv::Scalar(0, 0, 0));
             outtext.str("");
-            outtext << "trans_vec 2: " << std::setprecision(3) << translation_vec.at<double>(2, 1);
-            //outtext << "Y: " << std::setprecision(3) << euler_angle.at<double>(1);
+            //outtext << "trans_vec 2: " << std::setprecision(3) << translation_vec.at<double>(2, 1);
+            outtext << "Y: " << std::setprecision(3) << euler_angle.at<double>(1);
             cv::putText(temp, outtext.str(), cv::Point(50, 60), cv::FONT_HERSHEY_SIMPLEX, 0.75, cv::Scalar(0, 0, 0));
             outtext.str("");
-            //outtext << "Z: " << std::setprecision(3) << euler_angle.at<double>(2);
-            outtext << "trans_vec 3: " << std::setprecision(3) << translation_vec.at<double>(3, 1);
+            outtext << "Z: " << std::setprecision(3) << euler_angle.at<double>(2);
+            //outtext << "trans_vec 3: " << std::setprecision(3) << translation_vec.at<double>(3, 1);
             cv::putText(temp, outtext.str(), cv::Point(50, 80), cv::FONT_HERSHEY_SIMPLEX, 0.75, cv::Scalar(0, 0, 0));
             outtext.str("");
-            outtext << "rot_vec 1: " << std::setprecision(3) << rotation_vec.at<double>(1, 1);
+            //outtext << "rot_vec 1: " << std::setprecision(3) << rotation_vec.at<double>(1, 1);
             cv::putText(temp, outtext.str(), cv::Point(50, 100), cv::FONT_HERSHEY_SIMPLEX, 0.75, cv::Scalar(0, 0, 0));
             outtext.str("");
-            outtext << "rot_vec 2: " << std::setprecision(3) << rotation_vec.at<double>(2, 1);
+            //outtext << "rot_vec 2: " << std::setprecision(3) << rotation_vec.at<double>(2, 1);
             cv::putText(temp, outtext.str(), cv::Point(50, 120), cv::FONT_HERSHEY_SIMPLEX, 0.75, cv::Scalar(0, 0, 0));
             outtext.str("");
-            outtext << "rot_vec 3: " << std::setprecision(3) << rotation_vec.at<double>(3, 1);
+            //outtext << "rot_vec 3: " << std::setprecision(3) << rotation_vec.at<double>(3, 1);
             cv::putText(temp, outtext.str(), cv::Point(50, 140), cv::FONT_HERSHEY_SIMPLEX, 0.75, cv::Scalar(0, 0, 0));
             outtext.str("");
 

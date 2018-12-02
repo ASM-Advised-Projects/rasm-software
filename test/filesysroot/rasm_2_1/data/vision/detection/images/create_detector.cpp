@@ -67,7 +67,7 @@ int main(int argc, char** argv)
 
         typedef scan_fhog_pyramid<pyramid_down<6> > image_scanner_type;
         image_scanner_type scanner;
-        scanner.set_detection_window_size(140, 40);
+        scanner.set_detection_window_size(140, 140);
         structural_object_detection_trainer<image_scanner_type> trainer(scanner);
         trainer.set_num_threads(4);
         
