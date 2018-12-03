@@ -1,5 +1,11 @@
 /*
- * Defines the FacePoseEstimator and MarkerPoseEstimator classes.
+ * Defines the PoseEstimator class.
+ * Usage example: 
+ * PoseEstimator estimator(0); (The number here is the camera index; use 0 if you are 
+ *                                  using your built in camera, and use 1 if you are using
+ *                                  a USB camera.
+ * Pose face_pose = estimator.get_pose_face();
+ * Pose marker_pose = estimator.get_pose_marker();
  */
 
 #ifndef RASM2_VISION_POSE_ESTIMATION_HPP
