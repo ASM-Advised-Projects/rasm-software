@@ -19,6 +19,7 @@
 double K[9] = {7.3530833553043510e+02, 0.0, 320.0, 0.0, 7.3530833553043510e+02, 240.0, 0.0, 0.0, 1.0};
 double D[5] = {-2.3528667558034226e-02, 1.3301431879108856e+00, 0.0, 0.0,
     -6.0786673300480434e+00};
+typedef std::array<double, 6> Pose;
 
 
 class FacePoseEstimator
@@ -35,7 +36,7 @@ public:
         std::cout << "Unable to connect to camera" << std::endl;
         }
   }
-  void get_pose()
+  Pose get_pose()
   {
     dlib::frontal_face_detector detector;
     dlib::shape_predictor predictor;
@@ -126,9 +127,18 @@ image_pts.push_back(cv::Point2d(shape.part(17).x(), shape.part(17).y())); //#17 
             cv::decomposeProjectionMatrix(pose_mat, out_intrinsics, out_rotation, out_translation, cv::noArray(), cv::noArray(), cv::noArray(), euler_angle);
 
             image_pts.clear();
-
+      Pose pose = {
+      translation_vec.at<double>(1, 1),
+      translation_vec.at<double>(2, 1),
+      translation_vec.at<double>(3, 1),
+      rotation_vec.at<double>(1, 1),
+      rotation_vec.at<double>(2, 1),
+      rotation_vec.at<double>(3, 1)
+      };
+      return pose;
 
         }
+
   }
 
 
@@ -150,7 +160,7 @@ public:
   }
 
 
-  void get_pose()
+  Pose get_pose()
   {
     dlib::frontal_face_detector detector;
     dlib::shape_predictor predictor;
@@ -225,6 +235,17 @@ image_pts.push_back(cv::Point2d(shape.part(0).x(), shape.part(0).y())); //#57 mo
             cv::decomposeProjectionMatrix(pose_mat, out_intrinsics, out_rotation, out_translation, cv::noArray(), cv::noArray(), cv::noArray(), euler_angle);
 
             image_pts.clear();
+      Pose pose = {
+      translation_vec.at<double>(1, 1),
+      translation_vec.at<double>(2, 1),
+      translation_vec.at<double>(3, 1),
+      rotation_vec.at<double>(1, 1),
+      rotation_vec.at<double>(2, 1),
+      rotation_vec.at<double>(3, 1)
+
+      };
+
+      return pose;
 
 
         }
