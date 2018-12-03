@@ -137,9 +137,9 @@ image_pts.push_back(cv::Point2d(shape.part(17).x(), shape.part(17).y())); //#17 
       translation_vec.at<double>(1, 1),
       translation_vec.at<double>(2, 1),
       translation_vec.at<double>(3, 1),
-      rotation_vec.at<double>(1, 1),
-      rotation_vec.at<double>(2, 1),
-      rotation_vec.at<double>(3, 1)
+      euler_angle.at<double>(0),
+      euler_angle.at<double>(1),
+      euler_angle.at<double>(2)
       };
       return pose;
 
@@ -227,10 +227,9 @@ image_pts.push_back(cv::Point2d(shape.part(0).x(), shape.part(0).y())); //#57 mo
       translation_vec.at<double>(1, 1),
       translation_vec.at<double>(2, 1),
       translation_vec.at<double>(3, 1),
-      rotation_vec.at<double>(1, 1),
-      rotation_vec.at<double>(2, 1),
-      rotation_vec.at<double>(3, 1)
-
+      euler_angle.at<double>(0),
+      euler_angle.at<double>(1),
+      euler_angle.at<double>(2)
       };
 
       return pose;
