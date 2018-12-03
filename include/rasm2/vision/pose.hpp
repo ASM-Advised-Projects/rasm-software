@@ -22,13 +22,13 @@ double D[5] = {-2.3528667558034226e-02, 1.3301431879108856e+00, 0.0, 0.0,
 typedef std::array<double, 6> Pose;
 
 
-class FacePoseEstimator
+class PoseEstimator
 {
 private:
   cv::VideoCapture cap;
 
 public:
-  FacePoseEstimator(int cameraIndex)
+  PoseEstimator(int cameraIndex)
   {
     cap.open(cameraIndex);
     if (!cap.isOpened())
@@ -36,7 +36,7 @@ public:
         std::cout << "Unable to connect to camera" << std::endl;
         }
   }
-  Pose get_pose()
+  Pose get_pose_face()
   {
     dlib::frontal_face_detector detector;
     dlib::shape_predictor predictor;
@@ -140,27 +140,7 @@ image_pts.push_back(cv::Point2d(shape.part(17).x(), shape.part(17).y())); //#17 
         }
 
   }
-
-
-};
-
-class MarkerPoseEstimator 
-{
-private:
-  cv::VideoCapture cap;
-
-public:
-  MarkerPoseEstimator(int cameraIndex)
-  {
-   cap.open(cameraIndex);
-    if (!cap.isOpened())
-        {
-        std::cout << "Unable to connect to camera" << std::endl;
-        }
-  }
-
-
-  Pose get_pose()
+  Pose get_pose_marker()
   {
     dlib::frontal_face_detector detector;
     dlib::shape_predictor predictor;
@@ -249,11 +229,10 @@ image_pts.push_back(cv::Point2d(shape.part(0).x(), shape.part(0).y())); //#57 mo
 
 
         }
+
   }
-
-
-
 };
+
 
 
 
