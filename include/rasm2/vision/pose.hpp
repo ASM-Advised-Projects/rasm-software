@@ -41,7 +41,7 @@ public:
     dlib::frontal_face_detector detector;
     dlib::shape_predictor predictor;
        detector = dlib::get_frontal_face_detector();
-      dlib::deserialize("/home/browse/Documents/fall_2018/me4010/rasm-v2/test/filesysroot/rasm_2_1/data/vision/prediction/face_model_68_points.dat") >> predictor;
+      dlib::deserialize("../test/filesysroot/rasm_2_1/data/vision/prediction/face_model_68_points.dat") >> predictor;
      //fill in cam intrinsics and distortion coefficients
     cv::Mat cam_matrix = cv::Mat(3, 3, CV_64FC1, K);
     cv::Mat dist_coeffs = cv::Mat(5, 1, CV_64FC1, D);
@@ -138,16 +138,18 @@ image_pts.push_back(cv::Point2d(shape.part(17).x(), shape.part(17).y())); //#17 
       return pose;
 
         }
+       Pose zero_pose = {0, 0, 0, 0, 0, 0};  
+        return zero_pose;
+
 
   }
   Pose get_pose_marker()
   {
     dlib::frontal_face_detector detector;
     dlib::shape_predictor predictor;
-       std::cout << "The marker will be detected" << std::endl;
 
-      dlib::deserialize("/home/browse/Documents/fall_2018/me4010/rasm-v2/test/filesysroot/rasm_2_1/data/vision/detection/images/detector.svm") >> detector;
-      dlib::deserialize("/home/browse/Documents/fall_2018/me4010/rasm-v2/test/filesysroot/rasm_2_1/data/vision/detection/images/sp.dat") >> predictor;
+      dlib::deserialize("../test/filesysroot/rasm_2_1/data/vision/detection/images/detector.svm") >> detector;
+      dlib::deserialize("../test/filesysroot/rasm_2_1/data/vision/detection/images/sp.dat") >> predictor;
      //fill in cam intrinsics and distortion coefficients
     cv::Mat cam_matrix = cv::Mat(3, 3, CV_64FC1, K);
     cv::Mat dist_coeffs = cv::Mat(5, 1, CV_64FC1, D);
@@ -229,7 +231,8 @@ image_pts.push_back(cv::Point2d(shape.part(0).x(), shape.part(0).y())); //#57 mo
 
 
         }
-
+        Pose zero_pose = {0, 0, 0, 0, 0, 0};  
+        return zero_pose;
   }
 };
 
