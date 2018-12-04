@@ -1,9 +1,10 @@
 /home/browse/Documents/fall_2018/me4010/rasm-v2/build/temp_build/build/CMakeFiles/rebuild_cache.dir
-/home/browse/Documents/fall_2018/me4010/rasm-v2/build/temp_build/build/CMakeFiles/edit_cache.dir
-/home/browse/Documents/fall_2018/me4010/rasm-v2/build/temp_build/build/CMakeFiles/video_test_shape.dir
 /home/browse/Documents/fall_2018/me4010/rasm-v2/build/temp_build/build/CMakeFiles/camera_calibration.dir
-/home/browse/Documents/fall_2018/me4010/rasm-v2/build/temp_build/build/CMakeFiles/temp_main.dir
 /home/browse/Documents/fall_2018/me4010/rasm-v2/build/temp_build/build/CMakeFiles/create_detector.dir
+/home/browse/Documents/fall_2018/me4010/rasm-v2/build/temp_build/build/CMakeFiles/create_shape_predictor.dir
+/home/browse/Documents/fall_2018/me4010/rasm-v2/build/temp_build/build/CMakeFiles/temp_main.dir
+/home/browse/Documents/fall_2018/me4010/rasm-v2/build/temp_build/build/CMakeFiles/video_test_shape.dir
+/home/browse/Documents/fall_2018/me4010/rasm-v2/build/temp_build/build/CMakeFiles/edit_cache.dir
 /home/browse/Documents/fall_2018/me4010/rasm-v2/build/temp_build/build/dlib_build/CMakeFiles/rebuild_cache.dir
 /home/browse/Documents/fall_2018/me4010/rasm-v2/build/temp_build/build/dlib_build/CMakeFiles/dlib.dir
 /home/browse/Documents/fall_2018/me4010/rasm-v2/build/temp_build/build/dlib_build/CMakeFiles/edit_cache.dir

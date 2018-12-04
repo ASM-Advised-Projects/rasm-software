@@ -111,19 +111,6 @@ depend:
 .PHONY : depend
 
 #=============================================================================
-# Target rules for targets named video_test_shape
-
-# Build rule for target.
-video_test_shape: cmake_check_build_system
-	$(MAKE) -f CMakeFiles/Makefile2 video_test_shape
-.PHONY : video_test_shape
-
-# fast build rule for target.
-video_test_shape/fast:
-	$(MAKE) -f CMakeFiles/video_test_shape.dir/build.make CMakeFiles/video_test_shape.dir/build
-.PHONY : video_test_shape/fast
-
-#=============================================================================
 # Target rules for targets named camera_calibration
 
 # Build rule for target.
@@ -135,6 +122,32 @@ camera_calibration: cmake_check_build_system
 camera_calibration/fast:
 	$(MAKE) -f CMakeFiles/camera_calibration.dir/build.make CMakeFiles/camera_calibration.dir/build
 .PHONY : camera_calibration/fast
+
+#=============================================================================
+# Target rules for targets named create_detector
+
+# Build rule for target.
+create_detector: cmake_check_build_system
+	$(MAKE) -f CMakeFiles/Makefile2 create_detector
+.PHONY : create_detector
+
+# fast build rule for target.
+create_detector/fast:
+	$(MAKE) -f CMakeFiles/create_detector.dir/build.make CMakeFiles/create_detector.dir/build
+.PHONY : create_detector/fast
+
+#=============================================================================
+# Target rules for targets named create_shape_predictor
+
+# Build rule for target.
+create_shape_predictor: cmake_check_build_system
+	$(MAKE) -f CMakeFiles/Makefile2 create_shape_predictor
+.PHONY : create_shape_predictor
+
+# fast build rule for target.
+create_shape_predictor/fast:
+	$(MAKE) -f CMakeFiles/create_shape_predictor.dir/build.make CMakeFiles/create_shape_predictor.dir/build
+.PHONY : create_shape_predictor/fast
 
 #=============================================================================
 # Target rules for targets named temp_main
@@ -150,17 +163,17 @@ temp_main/fast:
 .PHONY : temp_main/fast
 
 #=============================================================================
-# Target rules for targets named create_detector
+# Target rules for targets named video_test_shape
 
 # Build rule for target.
-create_detector: cmake_check_build_system
-	$(MAKE) -f CMakeFiles/Makefile2 create_detector
-.PHONY : create_detector
+video_test_shape: cmake_check_build_system
+	$(MAKE) -f CMakeFiles/Makefile2 video_test_shape
+.PHONY : video_test_shape
 
 # fast build rule for target.
-create_detector/fast:
-	$(MAKE) -f CMakeFiles/create_detector.dir/build.make CMakeFiles/create_detector.dir/build
-.PHONY : create_detector/fast
+video_test_shape/fast:
+	$(MAKE) -f CMakeFiles/video_test_shape.dir/build.make CMakeFiles/video_test_shape.dir/build
+.PHONY : video_test_shape/fast
 
 #=============================================================================
 # Target rules for targets named dlib
@@ -256,6 +269,33 @@ home/browse/Documents/fall_2018/me4010/rasm-v2/test/filesysroot/rasm_2_1/data/vi
 	$(MAKE) -f CMakeFiles/create_detector.dir/build.make CMakeFiles/create_detector.dir/home/browse/Documents/fall_2018/me4010/rasm-v2/test/filesysroot/rasm_2_1/data/vision/detection/images/create_detector.cpp.s
 .PHONY : home/browse/Documents/fall_2018/me4010/rasm-v2/test/filesysroot/rasm_2_1/data/vision/detection/images/create_detector.cpp.s
 
+home/browse/Documents/fall_2018/me4010/rasm-v2/test/filesysroot/rasm_2_1/data/vision/detection/images/create_shape_predictor.o: home/browse/Documents/fall_2018/me4010/rasm-v2/test/filesysroot/rasm_2_1/data/vision/detection/images/create_shape_predictor.cpp.o
+
+.PHONY : home/browse/Documents/fall_2018/me4010/rasm-v2/test/filesysroot/rasm_2_1/data/vision/detection/images/create_shape_predictor.o
+
+# target to build an object file
+home/browse/Documents/fall_2018/me4010/rasm-v2/test/filesysroot/rasm_2_1/data/vision/detection/images/create_shape_predictor.cpp.o:
+	$(MAKE) -f CMakeFiles/create_shape_predictor.dir/build.make CMakeFiles/create_shape_predictor.dir/home/browse/Documents/fall_2018/me4010/rasm-v2/test/filesysroot/rasm_2_1/data/vision/detection/images/create_shape_predictor.cpp.o
+.PHONY : home/browse/Documents/fall_2018/me4010/rasm-v2/test/filesysroot/rasm_2_1/data/vision/detection/images/create_shape_predictor.cpp.o
+
+home/browse/Documents/fall_2018/me4010/rasm-v2/test/filesysroot/rasm_2_1/data/vision/detection/images/create_shape_predictor.i: home/browse/Documents/fall_2018/me4010/rasm-v2/test/filesysroot/rasm_2_1/data/vision/detection/images/create_shape_predictor.cpp.i
+
+.PHONY : home/browse/Documents/fall_2018/me4010/rasm-v2/test/filesysroot/rasm_2_1/data/vision/detection/images/create_shape_predictor.i
+
+# target to preprocess a source file
+home/browse/Documents/fall_2018/me4010/rasm-v2/test/filesysroot/rasm_2_1/data/vision/detection/images/create_shape_predictor.cpp.i:
+	$(MAKE) -f CMakeFiles/create_shape_predictor.dir/build.make CMakeFiles/create_shape_predictor.dir/home/browse/Documents/fall_2018/me4010/rasm-v2/test/filesysroot/rasm_2_1/data/vision/detection/images/create_shape_predictor.cpp.i
+.PHONY : home/browse/Documents/fall_2018/me4010/rasm-v2/test/filesysroot/rasm_2_1/data/vision/detection/images/create_shape_predictor.cpp.i
+
+home/browse/Documents/fall_2018/me4010/rasm-v2/test/filesysroot/rasm_2_1/data/vision/detection/images/create_shape_predictor.s: home/browse/Documents/fall_2018/me4010/rasm-v2/test/filesysroot/rasm_2_1/data/vision/detection/images/create_shape_predictor.cpp.s
+
+.PHONY : home/browse/Documents/fall_2018/me4010/rasm-v2/test/filesysroot/rasm_2_1/data/vision/detection/images/create_shape_predictor.s
+
+# target to generate assembly for a file
+home/browse/Documents/fall_2018/me4010/rasm-v2/test/filesysroot/rasm_2_1/data/vision/detection/images/create_shape_predictor.cpp.s:
+	$(MAKE) -f CMakeFiles/create_shape_predictor.dir/build.make CMakeFiles/create_shape_predictor.dir/home/browse/Documents/fall_2018/me4010/rasm-v2/test/filesysroot/rasm_2_1/data/vision/detection/images/create_shape_predictor.cpp.s
+.PHONY : home/browse/Documents/fall_2018/me4010/rasm-v2/test/filesysroot/rasm_2_1/data/vision/detection/images/create_shape_predictor.cpp.s
+
 temporary_main.o: temporary_main.cpp.o
 
 .PHONY : temporary_main.o
@@ -290,11 +330,12 @@ help:
 	@echo "... clean"
 	@echo "... depend"
 	@echo "... rebuild_cache"
-	@echo "... edit_cache"
-	@echo "... video_test_shape"
 	@echo "... camera_calibration"
-	@echo "... temp_main"
 	@echo "... create_detector"
+	@echo "... create_shape_predictor"
+	@echo "... temp_main"
+	@echo "... video_test_shape"
+	@echo "... edit_cache"
 	@echo "... dlib"
 	@echo "... home/browse/Documents/fall_2018/me4010/lib/lib/download/opencv-3.4.1/samples/cpp/tutorial_code/calib3d/camera_calibration/camera_calibration.o"
 	@echo "... home/browse/Documents/fall_2018/me4010/lib/lib/download/opencv-3.4.1/samples/cpp/tutorial_code/calib3d/camera_calibration/camera_calibration.i"
@@ -305,6 +346,9 @@ help:
 	@echo "... home/browse/Documents/fall_2018/me4010/rasm-v2/test/filesysroot/rasm_2_1/data/vision/detection/images/create_detector.o"
 	@echo "... home/browse/Documents/fall_2018/me4010/rasm-v2/test/filesysroot/rasm_2_1/data/vision/detection/images/create_detector.i"
 	@echo "... home/browse/Documents/fall_2018/me4010/rasm-v2/test/filesysroot/rasm_2_1/data/vision/detection/images/create_detector.s"
+	@echo "... home/browse/Documents/fall_2018/me4010/rasm-v2/test/filesysroot/rasm_2_1/data/vision/detection/images/create_shape_predictor.o"
+	@echo "... home/browse/Documents/fall_2018/me4010/rasm-v2/test/filesysroot/rasm_2_1/data/vision/detection/images/create_shape_predictor.i"
+	@echo "... home/browse/Documents/fall_2018/me4010/rasm-v2/test/filesysroot/rasm_2_1/data/vision/detection/images/create_shape_predictor.s"
 	@echo "... temporary_main.o"
 	@echo "... temporary_main.i"
 	@echo "... temporary_main.s"

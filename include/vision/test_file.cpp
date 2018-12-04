@@ -15,6 +15,7 @@
 #include <dlib/image_processing.h>
 #include <fstream>
 #include <unistd.h>
+#include <cmath>
 
 //Intrisics can be calculated using opencv sample code under opencv/sources/samples/cpp/tutorial_code/calib3d
 //Normally, you can also apprximate fx and fy by image width, cx by half image width, cy by half image height instead
@@ -215,6 +216,10 @@ int main(int argc, char** argv)
             double y_for_pose = my_y/temp.rows;
             std::cout << x_for_pose << std::endl;
             std::cout << y_for_pose << std::endl;
+            x_for_pose = x_for_pose -0.5;
+            y_for_pose = y_for_pose -0.5;
+            double x_distance = -translation_vec.at<double>(1,1)*atan(27.6*3.14159265/180)*x_for_pose/0.5;
+            double y_distance = translation_vec.at<double>(1,1)*atan(20*3.14159265/180)*y_for_pose/0.5;
 
             //calc euler angle
             cv::Rodrigues(rotation_vec, rotation_mat);
@@ -223,15 +228,15 @@ int main(int argc, char** argv)
 
                           //show angle result
             //outtext << "X: " << std::setprecision(3) << euler_angle.at<double>(0);
-            outtext << "Distance from camera in cm: " << std::setprecision(3) << -translation_vec.at<double>(1, 1);
+            outtext << "Distance from camera [in]: " << std::setprecision(3) << -translation_vec.at<double>(1, 1)/2.54;
             cv::putText(temp, outtext.str(), cv::Point(50, 40), cv::FONT_HERSHEY_SIMPLEX, 0.75, cv::Scalar(0, 0, 0));
             outtext.str("");
-            outtext << "x position along screen (unitless): " << std::setprecision(3) << x_for_pose;
+            outtext << "x position [in]: " << std::setprecision(3) << x_distance/2.54;
             //outtext << "Y: " << std::setprecision(3) << euler_angle.at<double>(1);
             cv::putText(temp, outtext.str(), cv::Point(50, 60), cv::FONT_HERSHEY_SIMPLEX, 0.75, cv::Scalar(0, 0, 0));
             outtext.str("");
             //outtext << "Z: " << std::setprecision(3) << euler_angle.at<double>(2);
-            outtext << "y position along screen (unitless): " << std::setprecision(3) << y_for_pose;
+            outtext << "y position [in]: " << std::setprecision(3) << y_distance/2.54;
             cv::putText(temp, outtext.str(), cv::Point(50, 80), cv::FONT_HERSHEY_SIMPLEX, 0.75, cv::Scalar(0, 0, 0));
             outtext.str("");
             //outtext << "rot_vec 1: " << std::setprecision(3) << rotation_vec.at<double>(1, 1);

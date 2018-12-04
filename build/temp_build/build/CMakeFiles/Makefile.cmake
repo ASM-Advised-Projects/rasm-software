@@ -74,9 +74,10 @@ set(CMAKE_MAKEFILE_PRODUCTS
 
 # Dependency information for all targets:
 set(CMAKE_DEPEND_INFO_FILES
-  "CMakeFiles/video_test_shape.dir/DependInfo.cmake"
   "CMakeFiles/camera_calibration.dir/DependInfo.cmake"
-  "CMakeFiles/temp_main.dir/DependInfo.cmake"
   "CMakeFiles/create_detector.dir/DependInfo.cmake"
+  "CMakeFiles/create_shape_predictor.dir/DependInfo.cmake"
+  "CMakeFiles/temp_main.dir/DependInfo.cmake"
+  "CMakeFiles/video_test_shape.dir/DependInfo.cmake"
   "dlib_build/CMakeFiles/dlib.dir/DependInfo.cmake"
   )
