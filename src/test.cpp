@@ -42,7 +42,7 @@
 #include "rasm2/control/trajectory_generation.hpp"
 #include "rasm2/periphery/uc_board.hpp"
 #include "rasm2/util/time.hpp"
-//#include "rasm2/vision/pose_estimator.hpp"
+#include "rasm2/vision/pose_estimator.hpp"
 
 using std::cout;
 using std::endl;
@@ -224,7 +224,7 @@ void camera_test()
 
 void track_pose_orientation(bool track_face)
 {
-  /*pose_estimator.reset(new PoseEstimator(1));
+  pose_estimator.reset(new PoseEstimator(1));
 
   for (int i = 0; i < 5; ++i)
   {
@@ -324,7 +324,7 @@ void track_pose_orientation(bool track_face)
     ucboard->set_motor_pwm(Joint::WRIST_YAW, 0);
     ucboard->set_motor_pwm(Joint::WRIST_PITCH, 0);
     ucboard->set_motor_pwm(Joint::WRIST_ROLL, 0);
-  }*/
+  }
 }
 
 int main(int argc, char **argv)
