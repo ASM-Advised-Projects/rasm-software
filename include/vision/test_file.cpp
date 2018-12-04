@@ -14,6 +14,7 @@
 #include <dlib/image_processing/render_face_detections.h>
 #include <dlib/image_processing.h>
 #include <fstream>
+#include <unistd.h>
 
 //Intrisics can be calculated using opencv sample code under opencv/sources/samples/cpp/tutorial_code/calib3d
 //Normally, you can also apprximate fx and fy by image width, cx by half image width, cy by half image height instead
@@ -128,6 +129,7 @@ int main(int argc, char** argv)
 #else
     while (1)
     {
+      usleep(500000);
         // Grab a frame
         cv::Mat temp;
         cap >> temp;
