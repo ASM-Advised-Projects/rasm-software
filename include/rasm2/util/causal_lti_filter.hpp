@@ -2,13 +2,14 @@
  * Defines the CausalLTIFilter class.
  */
 
-#ifndef FILTER_FILTER_HPP
-#define FILTER_FILTER_HPP
+#ifndef RASM2_UTIL_CAUSAL_LTI_FILTER_HPP
+#define RASM2_UTIL_CAUSAL_LTI_FILTER_HPP
 
-#include <StandardCplusplus.h>
 #include <vector>
 
-#include "CircularArray.hpp"
+#include "rasm2/util/circular_array.hpp"
+
+using std::vector;
 
 /**
  * This class represents a causal SISO LTI digital filter. SISO means
@@ -26,8 +27,8 @@
 class CausalLTIFilter
 {
 private:
-  std::vector<double> ff_coeffs;
-  std::vector<double> fb_coeffs;
+  vector<double> ff_coeffs;
+  vector<double> fb_coeffs;
 
   CircularArray<double> inputs;
   CircularArray<double> outputs;
@@ -40,7 +41,7 @@ public:
    * Creates a new filter using the given feedforward (ff_coeffs) and feedback
    * (fb_coeffs) coefficients.
    */
-  CausalLTIFilter(const std::vector<double> &ff_coeffs, const std::vector<double> &fb_coeffs)
+  CausalLTIFilter(const vector<double> &ff_coeffs, const vector<double> &fb_coeffs)
   : ff_coeffs(ff_coeffs)
   , fb_coeffs(fb_coeffs)
   , inputs(ff_coeffs.size())

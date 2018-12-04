@@ -1,9 +1,9 @@
 /**
- * Defines the PeripheryAccess (singleton) class.
+ * Defines the PeripheralAccessor (singleton) class.
  */
 
-#ifndef RASM2_PERIPHERY_PERIPHERY_ACCESS_HPP
-#define RASM2_PERIPHERY_PERIPHERY_ACCESS_HPP
+#ifndef RASM2_PERIPHERY_PERIPHERAL_ACCESSOR_HPP
+#define RASM2_PERIPHERY_PERIPHERAL_ACCESSOR_HPP
 
 #include <map>
 
@@ -13,9 +13,9 @@
 #include "periphery/spi.h"
 #include "periphery/serial.h"
 
-#include "periphery_config.hpp"
-#include "configuration.hpp"
-#include "logging.hpp"
+#include "rasm2/periphery/periphery_config.h"
+#include "rasm2/configuration.hpp"
+#include "rasm2/logging.hpp"
 
 using std::string;
 using Poco::format;
@@ -27,7 +27,7 @@ using Poco::format;
  *
  * Note that a bus/device instance is only created when it is requested.
  */
-class PeripheryAccess
+class PeripheralAccessor
 {
 private:
   // bus index to i2c bus device file mapping

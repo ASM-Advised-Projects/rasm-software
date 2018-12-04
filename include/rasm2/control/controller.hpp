@@ -2,31 +2,37 @@
  * Defines the Controller class.
  */
 
-#ifndef RASM2_CONTROL_CONTROL_HPP
-#define RASM2_CONTROL_CONTROL_HPP
+#ifndef RASM2_CONTROL_CONTROLLER_HPP
+#define RASM2_CONTROL_CONTROLLER_HPP
 
 #include <map>
 #include <thread>
+#include <memory>
 #include <pthread.h>
 #include <unistd.h>
 
 #include <Poco/Semaphore.h>
 #include <Poco/Exception.h>
 
-#include "pose_estimation_async.hpp"
-#include "trajectory_generation.hpp"
-#include "trajectory_tracking.hpp"
+#include "rasm2/control/async_pose_estimator.hpp"
+#include "rasm2/control/trajectory_containers.hpp"
+#include "rasm2/control/trajectory_generation.hpp"
+#include "rasm2/control/joint_state_estimator.hpp"
+//#include "rasm2/control/feedforward_generators.hpp"
+#include "rasm2/control/feedback_generators.hpp"
+#include "rasm2/control/motion_sentinel.hpp"
+#include "rasm2/control/kinematics.hpp"
+#include "rasm2/control/joint.hpp"
+
+#include "rasm2/vision/pose_estimation.hpp"
 #include "rasm2/periphery/uc_board.hpp"
-//#include "rasm2/battery.hpp"
+#include "rasm2/battery.hpp"
 #include "rasm2/util/time.hpp"
 #include "rasm2/util/pose.hpp"
 #include "rasm2/configuration.hpp"
-#include "../battery.hpp"
 
 /**
  * TODO - pose rotation
- * TODO - feedforward
- * TODO - feedback
  */
 class Controller
 {
@@ -36,13 +42,13 @@ protected:
    * be within when running.
    */
   enum State {
-    OVERRIDE,
-    SEARCH,
-    FACE,
-    MARKER,
-    FACE_MOVING,
-    MARKER_MOVING,
-    YIELD
+    OVERRIDE = 0,
+    SEARCH = 1,
+    FACE = 2,
+    MARKER = 3,
+    FACE_MOVING = 4,
+    MARKER_MOVING = 5,
+    YIELD = 6
   };
 
   State state;  // current state of this controller
@@ -50,30 +56,22 @@ protected:
   UCBoard &uc_board;
   BatteryEstimator &battery_estimator;
 
-  AsyncPoseEstimator pose_estimator;
-  TrajectoryGenerator traj_generator;
-  FeedforwardGenerator ff_generator;
-  PIDFeedbackGenerator fb_generator;
-  MotionSentinel motion_sentinel;
+  std::unique_ptr<AsyncPoseEstimator> pose_estimator;
+  std::unique_ptr<Kinematics> kinematics;
+  std::array< std::unique_ptr<PowIDFeedbackGenerator>, 6 > fb_generators;
+  std::array< std::unique_ptr<MotionSentinel>, 6 > motion_sentinels;
 
   bool running;  // indicates if control method has been called
   bool shutdown;  // indicates if the state machine should exit
   Poco::Semaphore shutdown_sema;  // blocking structure for control method
 
-  int precision_check_period;
-  int moving_check_period;
-  int force_check_period;
-
-  std::array<double, 6> joint_positions;
+  std::array< std::unique_ptr<JointStateEstimator>, 6 > joint_estimators;
+  ArrD6 joint_positions;
   Poco::Event joint_positions_required;
   Poco::Event joint_positions_updated;
 
-  /**
-   * State-to-time maps that describe what estimation periods for faces and
-   * markers should be used for each state.
-   */
-  std::map<State, int> face_est_period_map;
-  std::map<State, int> marker_est_period_map;
+  std::array<int, 7> face_est_periods;  // face estimation periods for each state
+  std::array<int, 7> marker_est_periods;  // marker estimation period for each state
 
   /**
    * References to the current face and marker pose values held in the pose
@@ -119,8 +117,18 @@ protected:
    */
   void set_estimation_periods(State state)
   {
-    pose_estimator.set_face_period(face_est_period_map[state]);
-    pose_estimator.set_marker_period(marker_est_period_map[state]);
+    pose_estimator->set_face_period(face_est_periods[(int)state]);
+    pose_estimator->set_marker_period(marker_est_periods[(int)state]);
+  }
+
+  /**
+   * Returns true if the shoulder or elbow joints are moving at a velocity of
+   * more than 2.0 degrees per second.
+   */
+  bool backdriving()
+  {
+    return joint_estimators[(int)Joint::SHOULDER]->get_velocity() > 2.0 ||
+      joint_estimators[(int)Joint::ELBOW]->get_velocity() > 2.0;
   }
 
   /**
@@ -135,8 +143,8 @@ protected:
 
     // initial state transition
     state = State::SEARCH;
-    pose_estimator.unlock_face();
-    pose_estimator.unlock_marker();
+    pose_estimator->unlock_face();
+    pose_estimator->unlock_marker();
     set_estimation_periods(state);
 
     // repeately execute blocks of code corresponding to the current state
@@ -150,12 +158,20 @@ protected:
       switch (state)
       {
         case OVERRIDE:
-
           break;
 
         case SEARCH:
+          joint_positions_required.set();
+          joint_positions_updated.wait();
+          if (backdriving())
+          {
+            state = State::YIELD;
+            set_estimation_periods(state);
+            break;
+          }
+
           // wait on new marker or face pose event w/timeout
-          new_pose = pose_estimator.general_pose_event.tryWait(wait_period);
+          new_pose = pose_estimator->general_pose_event.tryWait(wait_period);
 
           // potential state transitions
           if (new_pose)  // if timeout did not occur
@@ -163,23 +179,32 @@ protected:
             if (!PoseOps::equal(marker_pose, zero_pose))  // to MARKER
             {
               state = State::MARKER;
-              pose_estimator.lock_marker();
+              pose_estimator->lock_marker();
               set_estimation_periods(state);
             }
             else if (!PoseOps::equal(face_pose, zero_pose))  // to FACE
             {
               state = State::FACE;
-              pose_estimator.lock_face();
+              pose_estimator->lock_face();
               set_estimation_periods(state);
-              pose_estimator.general_pose_event.set();
+              pose_estimator->general_pose_event.set();
             }
           }
-
           break;
 
         case FACE:
+          joint_positions_required.set();
+          joint_positions_updated.wait();
+          if (backdriving())
+          {
+            state = State::YIELD;
+            pose_estimator->unlock_face();
+            set_estimation_periods(state);
+            break;
+          }
+
           // wait on new marker or face pose event w/timeout
-          new_pose = pose_estimator.general_pose_event.tryWait(wait_period);
+          new_pose = pose_estimator->general_pose_event.tryWait(wait_period);
 
           // potential state transitions
           if (new_pose)  // if timeout did not occur
@@ -187,14 +212,14 @@ protected:
             if (PoseOps::equal(face_pose, zero_pose))  // to SEARCH
             {
               state = State::SEARCH;
-              pose_estimator.unlock_face();
+              pose_estimator->unlock_face();
               set_estimation_periods(state);
             }
             else if (!PoseOps::equal(marker_pose, zero_pose))  // to MARKER
             {
               state = State::MARKER;
-              pose_estimator.unlock_face();
-              pose_estimator.lock_marker();
+              pose_estimator->unlock_face();
+              pose_estimator->lock_marker();
               set_estimation_periods(state);
             }
             else if (exceeds_threshold(face_pose))  // to FACE_MOVING
@@ -203,12 +228,21 @@ protected:
               set_estimation_periods(state);
             }
           }
-
           break;
 
         case MARKER:
+          joint_positions_required.set();
+          joint_positions_updated.wait();
+          if (backdriving())
+          {
+            state = State::YIELD;
+            pose_estimator->unlock_marker();
+            set_estimation_periods(state);
+            break;
+          }
+
           // wait on new marker or face pose event w/timeout
-          new_pose = pose_estimator.marker_pose_event.tryWait(wait_period);
+          new_pose = pose_estimator->marker_pose_event.tryWait(wait_period);
 
           // potential state transitions
           if (new_pose)  // if timeout did not occur
@@ -216,9 +250,9 @@ protected:
             if (PoseOps::equal(marker_pose, zero_pose))  // to SEARCH
             {
               state = State::SEARCH;
-              pose_estimator.unlock_marker();
+              pose_estimator->unlock_marker();
               set_estimation_periods(state);
-              pose_estimator.general_pose_event.reset();
+              pose_estimator->general_pose_event.reset();
             }
             else if (exceeds_threshold(marker_pose))  // to MARKER_MOVING
             {
@@ -226,10 +260,11 @@ protected:
               set_estimation_periods(state);
             }
           }
-
           break;
 
         case FACE_MOVING:
+          joint_positions_required.set();
+          joint_positions_updated.wait();
           generate_trajectory(face_pose, trajectory, final_global_pose, pose_diff);
 
           // if difference between initial and final global poses is greater
@@ -240,10 +275,11 @@ protected:
           if (state != State::YIELD)
             state = State::FACE;
           set_estimation_periods(state);
-
           break;
 
         case MARKER_MOVING:
+          joint_positions_required.set();
+          joint_positions_updated.wait();
           generate_trajectory(face_pose, trajectory, final_global_pose, pose_diff);
 
           // if difference between initial and final global poses is greater
@@ -254,11 +290,9 @@ protected:
           if (state != State::YIELD)
             state = State::MARKER;
           set_estimation_periods(state);
-
           break;
 
         case YIELD:
-
           break;
       }
     }
@@ -272,25 +306,26 @@ protected:
    * may be restricted due to the limited range of positions the RASM is capable
    * of.
    */
-  Pose generate_trajectory(const Pose &relative_object_pose, Trajectory6D &trajectory,
-      Pose &final_global_pose, Pose &pose_diff)
+  Pose generate_trajectory(const Pose &local_object_pose, Trajectory6D &trajectory,
+      Pose &final_screen_pose, Pose &pose_diff)
   {
-    // find initial global pose of screen center
+    // update current joint positions
     joint_positions_required.set();
     joint_positions_updated.wait();
-    Pose initial_global_pose;
-    traj_generator.joint_to_cartesian(joint_positions, initial_global_pose);
 
-    // find final global pose of screen center
-    Pose rotated_aligned_pose = PoseOps::rotate_extrinsic(aligned_pose, relative_object_pose);
-    final_global_pose = PoseOps::add(initial_global_pose, relative_object_pose);
-    final_global_pose = PoseOps::subtract(final_global_pose, rotated_aligned_pose);
+    Pose initial_screen_pose;
+    kinematics->joints_to_pose(joint_positions, initial_screen_pose);
 
-    // generate trajectory between initial and final global poses
-    final_global_pose = traj_generator.generate_trajectory(
-        initial_global_pose, final_global_pose, trajectory);
+    kinematics->aligned_screen_pose(initial_screen_pose, local_object_pose, final_screen_pose);
 
-    pose_diff = PoseOps::subtract(final_global_pose, initial_global_pose);
+    std::array<double, 6> final_joint_positions;
+    bool elbow_ccw = joint_estimators[(int)Joint::ELBOW]->get_position() >= 0;
+    final_screen_pose = kinematics->pose_to_joints(final_screen_pose, final_joint_positions, elbow_ccw);
+
+    TrajectoryGeneration::generate_trajectory(trajectory, TrajectoryGeneration::TrajectoryType::CUBIC,
+    &joint_positions, &final_joint_positions, nullptr, nullptr, nullptr, nullptr);
+
+    pose_diff = PoseOps::subtract(final_screen_pose, initial_screen_pose);
   }
 
   /**
@@ -306,86 +341,99 @@ protected:
    * throughput on the serial communication line for reading encoders and
    * setting motors.
    */
-  void track_trajectory(const Trajectory6D &trajectory, const Pose &final_global_pose)
+  int track_trajectory(const Trajectory6D &traj6, const Pose &final_global_pose)
   {
     battery_estimator.disable_reading();
 
-    long start_time = ProgramTime::current_millis();
-    long current_time = start_time;
+    // for each joint
+    Trajectory1D temp_traj;
+    for (int j = 0; j < 6; ++j)
+    {
+      fb_generators[j]->set_trajectory(traj6.get_trajectory((Joint)j));
+    }
 
-    //Pose current_precision;
-    bool precision_achieved = false;
-    long last_precision_check = current_time;
+    double start_time = ProgramTime::current_millis() / 1000.0;
+    double current_time = 0;
 
-    int not_moving_count = 0;
-    long last_moving_check = current_time;
+    bool precision_met = false;
+    double precision_check_period = 0.2;
+    double last_precision_check = current_time;
 
+    bool not_moving = false;
     bool external_force = false;
-    long last_force_check = current_time;
 
     std::array<float, 6> ff_motor_pwms;
     std::array<float, 6> fb_motor_pwms;
-    std::array<float, 6> motor_pwms;
+    std::array<float, 6> total_pwms;
 
     joint_positions_required.set();
 
-    while (!shutdown && not_moving_count < 3 && !precision_achieved && !external_force)
+    while (true)
     {
       joint_positions_updated.wait();
-      motion_sentinel.update(joint_positions);
       joint_positions_required.set();
-      current_time = ProgramTime::current_millis();
+      current_time = (ProgramTime::current_millis() - start_time) / 1000.0;
 
       // get feedforward control output
-      ff_generator.generate_pwms(trajectory, current_time-start_time, ff_motor_pwms);
+      //ff_generator.generate_pwms(current_time-start_time, ff_motor_pwms);
 
-      // get feedback control output
-      fb_generator.generate_pwms(trajectory, current_time-start_time, joint_positions, fb_motor_pwms);
+      // for each joint
+      for (int j = 0; j < 6; ++j)
+      {
+        // get feedback control level
+        fb_motor_pwms[j] = fb_generators[j]->generate(current_time, joint_positions[j]);
 
-      // combine feedforward and feedback control outputs
-      for (int i = 0; i < 6; ++i)
-        motor_pwms[i] = ff_motor_pwms[i] + fb_motor_pwms[i];
+        // combine feedforward and feedback control levels
+        total_pwms[j] = ff_motor_pwms[j] + fb_motor_pwms[j];
+
+        // update motion and force predictions
+        motion_sentinels[j]->update(joint_positions[j], current_time);
+        if (motion_sentinels[j]->motion_exists())
+        {
+          not_moving = true;
+          break;
+        }
+        if (motion_sentinels[j]->external_force_exists())
+        {
+          external_force = true;
+          break;
+        }
+      }
 
       // set motor levels
-      uc_board.set_motor_pwms(motor_pwms);
+      uc_board.set_motor_pwms(total_pwms);
 
       // determine if precision has been met
       if (current_time - last_precision_check > precision_check_period)
       {
-        Pose current_global_pose;
-        traj_generator.joint_to_cartesian(joint_positions, current_global_pose);
-        Pose current_precision = PoseOps::subtract(current_global_pose, final_global_pose);
-        precision_achieved = !PoseOps::exceeds(current_precision, pose_precision);
+        Pose screen_pose;
+        kinematics->joints_to_pose(joint_positions, screen_pose);
+        Pose precision = PoseOps::subtract(screen_pose, final_global_pose);
+        precision_met = !PoseOps::exceeds(precision, pose_precision);
         last_precision_check = current_time;
       }
 
-      // determine if joints are still moving
-      if (current_time - last_moving_check > moving_check_period)
-      {
-        if (motion_sentinel.motion_exists())
-          ++not_moving_count;
-        else
-          not_moving_count = 0;
-        last_moving_check = current_time;
-      }
+      if (!shutdown && !external_force)
+        break;
 
-      // determine if there is an external force
-      if (current_time - last_force_check > force_check_period)
-      {
-        external_force = motion_sentinel.external_force_exists();
-        last_force_check = current_time;
-      }
+      if (current_time > traj6.duration() && (precision_met || not_moving))
+        break;
     }
 
     // make sure all joints have stopped moving
-    motor_pwms.fill(0);
-    uc_board.set_motor_pwms(motor_pwms);
-
-    // change state to YIELD if an external force was detected
-    if (external_force)
-      state = State::YIELD;
+    total_pwms.fill(0);
+    uc_board.set_motor_pwms(total_pwms);
 
     battery_estimator.enable_reading();
+
+    if (external_force)
+    {
+      state = State::YIELD;
+      return -2;
+    }
+    if (not_moving)
+      return -1;
+    return 0;
   }
 
   /**
@@ -396,13 +444,18 @@ protected:
   void read_joint_positions()
   {
     std::array<int, 6> encoder_outputs;
+    double time;
     while (true)
     {
       joint_positions_required.wait();
       uc_board.get_encoder_outputs(encoder_outputs);
 
-      for (int i = 0; i < 6; ++i)
-        joint_positions[i] = encoder_outputs[i];
+      time = ProgramTime::current_millis() / 1000.0;
+      for (int j = 0; j < 6; ++j)
+      {
+        joint_estimators[j]->update(encoder_outputs[j], time);
+        joint_positions[j] = joint_estimators[j]->get_position();
+      }
 
       joint_positions_updated.set();
     }
@@ -413,7 +466,7 @@ protected:
    * delay in milliseconds between checks. Once the power is off, the shutdown
    * semaphore is set and this method returns.
    */
-  void check_power_loop(int delay_millis)
+  /*void check_power_loop(int delay_millis)
   {
     while (true)
     {
@@ -424,7 +477,7 @@ protected:
         break;
       }
     }
-  }
+  }*/
 
   /**
    * Repeatedly checks if the battery level is less than 1% with the given
@@ -467,37 +520,32 @@ public:
     running = false;
     shutdown = false;
 
-
     // get configuration group for control subsystem
     const MapConfiguration *configs = ConfigurationManager::get_instance().
         get_config_group(ConfigurationManagerImpl::Group::CONTROL);
 
-    face_est_period_map[State::OVERRIDE] = 0;
-    face_est_period_map[State::SEARCH] = configs->getInt("face_estimation_period.search");
-    face_est_period_map[State::FACE] = configs->getInt("face_estimation_period.face");
-    face_est_period_map[State::MARKER] = configs->getInt("face_estimation_period.marker");
-    face_est_period_map[State::FACE_MOVING] = configs->getInt("face_estimation_period.face_moving");
-    face_est_period_map[State::MARKER_MOVING] = configs->getInt("face_estimation_period.marker_moving");
-    face_est_period_map[State::YIELD] = 0;
+    face_est_periods[(int)State::OVERRIDE] = 0;
+    face_est_periods[(int)State::SEARCH] = configs->getInt("face_estimation_period.search");
+    face_est_periods[(int)State::FACE] = configs->getInt("face_estimation_period.face");
+    face_est_periods[(int)State::MARKER] = configs->getInt("face_estimation_period.marker");
+    face_est_periods[(int)State::FACE_MOVING] = configs->getInt("face_estimation_period.face_moving");
+    face_est_periods[(int)State::MARKER_MOVING] = configs->getInt("face_estimation_period.marker_moving");
+    face_est_periods[(int)State::YIELD] = 0;
 
-    marker_est_period_map[State::OVERRIDE] = 0;
-    marker_est_period_map[State::SEARCH] = configs->getInt("marker_estimation_period.search");
-    marker_est_period_map[State::FACE] = configs->getInt("marker_estimation_period.face");
-    marker_est_period_map[State::MARKER] = configs->getInt("marker_estimation_period.marker");
-    marker_est_period_map[State::FACE_MOVING] = configs->getInt("marker_estimation_period.face_moving");
-    marker_est_period_map[State::MARKER_MOVING] = configs->getInt("marker_estimation_period.marker_moving");
-    marker_est_period_map[State::YIELD] = 0;
-
-    face_pose = pose_estimator.get_face_pose();
-    marker_pose = pose_estimator.get_marker_pose();
+    marker_est_periods[(int)State::OVERRIDE] = 0;
+    marker_est_periods[(int)State::SEARCH] = configs->getInt("marker_estimation_period.search");
+    marker_est_periods[(int)State::FACE] = configs->getInt("marker_estimation_period.face");
+    marker_est_periods[(int)State::MARKER] = configs->getInt("marker_estimation_period.marker");
+    marker_est_periods[(int)State::FACE_MOVING] = configs->getInt("marker_estimation_period.face_moving");
+    marker_est_periods[(int)State::MARKER_MOVING] = configs->getInt("marker_estimation_period.marker_moving");
+    marker_est_periods[(int)State::YIELD] = 0;
+s
+    face_pose = pose_estimator->get_face_pose();
+    marker_pose = pose_estimator->get_marker_pose();
 
     aligned_pose = string_to_pose(configs->getString("aligned_pose"));
     pose_diff_threshold = string_to_pose(configs->getString("pose_diff_threshold"));
     pose_precision = string_to_pose(configs->getString("pose_precision"));
-
-    precision_check_period = configs->getInt("precision_check_period");
-    moving_check_period = configs->getInt("moving_check_period");
-    force_check_period = configs->getInt("force_check_period");
   }
 
   /**

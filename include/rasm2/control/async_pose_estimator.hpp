@@ -2,8 +2,8 @@
  * Defines the AsyncPoseEstimator class.
  */
 
-#ifndef RASM2_CONTROL_POSE_ESTIMATION_HPP
-#define RASM2_CONTROL_POSE_ESTIMATION_HPP
+#ifndef RASM2_CONTROL_ASYNC_POSE_ESTIMATOR_HPP
+#define RASM2_CONTROL_ASYNC_POSE_ESTIMATOR_HPP
 
 #include <thread>
 

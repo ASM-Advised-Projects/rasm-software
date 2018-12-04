@@ -10,7 +10,7 @@
 #include "rasm2/shell/shell_server.hpp"
 #include "rasm2/http/http_server.hpp"
 #include "rasm2/control/control.hpp"
-#include "rasm2/peripheral/uc_board.hpp"
+#include "rasm2/periphery/uc_board.hpp"
 #include "rasm2/battery.hpp"
 
 /**
@@ -22,7 +22,7 @@ private:
   bool running;
 
   RasmManager()
-  , running(false)
+  : running(false)
   {
   }
 
@@ -62,17 +62,6 @@ public:
 
     // run the controller
     controller.control();
-
-    // close all the subsystems in a logical order
-    //shell_server.~RasmShellServer();
-    //http_server.~RasmHttpServer();
-    controller.~Controller();
-    battery_sentinel.~BatterySentinel();
-    uc_board.~UCBoard();
-    config_manager.~ConfigurationManager();
-    log_manager.~LoggingManager();
-    // logging subsystem should destruct last to allow for all other subsystems
-    // to log messages until they are done destructing
   }
 };
 

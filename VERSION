@@ -3,7 +3,8 @@ Current Version:
 
 Previous Versions:
 2.0.0 [January 2018 - April 2018]
-    - used Robot Operating System (ROS)
-    - a deeper undertanding of the RASM's requirements and ROS as a toolset led to this version's discontinuation.
+    - Used robot operating system (ROS).
+    - A deeper undertanding of the RASM's requirements and ROS itself led to
+    this version's discontinuation.
 1.0.0 [January 2017 - December 2017]
-    - we don't talk about this...
+    - We don't talk about this...

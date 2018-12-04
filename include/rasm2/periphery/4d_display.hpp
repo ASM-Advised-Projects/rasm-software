@@ -14,10 +14,10 @@
 
 #include "periphery/serial.h"
 
-#include "diablo_commands.h"
-#include "periphery_access.hpp"
-#include "periphery_config.h"
-#include "configuration.hpp"
+//#include "rasm2/periphery/peripheral_accessor.h"
+#include "rasm2/periphery/diablo_commands.h"
+#include "rasm2/periphery/periphery_config.h"
+#include "rasm2/configuration.hpp"
 
 using std::string;
 
@@ -106,7 +106,7 @@ private:
 
   // for communicating with the display
   command_t command;
-  serial_t uart_port;
+  serial_t uartport;
   bool received;
   int recv_timeout;
 
@@ -138,15 +138,15 @@ private:
         {
           // send next command (with the ending null character)
           command_t &cmd = cmd_queue.front();
-          serial_write(&uart_port, &(cmd.buffer[0]), cmd.txlength);
-          serial_flush(&uart_port);
+          serial_write(&uartport, &(cmd.buffer[0]), cmd.txlength);
+          serial_flush(&uartport);
           received = false;
         }
         else
         {
           // wait for and read in the response
           command_t &cmd = cmd_queue.front();
-          serial_read(&uart_port, recvbuff, cmd.rxlength, recv_timeout);
+          serial_read(&uartport, recvbuff, cmd.rxlength, recv_timeout);
           received = true;
           cmd_queue.pop();
         }
@@ -210,7 +210,7 @@ private:
     // initialize the uart port connected to the display (defaut baud = 9600)
     UartConf uartconf;
     bool success = PeripheryAccess::get_instance().init_uart_device(
-        uartbus, &uart_port, uartconf);
+        uartbus, &uartport, uartconf);
     if (!success)
     {
       throw Poco::RuntimeException("In Display4D::Display4D()\n"
@@ -251,11 +251,11 @@ private:
        being received.*/
     command_t cmd;
     setbaudWait(&cmd, rateindex);  // set baud rate of display
-    serial_write(&uart_port, &(cmd.buffer[0]), cmd.txlength);
-    serial_flush(&uart_port);
-    serial_set_baudrate(&uart_port, baudrate);  // set baud rate of computer
+    serial_write(&uartport, &(cmd.buffer[0]), cmd.txlength);
+    serial_flush(&uartport);
+    serial_set_baudrate(&uartport, baudrate);  // set baud rate of computer
     unsigned char recvbuff[3];
-    serial_read(&uart_port, recvbuff, cmd.rxlength, recv_timeout);
+    serial_read(&uartport, recvbuff, cmd.rxlength, recv_timeout);
 
     // basic screen settings
     gfx_ScreenMode(&cmd, LANDSCAPE);  // set display orientation to landscape
@@ -294,7 +294,7 @@ public:
    */
   ~Display4D()
   {
-    serial_close(&uart_port);
+    serial_close(&uartport);
 
     cmd_event.set();
     cmd_process_thread.join();

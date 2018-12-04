@@ -1,9 +1,9 @@
 /**
- * Defines the Pose type and PoseOps class.
+ * Defines the Pose type and the PoseOps class.
  */
 
-#ifndef RASM2_CONTROL_POSE_HPP
-#define RASM2_CONTROL_POSE_HPP
+#ifndef RASM2_UTIL_POSE_HPP
+#define RASM2_UTIL_POSE_HPP
 
 #include <array>
 
@@ -132,7 +132,7 @@ public:
     Pose result;
     result.fill(0);
 
-    // 
+    return result;
   }
 };
 

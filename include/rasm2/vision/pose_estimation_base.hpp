@@ -10,8 +10,8 @@
 #include "dlib/image_processing/frontal_face_detector.h"
 
 #include "image_buffering.hpp"
+#include "rasm2/util/pose.hpp"
 
-typedef std::array<double, 6> Pose;
 typedef dlib::rectangle Rect;
 
 /**

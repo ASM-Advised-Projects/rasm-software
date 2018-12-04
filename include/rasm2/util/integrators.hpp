@@ -1,111 +1,41 @@
 /**
- * Defines the CausalLTIFilter, RealTimeDifferentiator, and RealTimeIntegrator
- * classes.
+ * Defines the RealTimeIntegrator and RealTimeRangeIntegrator classes.
  */
 
-#ifndef RASM2_UTIL_SIGNAL_PROCESSING_HPP
-#define RASM2_UTIL_SIGNAL_PROCESSING_HPP
+#ifndef RASM2_UTIL_INTEGRATORS_HPP
+#define RASM2_UTIL_INTEGRATORS_HPP
 
-#include "circular_array.hpp"
+#include <stdexcept>
+
+#include "rasm2/util/circular_array.hpp"
 
 /**
- * This class represents a causal SISO LTI digital filter. SISO means
- * single-input single-output while LTI means linear time-invariant.
+ * Computes the integral of a series of dependent input values with respect to
+ * a series of independent values (e.g., time). The integral is taken over all
+ * data segments since construction or the last reset.
  *
- * The filtering algorithm uses the given feedforward and feedback
- * coefficients (ff_coeffs and fb_coeffs) to compute the output signal y using
- * signal input x according to this equation:
- *   y[n] = sum{i=0:M}(ff_coeffs[i] * x[n-i]) + sum{j=1:N}(fb_coeffs[i] * y[n-j])
- * Where M is the number of feedforward coeffs and N is the number of feedback
- * coeffs. As the names suggest, feedforward coefficients relate input values
- * directly to the current output value while feedback coefficients relate
- * previous output values to the current output value.
+ * The trapezoidal rule is used to calculate the integral over a series of
+ * values for a given range. Simplson's rule is not used here because it takes
+ * a complicated modification in order to deal with non-uniformly spaced data.
  */
-class CausalLTIFilter
+class RealTimeIntegrator
 {
 private:
-  vector<double> ff_coeffs;
-  vector<double> fb_coeffs;
-
-  CircularArray<double> inputs;
-  CircularArray<double> outputs;
-
-public:
-  CausalLTIFilter(const CausalLTIFilter &) = default;
-  CausalLTIFilter & operator=(const CausalLTIFilter &) = default;
-
-  /**
-   * Creates a new filter using the given feedforward (ff_coeffs) and feedback
-   * (fb_coeffs) coefficients.
-   */
-  CausalLTIFilter(const vector<double> &ff_coeffs, const vector<double> &fb_coeffs)
-  : ff_coeffs(ff_coeffs)
-  , fb_coeffs(fb_coeffs)
-  , inputs(ff_coeffs.size())
-  , outputs(1+fb_coeffs.size())
-  {
-  }
-
-  /**
-   * Adds the given value as the newest input value of this filter. To get the
-   * new output of this filter, call output().
-   */
-  void input(double value)
-  {
-    inputs.push(value);
-    double new_output = 0;
-    for (int i = 0; i < ff_coeffs.size(); ++i)
-      new_output += ff_coeffs[i] * inputs[i];
-    for (int j = 0; j < fb_coeffs.size(); ++j)
-      new_output += fb_coeffs[j] * outputs[j];
-    outputs.push(new_output);
-  }
-
-  /**
-   * Returns the current output value of this filter.
-   */
-  double output() const
-  {
-    return outputs[0];
-  }
-
-  /**
-   * This operator calls input(value), then returns output().
-   */
-  double operator()(double value)
-  {
-    input(value);
-    return output();
-  }
-};
-
-
-/**
- * Computes the derivative of a series of dependent input values with respect
- * to a series of independent values (e.g., time). A second order lagrange
- * interpolating polynomial is used to find the current derivative. This
- * requires three data points. If there are only two points then a finite-
- * difference formula is used. If less than two points have been input, then the
- * derivative is zero.
- */
-class RealTimeDifferentiator
-{
-private:
-  CircularArray<double> x;
-  CircularArray<double> f;
-  double derivative_;
+  double prev_ind_value;
+  double prev_dep_value;
+  double _integral;
+  bool prev_input;
 
 public:
-  RealTimeDifferentiator(const RealTimeDifferentiator &) = default;
-  RealTimeDifferentiator & operator=(const RealTimeDifferentiator &) = default;
+  RealTimeIntegrator(const RealTimeIntegrator &) = default;
+  RealTimeIntegrator & operator=(const RealTimeIntegrator &) = default;
 
   /**
-   * Creates a new differentiator with no initial input data.
+   * Constructs a new infinite-segment integrator.
    */
-  RealTimeDifferentiator()
-  : x(3)
-  , f(3)
-  , derivative_(0)
+  RealTimeIntegrator()
+  : _integral(0)
+  , prev_input(false)
   {
   }
 
@@ -116,42 +46,39 @@ public:
    */
   void input(double ind_value, double dep_value)
   {
-    if (f.size() > 0 && ind_value == x[0])
+    if (!prev_input)
+    {
+      prev_ind_value = ind_value;
+      prev_dep_value = dep_value;
+      prev_input = true;
+      return;
+    }
+
+    if (ind_value == prev_ind_value)
       throw std::invalid_argument("Adjacent independent values must differ.");
 
-    x.push(ind_value);
-    f.push(dep_value);
+    // add latest trapezoid to the absolute integral
+    _integral += (ind_value-prev_ind_value) * (prev_dep_value+dep_value) / 2;
 
-    if (f.size() > 2)
-    {
-      double x0 = x[0];  // latest value
-      double x1 = x[1];
-      double x2 = x[2];
-      derivative_ =
-          f[2]*(2*x0-x1-x0) / ((x2-x1)*(x2-x0)) +
-          f[1]*(2*x0-x2-x0) / ((x1-x2)*(x1-x0)) +
-          f[0]*(2*x0-x2-x1) / ((x0-x2)*(x0-x1));
-    }
-    else if (f.size() > 1)
-    {
-      derivative_ = (f[0]-f[1]) / (x[0]-x[1]);
-    }
-    else
-    {
-      derivative_ = 0;
-    }
+    prev_ind_value = ind_value;
+    prev_dep_value = dep_value;
   }
 
   /**
-   * Returns the current derivative of the input data if more than one value
+   * Returns the current integral of the input data if more than one value
    * has been input; returns 0 otherwise.
    */
-  double derivative() const
+  double integral() const
   {
-    return derivative_;
+    return _integral;
+  }
+
+  void reset()
+  {
+    _integral = 0;
+    prev_input = false;
   }
 };
-
 
 /**
  * Computes the integral of a series of dependent input values with respect to
@@ -181,7 +108,7 @@ public:
  * values for a given range. Simplson's rule is not used here because it takes
  * a complicated modification in order to deal with non-uniformly spaced data.
  */
-class RealTimeIntegrator
+class RealTimeRangeIntegrator
 {
 private:
   CircularArray<double> x;  // independent variable
@@ -191,8 +118,8 @@ private:
   double final_integral;  // a relative or absolute integral value
 
 public:
-  RealTimeIntegrator(const RealTimeIntegrator &) = default;
-  RealTimeIntegrator & operator=(const RealTimeIntegrator &) = default;
+  RealTimeRangeIntegrator(const RealTimeRangeIntegrator &) = default;
+  RealTimeRangeIntegrator & operator=(const RealTimeRangeIntegrator &) = default;
 
   /**
    * Constructs a new integrator that integrates over the <segments> latest
@@ -200,7 +127,7 @@ public:
    * values will be viewed as relative to the data value at the start of the
    * current integration range.
    */
-  RealTimeIntegrator(unsigned int segments, bool relative)
+  RealTimeRangeIntegrator(unsigned int segments, bool relative)
   : x(segments+1)
   , f(segments+1)
   , relative(relative)
@@ -264,6 +191,14 @@ public:
   double integral() const
   {
     return final_integral;
+  }
+
+  void reset()
+  {
+    x.clear();
+    f.clear();
+    temp_integral = 0;
+    final_integral = 0;
   }
 };
 

@@ -5,7 +5,7 @@
  *
  * Summary
  *   structs
- *     MotorPins
+ *     DualMotorPins
  *     RasmMotorSet::DriversToJoints
  *     RasmEncoderSet::AdcPins
  *   enumerations
@@ -23,26 +23,24 @@
 #include <Arduino.h>
 
 #include <StandardCplusplus.h>
-#include <vector>
 #include <map>
 
 #include <DualMC33926MotorDriver.hpp>
-#include <Filter.hpp>
 
 typedef DualMC33926MotorDriver::MotorState MotorState;
-typedef DualMC33926MotorDriver::Pins MotorPins;
+typedef DualMC33926MotorDriver::Pins DualMotorPins;
 
 /**
  * Represents the six motorized joints of the RASM.
  */
 enum Joint
 {
-  BASE,
-  SHOULDER,
-  ELBOW,
-  WRIST_YAW,
-  WRIST_PITCH,
-  WRIST_ROLL
+  BASE = 0,
+  SHOULDER = 1,
+  ELBOW = 2,
+  WRIST_YAW = 3,
+  WRIST_PITCH = 4,
+  WRIST_ROLL = 5
 };
 
 /**
@@ -71,8 +69,8 @@ public:
   RasmMotorSet(const RasmMotorSet &) = delete;
   RasmMotorSet & operator=(const RasmMotorSet &) = delete;
 
-  RasmMotorSet(MotorPins &driver1_pins, MotorPins &driver2_pins,
-  MotorPins &driver3_pins, DriversToJoints &dtj)
+  RasmMotorSet(DualMotorPins &driver1_pins, DualMotorPins &driver2_pins,
+      DualMotorPins &driver3_pins, DriversToJoints &dtj)
   {
     dual_driver_1 = new DualMC33926MotorDriver(driver1_pins);
     dual_driver_2 = new DualMC33926MotorDriver(driver2_pins);
@@ -122,13 +120,12 @@ public:
 };
 
 /**
- * This class is for reading and filtering all rasm encoders.
+ * This class is for reading and all rasm encoders.
  */
 class RasmEncoderSet
 {
 private:
   std::map<Joint, unsigned int> pin_map;
-  std::map<Joint, CausalLTIFilter*> filter_map;
 
 public:
   RasmEncoderSet(const RasmEncoderSet &) = delete;
@@ -143,12 +140,7 @@ public:
     unsigned int wristroll;
   };
 
-  struct FilterCoeffs {
-    std::vector<double> ff_coeffs;
-    std::vector<double> fb_coeffs;
-  };
-
-  RasmEncoderSet(AdcPins &pins, FilterCoeffs &coeffs)
+  RasmEncoderSet(AdcPins &pins)
   {
     // set pin modes of each adc pin
     pinMode(pins.base, INPUT);
@@ -165,20 +157,14 @@ public:
     pin_map[Joint::WRIST_YAW] = pins.wristyaw;
     pin_map[Joint::WRIST_PITCH] = pins.wristpitch;
     pin_map[Joint::WRIST_ROLL] = pins.wristroll;
-
-    // initialize joint-to-filter map
-    for (Joint j = 0; j < 6; j = j+1)
-      filter_map[j] = new CausalLTIFilter(coeffs.ff_coeffs, coeffs.fb_coeffs);
   }
 
   /**
-   * Takes a new encoder reading for the given joint, filters it, and returns
-   * the new filter output.
+   * Returns a new encoder reading for the given joint.
    */
   unsigned int get_encoder_output(Joint joint)
   {
-    filter_map[joint]->input(analogRead(pin_map[joint]));
-    return filter_map[joint]->output();
+    return analogRead(pin_map[joint]);
   }
 };
 

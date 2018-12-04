@@ -5,6 +5,8 @@
 #ifndef RASM2_UTIL_CIRCULAR_ARRAY_HPP
 #define RASM2_UTIL_CIRCULAR_ARRAY_HPP
 
+#include <type_traits>
+
 /**
  * This class represents a ring buffer of numeric values. It's basically a
  * fixed-size array that will remove the oldest values in order to add new
@@ -113,6 +115,14 @@ public:
   unsigned int capacity() const
   {
     return max_size_;
+  }
+
+  void clear()
+  {
+    for (int i = 0; i < size_; i++)
+      array[i] = 0;
+    next_index = 0;
+    size_ = 0;
   }
 
   /**
