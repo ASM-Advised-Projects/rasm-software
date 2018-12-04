@@ -62,6 +62,7 @@ public:
   /*static void generate_trajectory(Trajectory6D &traj6, const std::vector<ArrD6> &positions,
     const ArrD6 &ivel, const ArrD6 &fvel, const ArrD6 &iacc, const ArrD6 &facc)
   {
+<<<<<<< HEAD
     mav_trajectory_generation::Vertex::Vector vertices;
     const int derivative_to_optimize = mav_trajectory_generation::derivative_order::ACC;
     mav_trajectory_generation::Vertex temp_vertex(6);
@@ -69,11 +70,23 @@ public:
     {
       temp_vertex.
     }
+=======
+    
+>>>>>>> 52e53d094c03381d1dce368e257cd91f9aece8ba
 
     start(dimension), middle(dimension), end(dimension);
 
+<<<<<<< HEAD
     start.makeStartOrEnd(Eigen::Vector3d(0,0,1), derivative_to_optimize);
     vertices.push_back(start);
+=======
+  // returns the true final global pose
+  Pose generate_trajectory(const Pose &initial_global_pose,
+      const Pose &final_global_pose, Trajectory6D &trajectory)
+  {
+    //double theta0 = theta_s;
+    //double thetatf = theta_f;
+>>>>>>> 52e53d094c03381d1dce368e257cd91f9aece8ba
 
     middle.addConstraint(mav_trajectory_generation::derivative_order::POSITION, Eigen::Vector3d(1,2,3));
     vertices.push_back(middle);
