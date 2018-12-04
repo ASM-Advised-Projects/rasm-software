@@ -129,7 +129,7 @@ int main(int argc, char** argv)
 #else
     while (1)
     {
-      usleep(500000);
+      //usleep(500000);
         // Grab a frame
         cv::Mat temp;
         cap >> temp;
@@ -152,7 +152,7 @@ int main(int argc, char** argv)
         // Find the pose of each face
         if (faces.size() > 0)
             {
-            std::cout << "DETECTED " << faces.size() << std::endl << std::endl;
+            //std::cout << "DETECTED " << faces.size() << std::endl << std::endl;
             //track features
             dlib::full_object_detection shape = predictor(cimg, faces[0]);
 
@@ -208,6 +208,13 @@ int main(int argc, char** argv)
             cv::line(temp, reprojectdst[1], reprojectdst[5], cv::Scalar(0, 0, 255));
             cv::line(temp, reprojectdst[2], reprojectdst[6], cv::Scalar(0, 0, 255));
             cv::line(temp, reprojectdst[3], reprojectdst[7], cv::Scalar(0, 0, 255));
+            cv::Point2d my_point = ((reprojectdst[0] + reprojectdst[1] + reprojectdst[2] + reprojectdst[3] + reprojectdst[4] + reprojectdst[5] + reprojectdst[6] + reprojectdst[7])/8);
+            double my_x = my_point.x;
+            double my_y = my_point.y;
+            double x_for_pose = my_x/temp.cols;
+            double y_for_pose = my_y/temp.rows;
+            std::cout << x_for_pose << std::endl;
+            std::cout << y_for_pose << std::endl;
 
             //calc euler angle
             cv::Rodrigues(rotation_vec, rotation_mat);
@@ -215,57 +222,60 @@ int main(int argc, char** argv)
             cv::decomposeProjectionMatrix(pose_mat, out_intrinsics, out_rotation, out_translation, cv::noArray(), cv::noArray(), cv::noArray(), euler_angle);
 
                           //show angle result
-            outtext << "X: " << std::setprecision(3) << euler_angle.at<double>(0);
-            //outtext << "trans_vec 1: " << std::setprecision(3) << translation_vec.at<double>(1, 1);
+            //outtext << "X: " << std::setprecision(3) << euler_angle.at<double>(0);
+            outtext << "Distance from camera in cm: " << std::setprecision(3) << -translation_vec.at<double>(1, 1);
             cv::putText(temp, outtext.str(), cv::Point(50, 40), cv::FONT_HERSHEY_SIMPLEX, 0.75, cv::Scalar(0, 0, 0));
             outtext.str("");
-            //outtext << "trans_vec 2: " << std::setprecision(3) << translation_vec.at<double>(2, 1);
-            outtext << "Y: " << std::setprecision(3) << euler_angle.at<double>(1);
+            outtext << "x position along screen (unitless): " << std::setprecision(3) << x_for_pose;
+            //outtext << "Y: " << std::setprecision(3) << euler_angle.at<double>(1);
             cv::putText(temp, outtext.str(), cv::Point(50, 60), cv::FONT_HERSHEY_SIMPLEX, 0.75, cv::Scalar(0, 0, 0));
             outtext.str("");
-            outtext << "Z: " << std::setprecision(3) << euler_angle.at<double>(2);
-            //outtext << "trans_vec 3: " << std::setprecision(3) << translation_vec.at<double>(3, 1);
+            //outtext << "Z: " << std::setprecision(3) << euler_angle.at<double>(2);
+            outtext << "y position along screen (unitless): " << std::setprecision(3) << y_for_pose;
             cv::putText(temp, outtext.str(), cv::Point(50, 80), cv::FONT_HERSHEY_SIMPLEX, 0.75, cv::Scalar(0, 0, 0));
             outtext.str("");
             //outtext << "rot_vec 1: " << std::setprecision(3) << rotation_vec.at<double>(1, 1);
+            outtext << "Pitch in degrees: " << std::setprecision(3) << euler_angle.at<double>(0);
             cv::putText(temp, outtext.str(), cv::Point(50, 100), cv::FONT_HERSHEY_SIMPLEX, 0.75, cv::Scalar(0, 0, 0));
             outtext.str("");
             //outtext << "rot_vec 2: " << std::setprecision(3) << rotation_vec.at<double>(2, 1);
+            outtext << "Yaw in degrees: " << std::setprecision(3) << euler_angle.at<double>(1);
             cv::putText(temp, outtext.str(), cv::Point(50, 120), cv::FONT_HERSHEY_SIMPLEX, 0.75, cv::Scalar(0, 0, 0));
             outtext.str("");
             //outtext << "rot_vec 3: " << std::setprecision(3) << rotation_vec.at<double>(3, 1);
+            outtext << "Roll in degrees: " << std::setprecision(3) << euler_angle.at<double>(2);
             cv::putText(temp, outtext.str(), cv::Point(50, 140), cv::FONT_HERSHEY_SIMPLEX, 0.75, cv::Scalar(0, 0, 0));
             outtext.str("");
 
 
             // Put the results of the image processing into a file so that it can read and
             // compared
-            results_file << std::endl;
-            results_file_euler << std::endl;
-            results_file_euler << std::endl;
+            //results_file << std::endl;
+            //results_file_euler << std::endl;
+            //results_file_euler << std::endl;
 #ifdef FILES
-            results_file << str << std::endl;
-            results_file_euler << str << std::endl;
+            //results_file << str << std::endl;
+            //results_file_euler << str << std::endl;
 #endif
-           results_file << "trans_vec 1: " << std::setprecision(3) << translation_vec.at<double>(1, 1) << std::endl;
+           //results_file << "trans_vec 1: " << std::setprecision(3) << translation_vec.at<double>(1, 1) << std::endl;
             //std::cout << "trans_vec 1: " << std::setprecision(3) << translation_vec.at<double>(1, 1) << std::endl;
-            results_file << "trans_vec 2: " << std::setprecision(3) << translation_vec.at<double>(2, 1) << std::endl;
+            //results_file << "trans_vec 2: " << std::setprecision(3) << translation_vec.at<double>(2, 1) << std::endl;
             //std::cout << "trans_vec 2: " << std::setprecision(3) << translation_vec.at<double>(2, 1) << std::endl;
-            results_file << "trans_vec 3: " << std::setprecision(3) << translation_vec.at<double>(3, 1) << std::endl;
+            //results_file << "trans_vec 3: " << std::setprecision(3) << translation_vec.at<double>(3, 1) << std::endl;
             //std::cout << "trans_vec 3: " << std::setprecision(3) << translation_vec.at<double>(3, 1) << std::endl;
-            results_file << "rot_vec 1: " << std::setprecision(3) << rotation_vec.at<double>(1, 1) << std::endl;
+            //results_file << "rot_vec 1: " << std::setprecision(3) << rotation_vec.at<double>(1, 1) << std::endl;
             //std::cout << "rot_vec 1: " << std::setprecision(3) << rotation_vec.at<double>(1, 1) << std::endl;
-            results_file << "rot_vec 2: " << std::setprecision(3) << rotation_vec.at<double>(2, 1) << std::endl;
+            //results_file << "rot_vec 2: " << std::setprecision(3) << rotation_vec.at<double>(2, 1) << std::endl;
             //std::cout << "rot_vec 2: " << std::setprecision(3) << rotation_vec.at<double>(2, 1) << std::endl;
-            results_file << "rot_vec 3: " << std::setprecision(3) << rotation_vec.at<double>(3, 1) << std::endl;
+            //results_file << "rot_vec 3: " << std::setprecision(3) << rotation_vec.at<double>(3, 1) << std::endl;
             //std::cout << "rot_vec 3: " << std::setprecision(3) << rotation_vec.at<double>(3, 1) << std::endl;
 
             std::cout << std::endl;
-            results_file_euler << "X: " << std::setprecision(3) << euler_angle.at<double>(0) << " ";
+            //results_file_euler << "X: " << std::setprecision(3) << euler_angle.at<double>(0) << " ";
             std::cout << "X: " << std::setprecision(3) << euler_angle.at<double>(0) << " ";
-            results_file_euler << "Y: " << std::setprecision(3) << euler_angle.at<double>(1) << " ";
+            //results_file_euler << "Y: " << std::setprecision(3) << euler_angle.at<double>(1) << " ";
             std::cout << "Y: " << std::setprecision(3) << euler_angle.at<double>(1) << " ";
-            results_file_euler << "Z: " << std::setprecision(3) << euler_angle.at<double>(2) << " ";
+            //results_file_euler << "Z: " << std::setprecision(3) << euler_angle.at<double>(2) << " ";
             std::cout << "Z: " << std::setprecision(3) << euler_angle.at<double>(2) << " ";
             std::cout << std::endl;
 
