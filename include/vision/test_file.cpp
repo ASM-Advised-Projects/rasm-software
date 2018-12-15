@@ -82,10 +82,18 @@ int main(int argc, char** argv)
     }
     else
     {
-    object_pts.push_back(cv::Point3d(61, 97, 0));
-    object_pts.push_back(cv::Point3d(249, 118, 0));
-    object_pts.push_back(cv::Point3d(249, 70, 0));
-    object_pts.push_back(cv::Point3d(48, 118, 0));
+    object_pts.push_back(cv::Point3d(-6.5, 5.8, 0));
+    object_pts.push_back(cv::Point3d(-2.5,5.8,0));
+    object_pts.push_back(cv::Point3d(0, 2, 0));
+    object_pts.push_back(cv::Point3d(2.5, 5.8, 0));
+    object_pts.push_back(cv::Point3d(6.5, 5.8, 0));
+    object_pts.push_back(cv::Point3d(2.5, 0, 0));
+    object_pts.push_back(cv::Point3d(6.5, -5.8, 0));
+    object_pts.push_back(cv::Point3d(2.5, -5.8, 0));
+    object_pts.push_back(cv::Point3d(0, -2, 0));
+    object_pts.push_back(cv::Point3d(-2.5, -5.8, 0));
+    object_pts.push_back(cv::Point3d(-6.5, -5.8, 0));
+    object_pts.push_back(cv::Point3d(-2.5, 0, 0));
     }
     //2D ref points(image coordinates), referenced from detected facial feature
     std::vector<cv::Point2d> image_pts;
@@ -185,9 +193,17 @@ int main(int argc, char** argv)
             {
             
             image_pts.push_back(cv::Point2d(shape.part(0).x(), shape.part(0).y())); //#57 mouth central bottom corner
+            image_pts.push_back(cv::Point2d(shape.part(1).x(), shape.part(1).y())); 
+            image_pts.push_back(cv::Point2d(shape.part(2).x(), shape.part(2).y())); 
+            image_pts.push_back(cv::Point2d(shape.part(3).x(), shape.part(3).y())); 
+            image_pts.push_back(cv::Point2d(shape.part(4).x(), shape.part(4).y())); 
+            image_pts.push_back(cv::Point2d(shape.part(5).x(), shape.part(5).y())); 
+            image_pts.push_back(cv::Point2d(shape.part(6).x(), shape.part(6).y())); 
             image_pts.push_back(cv::Point2d(shape.part(7).x(), shape.part(7).y()));   //#8 chin corner
             image_pts.push_back(cv::Point2d(shape.part(8).x(), shape.part(8).y()));   //#8 chin corner
             image_pts.push_back(cv::Point2d(shape.part(9).x(), shape.part(9).y()));   //#8 chin corner
+            image_pts.push_back(cv::Point2d(shape.part(10).x(), shape.part(10).y()));  
+            image_pts.push_back(cv::Point2d(shape.part(11).x(), shape.part(11).y()));
             }
 
             //calc pose
