@@ -1,3 +1,5 @@
+
+
 /**
  * This program runs a command interface over Serial1 for interacting with the
  * RASM's electrical and electromechanical systems. More specifically, controlling
@@ -42,12 +44,12 @@
 
 #include <Rasm.hpp>
 
-// function pre-declarations
+// function pre-declarations:
 void set_pwm_frequency();
 void zero_motors();
 
 // settings
-static const int baudrate = 115200;
+static const long int baudrate = 115200;
 static const int serial_timeout = 50;
 static const int override_delay = 100;
 
