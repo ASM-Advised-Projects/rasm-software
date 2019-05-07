@@ -126,12 +126,6 @@ class RasmEncoderSet
 {
 private:
 
-//  typedef struct {
-//	  Joint joint;
-//	  int joint_pin;
-//  } joint_struct;
-
-//  joint_struct pin_map[6];
     int pin_map[6];
 
 
@@ -159,24 +153,6 @@ public:
     pinMode(pins.wristroll, INPUT);
 
     // initialize joint-to-adc pin number map
-//    pin_map[0].joint = BASE;
-//    pin_map[0].joint_pin = pins.base;
-//
-//    pin_map[1].joint = SHOULDER;
-//    pin_map[1].joint_pin = pins.shoulder;
-//
-//    pin_map[2].joint = ELBOW;
-//    pin_map[2].joint_pin = pins.elbow;
-//
-//    pin_map[3].joint = WRIST_YAW;
-//    pin_map[3].joint_pin = pins.wristyaw;
-//
-//    pin_map[4].joint = WRIST_PITCH;
-//    pin_map[4].joint_pin = pins.wristpitch;
-//
-//    pin_map[5].joint = WRIST_ROLL;
-//    pin_map[5].joint_pin = pins.wristroll;
-//
     pin_map[0] = pins.base;
 
     pin_map[1] = pins.shoulder;
