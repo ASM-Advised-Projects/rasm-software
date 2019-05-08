@@ -154,7 +154,7 @@ void loop()
   if (!Serial.available())
     return;
 
-  Serial.println("received");
+  //Serial.println("received");
 
   // pre-declarations to avoid scoping problems accross switch cases
   char buf[5];
