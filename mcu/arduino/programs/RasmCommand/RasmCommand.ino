@@ -49,7 +49,6 @@ void set_pwm_frequency();
 void zero_motors();
 
 // settings
-static const long int baudrate = 115200;
 static const int serial_timeout = 50;
 static const int override_delay = 100;
 
@@ -64,8 +63,7 @@ void setup()
 {
   Serial.begin(9600);
   // initialize serial port
-  Serial3.begin(baudrate);
-  Serial3.setTimeout(serial_timeout);
+  Serial.setTimeout(serial_timeout);
 
   // configure pwm frequencies for certain motor driver pins
   set_pwm_frequency();
@@ -153,7 +151,7 @@ void loop()
     zero_motors();
 
   // continue only if serial data is available
-  if (!Serial3.available())
+  if (!Serial.available())
     return;
 
   Serial.println("received");
@@ -163,22 +161,22 @@ void loop()
   Joint joint;
   int dutycycle, enc_val, batt_val;
 
-  char header_char = Serial3.read();
+  char header_char = Serial.read();
   switch (header_char)
   {
     // ping
     // receive: p
     // transmit: a
     case 'p':
-      Serial3.write('a');
-      Serial3.flush();
+      Serial.write('a');
+      Serial.flush();
       break;
 
     // set motor speed
     // receive: m[0-5][frz][0-9][0-9] (big-endian)
     // transmit: none
     case 'm':
-      if (Serial3.readBytes(buf, 4) < 4)
+      if (Serial.readBytes(buf, 4) < 4)
         break;
 
       joint = (Joint)(buf[0]-'0');
@@ -201,17 +199,17 @@ void loop()
     // receive: e[0-5]
     // transmit: [0-9][0-9][0-9][0-9] (little-endian)
     case 'e':
-      if (Serial3.readBytes(buf, 1) < 1)
+      if (Serial.readBytes(buf, 1) < 1)
         break;
 
       joint = (Joint)(buf[0]-'0');
       enc_val = encoders->get_encoder_output(joint);
       for (int i = 0; i < 4; i++)
       {
-        Serial3.write((char)((enc_val%10) + '0'));
+        Serial.write((char)((enc_val%10) + '0'));
         enc_val /= 10;
       }
-      Serial3.flush();
+      Serial.flush();
       break;
 
     // read battery
@@ -219,10 +217,10 @@ void loop()
       batt_val = analogRead(battery_pin);
       for (int i = 0; i < 4; i++)
       {
-        Serial3.write((char)((batt_val%10) + '0'));
+        Serial.write((char)((batt_val%10) + '0'));
         batt_val /= 10;
       }
-      Serial3.flush();
+      Serial.flush();
       break;
 
     default:
