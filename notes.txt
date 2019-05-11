@@ -1,0 +1,12 @@
+-------------------------------------
+This note was left on the RASM covers:
+New encoders
+Green - Vout
+red - Vin
+Blue - GND
+-------------------------------------
+
+
+
+Resistance across the soldered encoder board: 34 Ohms
+Resistance across the board with the LED (when the encoder board is disconnected): 75 kiloohms
