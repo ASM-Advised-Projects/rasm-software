@@ -10,3 +10,6 @@ Blue - GND
 
 Resistance across the soldered encoder board: 34 Ohms
 Resistance across the board with the LED (when the encoder board is disconnected): 75 kiloohms
+
+
+The pitch motor has a cracked housing.
